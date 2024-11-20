@@ -6,7 +6,7 @@ const mongoDB = async() => {
     mongoose.connect(mongoURI, {useNewUrlParser: true, useUnifiedTopology: true},async (err, result) => {
     if(err) console.log('Some Error -- ', err)
         else { 
-             const fetch_data = await mongoose.connection.db.collection("a");
+             const fetch_data = await mongoose.connection.db.collection("users");
     console.log("connect");
         }
     })

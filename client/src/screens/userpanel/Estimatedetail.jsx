@@ -72,7 +72,7 @@ export default function Estimatedetail() {
     try {
       const userid = localStorage.getItem("userid");
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://immaculate.onrender.com/api/getestimatedata/${estimateid}`, {
+      const response = await fetch(`http://localhost:3001/api/getestimatedata/${estimateid}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -116,7 +116,7 @@ export default function Estimatedetail() {
     }
   
     try {
-      const response = await fetch(`https://immaculate.onrender.com/api/checkcustomersignature/${encodeURIComponent(estimateIdpass)}`);
+      const response = await fetch(`http://localhost:3001/api/checkcustomersignature/${encodeURIComponent(estimateIdpass)}`);
       const json = await response.json();
       console.log('Customer signature response:', json);
       if (response.ok && json.hasSignature) {
@@ -133,7 +133,7 @@ export default function Estimatedetail() {
     try {
       const ownerId = localStorage.getItem('userid');
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://immaculate.onrender.com/api/getownerdata/${ownerId}`, {
+      const response = await fetch(`http://localhost:3001/api/getownerdata/${ownerId}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -158,7 +158,7 @@ export default function Estimatedetail() {
     try {
       const userid = localStorage.getItem("userid");
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://immaculate.onrender.com/api/gettransactiondata/${estimateid}`, {
+      const response = await fetch(`http://localhost:3001/api/gettransactiondata/${estimateid}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -195,7 +195,7 @@ export default function Estimatedetail() {
     try {
       const userid = localStorage.getItem("userid");
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://immaculate.onrender.com/api/getsignupdata/${userid}`, {
+      const response = await fetch(`http://localhost:3001/api/getsignupdata/${userid}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -564,7 +564,7 @@ thead{
       // If a signature exists, delete it
       if (signatureData) {
         const authToken = localStorage.getItem('authToken');
-        const deleteSignatureResponse = await fetch(`https://immaculate.onrender.com/api/delcustomersignature/${encodeURIComponent(estimateIdpass)}`, {
+        const deleteSignatureResponse = await fetch(`http://localhost:3001/api/delcustomersignature/${encodeURIComponent(estimateIdpass)}`, {
           method: 'DELETE',
           headers: {
             'Authorization': authToken,
@@ -582,7 +582,7 @@ thead{
   
       // Proceed with deleting the estimate data
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://immaculate.onrender.com/api/delestimatedata/${estimateid}`, {
+      const response = await fetch(`http://localhost:3001/api/delestimatedata/${estimateid}`, {
         method: 'GET',
         headers: {
           'Authorization': authToken,
@@ -614,7 +614,7 @@ thead{
   // const handleRemove = async (estimateid) => {
   //   try {
   //     const authToken = localStorage.getItem('authToken');
-  //     const response = await fetch(`https://immaculate.onrender.com/api/delestimatedata/${estimateid}`, {
+  //     const response = await fetch(`http://localhost:3001/api/delestimatedata/${estimateid}`, {
   //       method: 'GET',
   //       headers: {
   //         'Authorization': authToken,
@@ -668,7 +668,7 @@ thead{
     // console.log(userEmail, "userEmail ============");
     try {
       const finalContent = content.trim() || ``; // If content is empty, use default value
-      const response = await fetch('https://immaculate.onrender.com/api/send-estimate-email', {
+      const response = await fetch('http://localhost:3001/api/send-estimate-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -697,7 +697,7 @@ thead{
         setShowEmailAlert(true);
         // Update the database with emailsent status
         const updatedData = { ...estimateData,status:'Send', emailsent: 'yes' }; // Update emailsent status
-        await fetch(`https://immaculate.onrender.com/api/updateestimateData/${estimateid}`, {
+        await fetch(`http://localhost:3001/api/updateestimateData/${estimateid}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -707,12 +707,12 @@ thead{
         });
 
         // Check if customer signature already exists
-      const checkResponse = await fetch(`https://immaculate.onrender.com/api/checkcustomersignature/${encodeURIComponent(estimateData._id)}`);
+      const checkResponse = await fetch(`http://localhost:3001/api/checkcustomersignature/${encodeURIComponent(estimateData._id)}`);
       const checkJson = await checkResponse.json();
 
       if (checkResponse.ok && !checkJson.hasSignature) {
         // Create new customer signature only if it doesn't exist
-        await fetch('https://immaculate.onrender.com/api/customersignature', {
+        await fetch('http://localhost:3001/api/customersignature', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

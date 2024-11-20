@@ -1354,6 +1354,8 @@ router.post('/login', [
     try {
         // Check if it's a user
         const user = await User.findOne({ email });
+        console.log(user,"user");
+        
 
         if (user) {
             const pwdCompare = await bcrypt.compare(password, user.password);

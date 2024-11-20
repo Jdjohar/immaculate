@@ -27,7 +27,7 @@ export default function Teamhistory() {
         try {
             const teamid = localStorage.getItem('userid');
             const authToken = localStorage.getItem('authToken');
-          const response = await fetch(`https://immaculate.onrender.com/api/userEntries/${teamid}`, {
+          const response = await fetch(`http://localhost:3001/api/userEntries/${teamid}`, {
             headers: {
               'Authorization': authToken,
             }
