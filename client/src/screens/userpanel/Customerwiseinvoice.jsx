@@ -33,7 +33,7 @@ function Customerwiseinvoice() {
     try {
       const authToken = localStorage.getItem('authToken');
     //   const customerEmail = localStorage.getItem('customerEmail');
-      const response = await fetch(`http://localhost:3001/api/customerwisedata/${customerEmail}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/customerwisedata/${customerEmail}`, {
         headers: {
           'Authorization': authToken,
         }

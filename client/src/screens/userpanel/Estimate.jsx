@@ -34,7 +34,7 @@ export default function Estimate() {
     try {
       const userid = localStorage.getItem("userid");
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/estimatedata/${userid}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/estimatedata/${userid}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -80,7 +80,7 @@ export default function Estimate() {
     console.log(estimateid);
     try {
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/converttoinvoice/${estimateid}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/converttoinvoice/${estimateid}`, {
         method: 'POST',
         headers: {
           'Authorization': authToken,

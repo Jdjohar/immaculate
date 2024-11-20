@@ -60,7 +60,7 @@ export default function Invoice() {
     try {
       const userid = localStorage.getItem("userid");
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/invoicedata/${userid}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/invoicedata/${userid}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -80,7 +80,7 @@ export default function Invoice() {
           setinvoices(json);
 
           const transactionPromises = json.map(async (invoice) => {
-            const response = await fetch(`http://localhost:3001/api/gettransactiondata/${invoice._id}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/gettransactiondata/${invoice._id}`, {
               headers: {
                 'Authorization': authToken,
               }

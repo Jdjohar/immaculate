@@ -451,7 +451,7 @@ thead{
     try {
       // const userid = localStorage.getItem("userid");
       // const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/getemailestimatedata/${estimateId}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/getemailestimatedata/${estimateId}`, {
         // headers: {
         //   'Authorization': authToken,
         // }
@@ -496,7 +496,7 @@ thead{
       const userId =  estimateData.userid;  // localStorage.getItem("userid");
       // const userid =   localStorage.getItem("userid");
       // const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/getemailsignupdata/${userId}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/getemailsignupdata/${userId}`, {
         // headers: {
         //   'Authorization': authToken,
         // }
@@ -525,7 +525,7 @@ thead{
     try {
       // const userid = localStorage.getItem("userid");
       // const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/getemailtransactiondata/${estimateId}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/getemailtransactiondata/${estimateId}`, {
         // headers: {
         //   'Authorization': authToken,
         // }
@@ -562,7 +562,7 @@ thead{
       const ownerId = estimateData.userid;
       // const ownerId = localStorage.getItem('userid');
       // const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/getemailownerdata/${ownerId}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/getemailownerdata/${ownerId}`, {
         // headers: {
         //   'Authorization': authToken,
         // }
@@ -591,7 +591,7 @@ thead{
     }
   
     try {
-      const response = await fetch(`http://localhost:3001/api/checkcustomersignature/${encodeURIComponent(estimateIdpass)}`);
+      const response = await fetch(`https://immaculate.onrender.com/api/checkcustomersignature/${encodeURIComponent(estimateIdpass)}`);
       const json = await response.json();
       console.log('Customer signature response:', json);
       console.log('Customer signature response:', response.ok);
@@ -611,12 +611,12 @@ thead{
 
     try {
       // Check if customer signature already exists
-      const checkResponse = await fetch(`http://localhost:3001/api/checkcustomersignature/${encodeURIComponent(estimateData._id)}`);
+      const checkResponse = await fetch(`https://immaculate.onrender.com/api/checkcustomersignature/${encodeURIComponent(estimateData._id)}`);
       const checkJson = await checkResponse.json();
   
       if (checkJson.hasSignature) {
         // Update the existing customer signature
-        const updateResponse = await fetch(`http://localhost:3001/api/updatecustomersignature/${encodeURIComponent(estimateData._id)}`, {
+        const updateResponse = await fetch(`https://immaculate.onrender.com/api/updatecustomersignature/${encodeURIComponent(estimateData._id)}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -652,12 +652,12 @@ thead{
   
     try {
       // Check if customer signature already exists
-      const checkResponse = await fetch(`http://localhost:3001/api/checkcustomersignature/${encodeURIComponent(estimateData._id)}`);
+      const checkResponse = await fetch(`https://immaculate.onrender.com/api/checkcustomersignature/${encodeURIComponent(estimateData._id)}`);
       const checkJson = await checkResponse.json();
   
       // if (checkJson.ok) {
         // Update the existing customer signature
-        const updateResponse = await fetch(`http://localhost:3001/api/updatecustomersignature/${encodeURIComponent(estimateData._id)}`, {
+        const updateResponse = await fetch(`https://immaculate.onrender.com/api/updatecustomersignature/${encodeURIComponent(estimateData._id)}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -751,7 +751,7 @@ console.log(offset);
       }
 
       // Send email request to backend
-      const emailResponse = await fetch('http://localhost:3001/api/send-estimate-signed-email', {
+      const emailResponse = await fetch('https://immaculate.onrender.com/api/send-estimate-signed-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -771,7 +771,7 @@ console.log(offset);
       }
       
       console.log('Email sent successfully');// Update customer signature
-      const updateResponse = await fetch(`http://localhost:3001/api/updatecustomersignature/${encodeURIComponent(estimateData._id)}`, {
+      const updateResponse = await fetch(`https://immaculate.onrender.com/api/updatecustomersignature/${encodeURIComponent(estimateData._id)}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
