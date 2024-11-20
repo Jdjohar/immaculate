@@ -83,17 +83,7 @@ export default function SignUp() {
         
         companyFormData.append('companyImage', imgurl);
         console.log("imgurl: ", companyFormData);
-
-
-        // const companyUploadResponse = await fetch("http://localhost:3001/api/upload-image", {
-        // method: 'POST',
-        // body: companyFormData,
-        // });
-        // const uploadedCompanyImage = await companyUploadResponse.json();
-        // console.log('Uploaded company image:', uploadedCompanyImage);
-        // const companyImageUrl = uploadedCompanyImage.companyImageUrl || '';
-    
-        const response = await fetch("http://localhost:3001/api/createuser", {
+        const response = await fetch("https://immaculate.onrender.com/api/createuser", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

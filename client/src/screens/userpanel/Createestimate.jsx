@@ -91,7 +91,20 @@ export default function Createestimate() {
     });
 
     // const [editorData, setEditorData] = useState("<p></p>");
-    const [editorData, setEditorData] = useState(``);
+    const [editorData, setEditorData] = useState(`
+        <p><b>Notes:</b></p>
+        <br>
+        <p><b>Terms:</b></p>
+        <p>Quotes are valid for 30 days from the date of quotation prepared.</p>
+        <p>Basic Selection</p>
+        <p>(Extra charges may apply on upgrades)</p>
+        
+        
+        <br>
+        <p><b>Payments to be made as follows:</b></p>
+        <p><b> Advance</b></p>
+<p><b>After Finishing</b></p>
+`);
     const [noteimageUrl, setnoteImageUrl] = useState(''); 
     const [alertMessage, setAlertMessage] = useState('');
     const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false);
@@ -149,7 +162,7 @@ export default function Createestimate() {
         if (event.target.checked) {
             try {
                 const ownerId = localStorage.getItem('userid');
-                const response = await fetch(`http://localhost:3001/api/check-signature/${ownerId}`);
+                const response = await fetch(`https://immaculate.onrender.com/api/check-signature/${ownerId}`);
                 const data = await response.json();
                 setHasSignature(data.hasSignature);
 
@@ -187,7 +200,7 @@ export default function Createestimate() {
             const ownerId = localStorage.getItem('userid');
             const email = localStorage.getItem('userEmail');
             const companyname = localStorage.getItem('companyname');
-            await fetch('http://localhost:3001/api/ownersignature', {
+            await fetch('https://immaculate.onrender.com/api/ownersignature', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -209,7 +222,7 @@ export default function Createestimate() {
         try {
             const userid = localStorage.getItem('userid');
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/lastEstimateNumber/${userid}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/lastEstimateNumber/${userid}`, {
                 headers: {
                     'Authorization': authToken,
                 }
@@ -246,7 +259,7 @@ export default function Createestimate() {
         try {
             const userid = localStorage.getItem("userid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/customers/${userid}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/customers/${userid}`, {
                 headers: {
                     'Authorization': authToken,
                 }
@@ -276,7 +289,7 @@ export default function Createestimate() {
         try {
           const userid = localStorage.getItem("userid");
           const authToken = localStorage.getItem('authToken');
-          const response = await fetch(`http://localhost:3001/api/getsignupdata/${userid}`, {
+          const response = await fetch(`https://immaculate.onrender.com/api/getsignupdata/${userid}`, {
             headers: {
               'Authorization': authToken,
             }
@@ -308,7 +321,7 @@ export default function Createestimate() {
         try {
             const userid = localStorage.getItem("userid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/itemdata/${userid}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/itemdata/${userid}`, {
                 headers: {
                     'Authorization': authToken,
                 }
@@ -625,7 +638,7 @@ export default function Createestimate() {
             console.log(data,"Data sdsdfsdsfsdf");
 
             // Sending estimate data to the backend API
-            const response = await fetch('http://localhost:3001/api/savecreateestimate', {
+            const response = await fetch('https://immaculate.onrender.com/api/savecreateestimate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -734,7 +747,7 @@ export default function Createestimate() {
         e.preventDefault();
         let userid = localStorage.getItem('userid');
         const authToken = localStorage.getItem('authToken');
-        const response = await fetch('http://localhost:3001/api/addcustomer', {
+        const response = await fetch('https://immaculate.onrender.com/api/addcustomer', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

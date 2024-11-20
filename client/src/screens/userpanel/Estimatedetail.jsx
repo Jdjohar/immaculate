@@ -10,7 +10,7 @@ import html2pdf from 'html2pdf.js';
 import CurrencySign from '../../components/CurrencySign ';
 import Alertauthtoken from '../../components/Alertauthtoken';
 // import { PDFViewer, pdf, PDFDownloadLink, Document, Image, Page, Text, Font, View, StyleSheet } from '@react-pdf/renderer';   
-
+import sign from '../../../public/signs.png'
 export default function Estimatedetail() {
   const [loading, setloading] = useState(true);
   const [signupdata, setsignupdata] = useState([]);
@@ -72,7 +72,7 @@ export default function Estimatedetail() {
     try {
       const userid = localStorage.getItem("userid");
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/getestimatedata/${estimateid}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/getestimatedata/${estimateid}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -116,7 +116,7 @@ export default function Estimatedetail() {
     }
   
     try {
-      const response = await fetch(`http://localhost:3001/api/checkcustomersignature/${encodeURIComponent(estimateIdpass)}`);
+      const response = await fetch(`https://immaculate.onrender.com/api/checkcustomersignature/${encodeURIComponent(estimateIdpass)}`);
       const json = await response.json();
       console.log('Customer signature response:', json);
       if (response.ok && json.hasSignature) {
@@ -133,7 +133,7 @@ export default function Estimatedetail() {
     try {
       const ownerId = localStorage.getItem('userid');
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/getownerdata/${ownerId}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/getownerdata/${ownerId}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -158,7 +158,7 @@ export default function Estimatedetail() {
     try {
       const userid = localStorage.getItem("userid");
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/gettransactiondata/${estimateid}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/gettransactiondata/${estimateid}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -195,7 +195,7 @@ export default function Estimatedetail() {
     try {
       const userid = localStorage.getItem("userid");
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/getsignupdata/${userid}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/getsignupdata/${userid}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -564,7 +564,7 @@ thead{
       // If a signature exists, delete it
       if (signatureData) {
         const authToken = localStorage.getItem('authToken');
-        const deleteSignatureResponse = await fetch(`http://localhost:3001/api/delcustomersignature/${encodeURIComponent(estimateIdpass)}`, {
+        const deleteSignatureResponse = await fetch(`https://immaculate.onrender.com/api/delcustomersignature/${encodeURIComponent(estimateIdpass)}`, {
           method: 'DELETE',
           headers: {
             'Authorization': authToken,
@@ -582,7 +582,7 @@ thead{
   
       // Proceed with deleting the estimate data
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/delestimatedata/${estimateid}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/delestimatedata/${estimateid}`, {
         method: 'GET',
         headers: {
           'Authorization': authToken,
@@ -614,7 +614,7 @@ thead{
   // const handleRemove = async (estimateid) => {
   //   try {
   //     const authToken = localStorage.getItem('authToken');
-  //     const response = await fetch(`http://localhost:3001/api/delestimatedata/${estimateid}`, {
+  //     const response = await fetch(`https://immaculate.onrender.com/api/delestimatedata/${estimateid}`, {
   //       method: 'GET',
   //       headers: {
   //         'Authorization': authToken,
@@ -668,7 +668,7 @@ thead{
     // console.log(userEmail, "userEmail ============");
     try {
       const finalContent = content.trim() || ``; // If content is empty, use default value
-      const response = await fetch('http://localhost:3001/api/send-estimate-email', {
+      const response = await fetch('https://immaculate.onrender.com/api/send-estimate-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -697,7 +697,7 @@ thead{
         setShowEmailAlert(true);
         // Update the database with emailsent status
         const updatedData = { ...estimateData,status:'Send', emailsent: 'yes' }; // Update emailsent status
-        await fetch(`http://localhost:3001/api/updateestimateData/${estimateid}`, {
+        await fetch(`https://immaculate.onrender.com/api/updateestimateData/${estimateid}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -707,12 +707,12 @@ thead{
         });
 
         // Check if customer signature already exists
-      const checkResponse = await fetch(`http://localhost:3001/api/checkcustomersignature/${encodeURIComponent(estimateData._id)}`);
+      const checkResponse = await fetch(`https://immaculate.onrender.com/api/checkcustomersignature/${encodeURIComponent(estimateData._id)}`);
       const checkJson = await checkResponse.json();
 
       if (checkResponse.ok && !checkJson.hasSignature) {
         // Create new customer signature only if it doesn't exist
-        await fetch('http://localhost:3001/api/customersignature', {
+        await fetch('https://immaculate.onrender.com/api/customersignature', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -880,22 +880,26 @@ thead{
                                 <address className='m-t-5 m-b-5'>
                                   <div className='mb-2'>
                                     <div className=''>{signupdata.address} </div>
-                                      {signupdata.city ? JSON.parse(signupdata.city).name+',' : ' '}
-                                      {signupdata.state ? JSON.parse(signupdata.state).name : ' '}
+                                    {signupdata.city ? JSON.parse(signupdata.city).name + ',' : ' '}
+                                    {signupdata.state ? JSON.parse(signupdata.state).name : ' '}
+                                    
+                                    <div className=''>{signupdata.state ? JSON.parse(signupdata.country).name : ' '}</div>
+                                    {/* <div className=''>{JSON.parse(signupdata.city).name}, {JSON.parse(signupdata.state).name}</div>
+                                    <div className=''>{JSON.parse(signupdata.country).emoji}</div> */}
                                   </div>
-                                  
-                                  <div>{signupdata.email}</div>
-                                  <div>{signupdata.website} </div>
-                                  {/* <div>
-                                    {signupdata.gstNumber == ''
-                                    ?
-                                  ""
-                                  :
-                                  `${signupdata.TaxName } ${signupdata.gstNumber}`
-                                  }
 
-                                    </div> */}
-                                  {/* <div>{signupdata.TaxName}: {signupdata.gstNumber}</div> */}
+                                  <div ><a className='text-decoration-none' href={`mailto:${signupdata.email}`}>{signupdata.email}</a></div>
+                                  <div ><a className='text-decoration-none' href={`${signupdata.website}`}>{signupdata.website}</a></div>
+                                  <div>
+                                    {signupdata.gstNumber == ''
+                                      ?
+                                      ""
+                                      :
+                                      `${signupdata.TaxName} ${signupdata.gstNumber}`
+                                    }
+
+
+                                  </div>
 
                                 </address>
                               </div>
@@ -906,7 +910,7 @@ thead{
                           <div className='invoice-header'>
   <div className='row'>
     <div className='invoice-to col-sm-12 col-md-6'>
-      <strong>Bill To</strong> 
+      <strong>Prepared For</strong> 
       {console.log(estimateData, "estimateData -======-==--==---===--")}
       <div className='text-inverse mb-1'>
         {estimateData.customername}
@@ -1053,7 +1057,7 @@ thead{
 
                             </div>
                             <div className='invoice-price-right'>
-                              <small>Amount Due</small>
+                              <small>Estimate Total</small>
                               <span class="f-w-600 mt-3"><CurrencySign />{roundOff(estimateData.total - transactions.reduce((total, payment) => total + payment.paidamount, 0))}</span>
                             </div>
 
@@ -1105,8 +1109,15 @@ thead{
 
                           <div className='invoice-body invoice-body-text'>
                             <div className='mt-1'>
-                              <span>{estimateData.information == '' ? '' : 'Note:'}</span> 
+                              <div className='row'>
+                                <div className='col'>
                               <div className='information-content' dangerouslySetInnerHTML={{ __html: estimateData.information }} />
+
+                                </div>
+                                <div className='col'>
+                                  <img src={sign} className='w-100' />
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
