@@ -549,12 +549,15 @@ export default function Invoicedetail() {
 
       if (response.status === 401) {
         const json = await response.json();
+        alert("Something Went Wrong!")
         setAlertMessage(json.message);
         setloading(false);
         window.scrollTo(0, 0);
         return; // Stop further execution
       } else {
         const json = await response.json();
+        console.log(json,"Owner Data");
+        
         setOwnerData(json[0]); // Save all owner data
       }
     } catch (error) {

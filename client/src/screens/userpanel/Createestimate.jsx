@@ -785,7 +785,7 @@ export default function Createestimate() {
             const json = await response.json();
             console.log(json);
 
-            if (json.Success) {
+            if (json.success) {
                 setCredentials({
                     name: '',
                     email: '',
