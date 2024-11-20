@@ -19,7 +19,7 @@ app.use((req, res, next) => {
   // res.setHeader("Access-Control-Allow-Origin", "https://restro-wbno.vercel.app");
   // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
   const corsWhitelist = [
-    "immaculate-beta.vercel.app",
+    "https://immaculate-beta.vercel.app",
     'http://localhost:5173'
 ];
 if (corsWhitelist.indexOf(req.headers.origin) !== -1) {
