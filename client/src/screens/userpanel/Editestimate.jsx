@@ -27,10 +27,10 @@ class MyCustomUploadAdapter {
                 const formData = new FormData();
                 formData.append('file', file);
                 formData.append('upload_preset', 'employeeApp'); // Replace with your Cloudinary upload preset
-                formData.append('cloud_name', 'dxwge5g8f'); // Replace with your Cloudinary cloud name
+                formData.append('cloud_name', 'dcldwaiyq'); // Replace with your Cloudinary cloud name
 
                 // Upload image to Cloudinary
-                fetch('https://api.cloudinary.com/v1_1/dxwge5g8f/image/upload', {
+                fetch('https://api.cloudinary.com/v1_1/dcldwaiyq/image/upload', {
                     method: 'POST',
                     body: formData,
                 })
@@ -107,7 +107,7 @@ export default function Editestimate() {
     const fetchSignatureStatus = async () => {
         try {
             const ownerId = localStorage.getItem('userid');
-            const response = await fetch(`http://localhost:3001/api/check-signature/${ownerId}`);
+            const response = await fetch(`https://immaculate.onrender.com/api/check-signature/${ownerId}`);
             const data = await response.json();
             setHasSignature(data.hasSignature);
             setIsAddSignatureSwitchOn(data.hasSignature); 
@@ -121,7 +121,7 @@ export default function Editestimate() {
         if (event.target.checked) {
             try {
                 const ownerId = localStorage.getItem('userid');
-                const response = await fetch(`http://localhost:3001/api/check-signature/${ownerId}`);
+                const response = await fetch(`https://immaculate.onrender.com/api/check-signature/${ownerId}`);
                 const data = await response.json();
                 setHasSignature(data.hasSignature);
 
@@ -159,7 +159,7 @@ export default function Editestimate() {
             const ownerId = localStorage.getItem('userid');
             const email = localStorage.getItem('userEmail');
             const companyname = localStorage.getItem('companyname');
-            await fetch('http://localhost:3001/api/ownersignature', {
+            await fetch('https://immaculate.onrender.com/api/ownersignature', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -180,7 +180,7 @@ export default function Editestimate() {
     const fetchdata = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/geteditestimateData/${estimateid}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/geteditestimateData/${estimateid}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -221,7 +221,7 @@ export default function Editestimate() {
         try {
             const userid =  localStorage.getItem("userid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/customers/${userid}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/customers/${userid}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -271,7 +271,7 @@ export default function Editestimate() {
         try {
             const userid =  localStorage.getItem("userid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/itemdata/${userid}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/itemdata/${userid}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -312,7 +312,7 @@ export default function Editestimate() {
             };
             const authToken = localStorage.getItem('authToken');
     
-            const response = await fetch(`http://localhost:3001/api/updateestimateData/${estimateid}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/updateestimateData/${estimateid}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -442,7 +442,7 @@ export default function Editestimate() {
             }
     
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/delestimateitem/${estimateData._id}/${itemId}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/delestimateitem/${estimateData._id}/${itemId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': authToken,

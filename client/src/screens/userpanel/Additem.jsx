@@ -35,7 +35,7 @@ export default function Additem() {
     e.preventDefault();
     let userid = localStorage.getItem('userid');
     const authToken = localStorage.getItem('authToken');
-    const response = await fetch('http://localhost:3001/api/additem', {
+    const response = await fetch('https://immaculate.onrender.com/api/additem', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

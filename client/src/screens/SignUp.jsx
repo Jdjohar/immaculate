@@ -46,11 +46,11 @@ export default function SignUp() {
       
       data.append("file", addedCompanyPhotos);
         data.append("upload_preset", "employeeApp");
-        data.append("cloud_name", "dxwge5g8f");
+        data.append("cloud_name", "dcldwaiyq");
       
         try {
           const cloudinaryResponse = await fetch(
-            "https://api.cloudinary.com/v1_1/dxwge5g8f/image/upload",
+            "https://api.cloudinary.com/v1_1/dcldwaiyq/image/upload",
             {
               method: "post",
               body: data,
@@ -85,7 +85,7 @@ export default function SignUp() {
         console.log("imgurl: ", companyFormData);
 
 
-        // const companyUploadResponse = await fetch("http://localhost:3001/api/upload-image", {
+        // const companyUploadResponse = await fetch("https://immaculate.onrender.com/api/upload-image", {
         // method: 'POST',
         // body: companyFormData,
         // });
@@ -93,7 +93,7 @@ export default function SignUp() {
         // console.log('Uploaded company image:', uploadedCompanyImage);
         // const companyImageUrl = uploadedCompanyImage.companyImageUrl || '';
     
-        const response = await fetch("http://localhost:3001/api/createuser", {
+        const response = await fetch("https://immaculate.onrender.com/api/createuser", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

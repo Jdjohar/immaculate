@@ -44,11 +44,11 @@ export default function Imageupload() {
       
       data.append("file", imageFile);
         data.append("upload_preset", "employeeApp");
-        data.append("cloud_name", "dxwge5g8f");
+        data.append("cloud_name", "dcldwaiyq");
       
         try {
           const cloudinaryResponse = await fetch(
-            "https://api.cloudinary.com/v1_1/dxwge5g8f/image/upload",
+            "https://api.cloudinary.com/v1_1/dcldwaiyq/image/upload",
             {
               method: "post",
               body: data,
@@ -74,7 +74,7 @@ export default function Imageupload() {
         try {
             const userid =  localStorage.getItem("userid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/getsignupdata/${userid}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/getsignupdata/${userid}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -127,7 +127,7 @@ export default function Imageupload() {
                 }
             });
     
-            const response = await fetch(`http://localhost:3001/api/updatesignupdatadata/${userid}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/updatesignupdatadata/${userid}`, {
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -162,7 +162,7 @@ export default function Imageupload() {
     //         const updatedsignupdata = {
     //             ...signupdata
     //         };
-    //         const response = await fetch(`http://localhost:3001/api/updatesignupdatadata/${userid}`, {
+    //         const response = await fetch(`https://immaculate.onrender.com/api/updatesignupdatadata/${userid}`, {
     //             method: 'POST',
     //             headers: {
     //                 'Content-Type': 'application/json'
