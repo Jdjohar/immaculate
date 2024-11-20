@@ -25,9 +25,9 @@ export default function ExpenseEntries() {
     const [alertMessage, setAlertMessage] = useState('');
     const [alertMessageShow, setAlertMessageShow] = useState(false);
 
-    const apiURL = 'https://immaculate.onrender.com/api/expense';
-    const expenseTypeURL = 'https://immaculate.onrender.com/api/expensetype';
-    const vendorURL = 'https://immaculate.onrender.com/api/vendor';
+    const apiURL = 'http://localhost:3001/api/expense';
+    const expenseTypeURL = 'http://localhost:3001/api/expensetype';
+    const vendorURL = 'http://localhost:3001/api/vendor';
     const [showModal, setShowModal] = useState(false); // State to manage modal visibility
     const [fileName, setFileName] = useState('');
     const [isUploading, setIsUploading] = useState(false);
@@ -80,7 +80,7 @@ export default function ExpenseEntries() {
         try {
             const userid = localStorage.getItem("userid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://immaculate.onrender.com/api/invoicedata/${userid}`, {
+            const response = await fetch(`http://localhost:3001/api/invoicedata/${userid}`, {
                 headers: {
                     'Authorization': authToken,
                 }

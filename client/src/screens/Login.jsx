@@ -3,6 +3,7 @@ import {Link, useNavigate} from 'react-router-dom'
 import { ColorRing } from  'react-loader-spinner'
 // import jwt_decode from "jwt-decode";
 import './Login.css'
+import logo from '../../public/logo.png'
 
 export default function Login() {
   const [credentials, setCredentials] = useState({email:"", password:""})
@@ -19,49 +20,7 @@ export default function Login() {
       navigate("/userpanel/Userdashboard");
     }
   })
-//   const handleSubmit = async(e) => {
-//     e.preventDefault();
-//     setloginbtnloader(true);
-//     const response = await fetch("https://immaculate.onrender.com/api/login",{
-//         method:'POST',
-//         headers: {
-//             'Content-Type':'application/json'
-//         },
-//         body:JSON.stringify({email:credentials.email,password:credentials.password})
-//     });
 
-//     const json = await response.json();
-
-//     console.log(json, 'sd');
-
-//     if(!json.Success){
-//         // alert('Enter vaild  Credentails');
-//         setmessage(true);
-//         setAlertShow(json.errors)
-//         setloginbtnloader(false);
-
-//     }
-//     if(json.Success){
-//       localStorage.setItem("authToken", json.authToken)
-//       localStorage.setItem("userid", json.userid)
-//       localStorage.setItem("username", json.username)
-//       localStorage.setItem("userEmail", credentials.email)
-//       localStorage.setItem("isTeamMember", json.isTeamMember)
-//       localStorage.setItem("startTime", json.startTime)
-//       console.log(localStorage.getItem("authToken"), "Data")
-//         // navigate("/userpanel/Userdashboard");
-//         if (json.isTeamMember == true) {
-//           // Redirect to the team member dashboard
-//           navigate('/Teammemberpanel/Teammenberdashboard');
-//         } else if (json.isTeamMember == false){
-//           // Redirect to the user dashboard
-//           navigate('/userpanel/Userdashboard');
-//         }
-//     }
-//     else{
-//       alert("Login with correct details")
-//     }
-// }
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -69,7 +28,7 @@ const handleSubmit = async (e) => {
 
   try {
     const sanitizedEmail = credentials.email.toLowerCase().replace(/\s+/g, '');
-    const response = await fetch("https://immaculate.onrender.com/api/login", {
+    const response = await fetch("http://localhost:3001/api/login", {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -120,10 +79,14 @@ const onchange = (event) => {
 
   return (
     <div className='py-3'>
-        <h1 className='text-center my-5 fw-bold'>IN<span className='clrblue'>VOICE</span></h1>
+    <img src={logo} className='my-5'  style={{width:'200px', display:'block', margin:'auto'}}/>
+        {/* <h1 className='text-center my-5 fw-bold'>IN<span className='clrblue'>VOICE</span></h1> */}
+      <div>
+
+      </div>
       <section className='d-flex justify-content-center align-items-center'>
-        
         <form class="signin-form loginbox" onSubmit={handleSubmit}>
+       
             <div className=' p-5 pb-4 mt-3'>
                 <p className='h4 fw-bold'>Sign In</p>
 
