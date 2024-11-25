@@ -556,8 +556,8 @@ export default function Invoicedetail() {
         return; // Stop further execution
       } else {
         const json = await response.json();
-        console.log(json,"Owner Data");
-        
+        console.log(json, "Owner Data");
+
         setOwnerData(json[0]); // Save all owner data
       }
     } catch (error) {
@@ -1557,10 +1557,10 @@ thead{
       const content = document.getElementById('invoiceContent').innerHTML;
       const opt = {
         filename: 'myfile.pdf',
-        margin: 0.2, // [top, bottom] margin in millimeters
-        html2canvas: { scale: 1, useCORS: true }, // Increase scale for better resolution
-        jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' },
-        userUnit: 450 / 210
+        margin: [10, 10, 10, 10], // Top, right, bottom, left (in millimeters)
+        html2canvas: { scale: 3, useCORS: true }, // Increase scale for better resolution
+        jsPDF: { unit: 'mm', format: 'A4', orientation: 'portrait' },
+        // userUnit: 450 / 210
       };
 
       html2pdf().from(content).set(opt).toPdf().get('pdf').then(function (pdf) {
@@ -1592,12 +1592,12 @@ thead{
     const content = document.getElementById('invoiceContent').innerHTML;
     const opt = {
       filename: 'invoice.pdf',
-      html2canvas: { scale: 1, useCORS: true },
+      html2canvas: { scale: 4, useCORS: true },
       enableLinks: true,
       image: { type: 'jpeg', quality: 0.98 },
-      margin: 0.2,
+      margin: 0.1,
       jsPDF: {
-        unit: 'in',
+        unit: 'mm',
         format: 'A4',
         orientation: 'portrait'
       },
@@ -1701,9 +1701,152 @@ thead{
                       </>
                     )}
 
+
+                    <div class="page" style={{display:'none'}} id='invoiceContent'>
+                      <div class="header ps pt-5" >
+                        {signupdata.companyImageUrl !== "" ?
+                          <img src={signupdata.companyImageUrl} style={{ height: '85px' }} className='logoimage' alt="" /> :
+                          <p className='h4 fw-bold'>{signupdata.companyname}</p>
+                        }
+                        <div class="company-info fs12">
+                          <h1 className='m-0' style={{ fontSize: '26px' }}>Invoice</h1>
+                          <p className='m-0'><strong>{signupdata.companyname}</strong></p>
+                          <p className='m-0'>{signupdata.address}</p>
+                          {signupdata.city ? JSON.parse(signupdata.city).name + ',' : ' '}
+                          {signupdata.state ? JSON.parse(signupdata.state).name : ' '}
+                          <div className=''>{signupdata.state ? JSON.parse(signupdata.country).name : ' '}</div>
+                          <div ><a className='text-decoration-none' href={`mailto:${signupdata.email}`}>{signupdata.email}</a></div>
+                          <div ><a className='text-decoration-none' href='https://www.instagram.com/immaculate.homes'>https://www.instagram.com/immaculate.homes</a></div>
+                          <div ><a className='text-decoration-none' href={`${signupdata.website}`}>{signupdata.website}</a></div>
+                          <div>
+                            {signupdata.gstNumber == ''
+                              ?
+                              ""
+                              :
+                              `${signupdata.TaxName} ${signupdata.gstNumber}`
+                            }
+                          </div>
+                          {/* <p className='m-0'>GST 774737217RT0001</p> */}
+                        </div>
+                      </div>
+
+                      <div class="invoice-details fs12 ps py-2 bg-light">
+                        <div>
+                          <p className='m-0'><strong>Prepared For</strong></p>
+                          <p className='m-0'> {invoiceData.customername}</p>
+                          <p className='m-0'>{invoiceData.customeremail}</p>
+                          <p className='m-0'>{invoiceData.customerphone || ''}</p>
+                        </div>
+                        <div>
+                          <p className='m-0'><strong>Invoice #:</strong> {invoiceData.InvoiceNumber}</p>
+                          <p className='m-0'><strong>Date:</strong> {formatCustomDate(invoiceData.date)}</p>
+                          <p className='m-0'><strong>Due date:</strong> {formatCustomDate(invoiceData.duedate)}</p>
+
+                          {
+                            invoiceData.job == "" || invoiceData.job == null
+                              ?
+                              ""
+                              :
+                              <p className='m-0'><strong>Job: {invoiceData.job}</strong></p>
+                          }
+                        </div>
+                      </div>
+                      <div className='ps pb-0'>
+
+
+                        <table className='fs12'>
+                          <thead className='border-bottom'>
+                            <tr>
+                              <th className='text-left'>Item</th>
+                              <th>Quantity</th>
+                              <th>Unit</th>
+                              <th>Price</th>
+                              <th style={{ textAlign: 'right' }}>Amount</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {items.map((item) => (
+                              <tr className='border-bottom' key={item._id}>
+                                <td>
+                                  <div>
+                                    <span><strong>{item.itemname}</strong></span>
+                                    <div dangerouslySetInnerHTML={{ __html: item.description }} />
+                                    {/* <div>{item.description.replace(/<\/?[^>]+(>|$)/g, '')}</div> */}
+                                  </div>
+                                </td>
+                                <td >{item.itemquantity}</td>
+                                <td >{item.unit}</td>
+                                <td>{roundOff(item.price)}</td>
+                                <td className='text-end'>{roundOff(item.amount)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="totals ps">
+                        <table>
+                          <tr className='pb-2'>
+                            <td className='text-end'>Subtotal:</td>
+                            <td style={{ textAlign: 'right' }}><CurrencySign />{roundOff(invoiceData.subtotal)}</td>
+                          </tr>
+
+                          {
+                            invoiceData.discountTotal > 0
+                              ?
+                              <tr className='pb-2'>
+                                <td className='text-end' width="22%">Discount</td>
+                                <td className='text-end' width="22%"><CurrencySign />{roundOff(invoiceData.discountTotal)}</td>
+                              </tr>
+                              :
+                              null
+                          }
+
+                          {
+                            signupdata.taxPercentage == 0
+                              ?
+                              <tr></tr>
+                              :
+                              <tr className='pb-2'>
+                                <td className='text-end' width="22%">
+                                  {signupdata.TaxName} ({signupdata.taxPercentage}%)
+
+                                </td>
+                                <td className='text-end' width="22%"><CurrencySign />{roundOff(invoiceData.tax)}</td>
+                              </tr>
+                          }
+
+
+                          <tr className='pb-2'>
+                            <td className='text-end'>Total</td>
+                            <td style={{ textAlign: 'right' }}><CurrencySign />{roundOff(invoiceData.total)}</td>
+                          </tr>
+
+                          {transactions.map((transaction) => (
+                            <tr className='border-bottom pb-2' key={transaction._id}>
+                              <td className='text-md-end' width="100%">{transaction.method == "deposit" ? "Deposit" : "Paid"} on {formatCustomDate(transaction.paiddate)}</td>
+                              <td className='text-end' width="100%" style={{ borderBottom: '1px solid #ddd' }}><CurrencySign />{transaction.paidamount}</td>
+                            </tr>
+                          ))}
+                        </table>
+                      </div>
+
+
+
+                      <div className='ps text-right' >
+                        <p className='text-end'> <span className='p-3' style={{background:'#f0f3f4'}} >Amount Due: <strong><CurrencySign />{roundOff(invoiceData.total - transactions.reduce((total, payment) => total + payment.paidamount, 0))}</strong></span></p>
+                      </div>
+                    </div>
+
+
+
+
+
+
+
+
                     <div className="row">
                       <div className="col-12 col-sm-12 col-md-12 col-lg-8" id="">
-                        <div className='print' id='invoiceContent'>
+                        <div className='print' id='invoiceContent1'>
 
                           <div className="invoice-body">
                             <div className='row'>
@@ -1714,7 +1857,7 @@ thead{
                                 }
                               </div>
                               <div className='col-sm-12 col-md-6 text-md-end'>
-                                <h1>Invoice</h1> {console.log(signupdata,"signupdata")
+                                <h1>Invoice</h1> {console.log(signupdata, "signupdata")
                                 }
                                 <div className='text-inverse mb-1'>
                                   <strong>{signupdata.companyname}</strong>
@@ -1724,13 +1867,14 @@ thead{
                                     <div className=''>{signupdata.address} </div>
                                     {signupdata.city ? JSON.parse(signupdata.city).name + ',' : ' '}
                                     {signupdata.state ? JSON.parse(signupdata.state).name : ' '}
-                                    
+
                                     <div className=''>{signupdata.state ? JSON.parse(signupdata.country).name : ' '}</div>
                                     {/* <div className=''>{JSON.parse(signupdata.city).name}, {JSON.parse(signupdata.state).name}</div>
                                     <div className=''>{JSON.parse(signupdata.country).emoji}</div> */}
                                   </div>
 
                                   <div ><a className='text-decoration-none' href={`mailto:${signupdata.email}`}>{signupdata.email}</a></div>
+                                  <div ><a className='text-decoration-none' href='https://www.instagram.com/immaculate.homes'>https://www.instagram.com/immaculate.homes</a></div>
                                   <div ><a className='text-decoration-none' href={`${signupdata.website}`}>{signupdata.website}</a></div>
                                   <div>
                                     {signupdata.gstNumber == ''
@@ -1739,8 +1883,6 @@ thead{
                                       :
                                       `${signupdata.TaxName} ${signupdata.gstNumber}`
                                     }
-
-
                                   </div>
 
                                 </address>
@@ -1851,9 +1993,9 @@ thead{
 
                                   <tbody>
                                     <tr>
-                                      <td className='d-none d-md-table-cell' rowspan="10"></td>
-                                      <td className='text-md-end' width="22%">Subtotal</td>
-                                      <td className='text-end' width="22%"><CurrencySign />{roundOff(invoiceData.subtotal)}</td>
+                                      <td className='d-none d-md-table-cell pb-2' rowspan="10"></td>
+                                      <td className='text-md-end pb-2' width="22%">Subtotal</td>
+                                      <td className='text-end pb-2' width="22%"><CurrencySign />{roundOff(invoiceData.subtotal)}</td>
                                     </tr>
                                     {
                                       invoiceData.discountTotal > 0
@@ -1887,7 +2029,6 @@ thead{
 
 
                                     <tr>
-
                                       <td className='text-md-end' width="22%" style={{ borderBottom: '1px solid #ddd' }}>Total</td>
                                       <td className='text-end' width="22%" style={{ borderBottom: '1px solid #ddd' }}><CurrencySign />{roundOff(invoiceData.total)}</td>
                                     </tr>
@@ -2222,10 +2363,10 @@ thead{
                       <strong>
                         <CurrencySign />
                         {
-          // Filter transactions with "Expense" type and sum their amounts
-          expenseTransactions.filter(transaction => transaction.transactionType === 'Expense')
-            .reduce((sum, transaction) => sum + transaction.amount, 0)
-        }
+                          // Filter transactions with "Expense" type and sum their amounts
+                          expenseTransactions.filter(transaction => transaction.transactionType === 'Expense')
+                            .reduce((sum, transaction) => sum + transaction.amount, 0)
+                        }
                       </strong>
                     </td>
 
@@ -2241,13 +2382,13 @@ thead{
                       <strong>
                         <CurrencySign />
                         {
-          // Subtract the sum of "Expense" transactions from the total invoice amount
-          roundOff(
-            invoiceData.total -
-            expenseTransactions.filter(transaction => transaction.transactionType === 'Expense')
-              .reduce((sum, transaction) => sum + transaction.amount, 0)
-          )
-        }
+                          // Subtract the sum of "Expense" transactions from the total invoice amount
+                          roundOff(
+                            invoiceData.total -
+                            expenseTransactions.filter(transaction => transaction.transactionType === 'Expense')
+                              .reduce((sum, transaction) => sum + transaction.amount, 0)
+                          )
+                        }
                       </strong>
                     </td>
 
@@ -2400,7 +2541,13 @@ thead{
                   <div className="col-5">
                     <label for="text" class="form-label">Amount</label>
                     <div className='input-group mb-4'>
-                      <input type="text" className="form-control" id="amount" value={amount} readOnly />
+                      <input
+                        type="text"
+                        className="form-control"
+                        id="amount"
+                        onChange={(e) => setAmount(e.target.value)}
+                        value={amount}
+                      />
                       <span class="input-group-text"><CurrencySign /></span>
                     </div>
                   </div>

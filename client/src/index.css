@@ -20,3 +20,7 @@ html, body {
   padding: 0;
   overflow: auto !important;
 }
+.ck.ck-editor{
+  width: 99% !important;
+}
+

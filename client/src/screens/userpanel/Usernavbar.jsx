@@ -82,6 +82,11 @@ export default function Usernavbar() {
                         <img src={pin} width="24px" height='24px' /> <span className='ps-2'>E-Sign</span>
                       </Link>
                     </li>
+                    <li>
+                      <Link to="/userpanel/docs" className='nav-link scrollto icones w-100 text-black' >
+                        <img src={pin} width="24px" height='24px' /> <span className='ps-2'>Documents</span>
+                      </Link>
+                    </li>
                     <li className="nav-item">
                       <div className="nav-link pointer text-black" onClick={() => toggleDropdown('documents')}>
                         {/* <span>Expenses</span> */}

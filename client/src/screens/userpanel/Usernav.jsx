@@ -84,6 +84,11 @@ export default function Usernav() {
                     <i class="fa-solid fa-house me-2 dashclr"></i> <span>E-Sign</span>
                   </Link>
                 </li>
+                <li>
+                      <Link to="/userpanel/docs" className='nav-link scrollto icones w-100 text-black' >
+                        <img src={pin} width="24px" height='24px' /> <span className='ps-2'>Documents</span>
+                      </Link>
+                    </li>
                 <li className="nav-item">
                       <div className="nav-link pointer text-black" onClick={() => toggleDropdown('documents')}>
                         {/* <span>Expenses</span> */}
@@ -91,6 +96,11 @@ export default function Usernav() {
                       </div>
                       {dropdownOpen.documents && (
                         <ul className="dropdown-list">
+                          <li>
+                            <Link to="/userpanel/Expense" className='nav-link text-black'>
+                              <img src={dollar} width="24px" height='24px' /> <span className='ps-2'>Expense Entry</span>
+                            </Link>
+                          </li>
                           <li>
                             <Link to="/userpanel/Category" className='nav-link text-black'>
                               <img src={dollar} width="24px" height='24px' /> <span className='ps-2'>Category</span>

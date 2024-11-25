@@ -7,6 +7,74 @@
   pointer-events: none;
 }
 
+.ps {
+  padding-top: 30px 50px;
+}
+.information-content p {
+  margin: 0;
+  font-size:14px;
+}
+
+.page {
+  width: 210mm;
+  font-size: 14px;
+  /* height: 297mm; */
+  margin: 0 auto;
+  background-color: white;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-sizing: border-box;
+}
+.p15mm {
+  padding: 5mm 15mm;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+.logo {
+  width: 150px;
+  height: auto;
+}
+.company-info {
+  text-align: right;
+}
+.invoice-details, .customer-details {
+  display: flex;
+  justify-content: space-between;
+}
+.fs12{
+  font-size: 12px;
+}
+.fs12 p {
+  margin: 0;
+}
+table {
+  width: 100%;
+}
+th, td {
+  padding: 2px;
+}
+th {
+  /* background-color: #f2f2f2; */
+}
+.totals {
+  margin-left: auto;
+  width: 400px;
+}
+.totals table {
+  width: 100%;
+}
+.totals td {
+  border: none;
+}
+.amount-due {
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-top: 20px;
+  text-align: right;
+}
+
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;

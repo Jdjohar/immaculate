@@ -85,6 +85,7 @@
       else{
         const json = await response.json();
         console.log(json);
+        navigate('/userpanel/Customerlist')
 
         if (json.Success) {
           setCredentials({
@@ -106,7 +107,7 @@
         }
 
         else{
-          setAlertmessageShow("This Email already exist")
+          setAlertmessageShow("Something Went Wrong!")
         }
       }
 

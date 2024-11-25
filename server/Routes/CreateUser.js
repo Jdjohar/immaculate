@@ -21,6 +21,7 @@ const Customerlist = require('../models/Customerlist');
 const Invoice = require('../models/Invoice');
 const Estimate = require('../models/Estimate');
 const Transactions = require('../models/Transactions');
+const Docslink = require('../models/DoumentLinks')
 const Deposit = require('../models/Deposit');
 const Signature = require('../models/Signature')
 const Ownwesignature = require('../models/Ownwesignature')
@@ -2486,6 +2487,39 @@ router.get('/delestimatedata/:estimateid', async (req, res) => {
     }
 });
 
+router.get('/deltransaction/:transactionid', async (req, res) => {
+    try {
+        const transactionid = req.params.transactionid;
+        let authtoken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        console.log(decodedToken);
+
+        const result = await Transactions.findByIdAndDelete(transactionid);
+
+        if (result) {
+            res.json({
+                Success: true,
+                message: "teammember deleted successfully"
+            });
+        } else {
+            res.status(404).json({
+                Success: false,
+                message: "teammember not found"
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        // Handle token verification errors
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        // Handle other errors
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // DELETE route to remove invoice and associated transactions by invoice ID
 router.get('/removeInvoiceAndTransactions/:invoiceid', async (req, res) => {
     try {
@@ -4405,6 +4439,51 @@ router.delete('/vendor/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+
+
+
+// Create a new vendor
+router.post('/docs', async (req, res) => {
+    try {
+        const { name, link } = req.body;
+        // Create and save the new vendor
+        const docs = new Docslink({ name, link });
+        await docs.save();
+
+        res.status(201).json(docs);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Get all vendors
+router.get('/docs', async (req, res) => {
+    try {
+        const docs = await Docslink.find();
+        res.status(200).json(docs);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Delete a vendor
+router.delete('/docs/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const docs = await Docslink.findByIdAndDelete(id);
+        if (!docs) {
+            return res.status(404).json({ error: 'Docs not found' });
+        }
+
+        res.status(200).json({ message: 'Docs deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
 
 
 

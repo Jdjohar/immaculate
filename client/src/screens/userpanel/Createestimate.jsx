@@ -93,17 +93,31 @@ export default function Createestimate() {
     // const [editorData, setEditorData] = useState("<p></p>");
     const [editorData, setEditorData] = useState(`
         <p><b>Notes:</b></p>
+        <p> <b>Kitchen/Bar:</b> Textured Cabinets and quartz countertop.</p>
+        <p> <b>Kitchen Backsplash:</b> Subway Tiles</p>
+        <p> <b>Flooring/Stairs:</b> Vinyl(6.5mm) with metal nosing.</p>
+        <p> <b>Bath:</b> Tub</p>
+        <p> <b>Texture:</b> Knockdown</sp
+        <p> <b>Lock/Accessory:</b> Polished chrome</p>
+        <p> <b>Spray Paint:</b> Semi Gloss</p>
+        <p> <b>Appliances:</b> Not Included</p>
+        <p> <b>Hood Fan:</b> Not Included</p>
+        <p> <b>City Permits:</b> Included</p>
+        <p> <b>Fire Rated Door Style:</b> Plain</p>
         <br>
         <p><b>Terms:</b></p>
         <p>Quotes are valid for 30 days from the date of quotation prepared.</p>
         <p>Basic Selection</p>
         <p>(Extra charges may apply on upgrades)</p>
         
-        
         <br>
         <p><b>Payments to be made as follows:</b></p>
-        <p><b> Advance</b></p>
-<p><b>After Finishing</b></p>
+        <p><b>S5,000</b> Advance</p>
+        <p><b>$5,000</b> For Furnace Before Inspection</p>
+        <p><b>$13,000</b> After Rough Inspections</p>
+        <p><b>$13,000</b> After Door Installation</p>
+        <p><b>$4,950</b> After Final Inspections</p>
+
 `);
     const [noteimageUrl, setnoteImageUrl] = useState(''); 
     const [alertMessage, setAlertMessage] = useState('');

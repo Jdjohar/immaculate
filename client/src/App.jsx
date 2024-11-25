@@ -36,6 +36,7 @@ import Customersigninvoice from './screens/userpanel/Customersigninvoice';
 import Signature from './screens/userpanel/Signature';
 import Completedocument from './screens/userpanel/Completedocument';
 import Category from './screens/userpanel/Expense/Category';
+import AddDocument from './screens/userpanel/Docs';
 // import { InvoiceProvider } from './components/InvoiceContext';
 import {
   BrowserRouter as Router,
@@ -88,6 +89,7 @@ function App() {
             <Route exact path='/userpanel/Category' element={<Category/>} />
             <Route exact path='/userpanel/Vendor' element={<Vendor/>} />
             <Route exact path='/userpanel/Expense' element={<ExpenseEntries/>} />
+            <Route exact path='/userpanel/Docs' element={<AddDocument/>} />
             <Route exact path='/Timeschemahistory' element={<Timeschemahistory/>} />
             <Route exact path='/Teammemberpanel/Teammenberdashboard' element={<Teammenberdashboard/>} />
             <Route exact path='/Teammemberpanel/History' element={<Teamhistory/>} />
