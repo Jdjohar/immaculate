@@ -917,26 +917,27 @@ thead{
                           <thead className='border-bottom'>
                             <tr>
                               <th width="40%" className='text-left'>Item</th>
-                              <th className=' d-none d-md-table-cell' width="15%">Quantity</th>
-                              <th className=' d-none d-md-table-cell' width="15%" >Unit</th>
-                              <th className=' d-none d-md-table-cell' width="15%">Price</th>
-                              <th className=' d-none d-md-table-cell' width="15%" style={{ textAlign: 'right' }}>Amount</th>
+                              <th className='  d-md-table-cell' width="15%">Quantity</th>
+                              <th className='  d-md-table-cell' width="15%" >Unit</th>
+                              <th className='  d-md-table-cell' width="15%">Price</th>
+                              <th className=' e d-md-table-cell' width="15%" style={{ textAlign: 'right' }}>Amount</th>
                             </tr>
                           </thead>
                           <tbody>
+                            {console.log(items,"items")}
                             {items.map((item) => (
                               <tr className='border-bottom' key={item._id}>
-                                <td className=' d-none d-md-table-cell' width="15%">
+                                <td className='  d-md-table-cell' width="15%">
                                   <div>
                                     <span><strong>{item.itemname}</strong></span>
                                     <div dangerouslySetInnerHTML={{ __html: item.description }} />
                                     {/* <div>{item.description.replace(/<\/?[^>]+(>|$)/g, '')}</div> */}
                                   </div>
                                 </td>
-                                <td className='d-none d-md-table-cell' width="15%">{item.itemquantity}</td>
-                                <td className='d-none d-md-table-cell' width="15%">{item.unit}</td>
-                                <td className='d-none d-md-table-cell' width="15%">{roundOff(item.price)}</td>
-                                <td className='d-none d-md-table-cell text-end' width="15%">{roundOff(item.amount)}</td>
+                                <td className='e d-md-table-cell' width="15%">{item.itemquantity}</td>
+                                <td className=' d-md-table-cell' width="15%">{item.unit}</td>
+                                <td className=' d-md-table-cell' width="15%">{roundOff(item.price)}</td>
+                                <td className=' d-md-table-cell text-end' width="15%">{roundOff(item.amount)}</td>
                               </tr>
                             ))}
                           </tbody>
