@@ -1557,10 +1557,10 @@ thead{
       const content = document.getElementById('invoiceContent').innerHTML;
       const opt = {
         filename: 'myfile.pdf',
-        margin: [10, 10, 10, 10], // Top, right, bottom, left (in millimeters)
-        html2canvas: { scale: 3, useCORS: true }, // Increase scale for better resolution
+        margin: 0.2, // [top, bottom] margin in millimeters
+        html2canvas: { scale: 6, useCORS: true }, // Increase scale for better resolution
         jsPDF: { unit: 'mm', format: 'A4', orientation: 'portrait' },
-        // userUnit: 450 / 210
+        userUnit: 450 / 210
       };
 
       html2pdf().from(content).set(opt).toPdf().get('pdf').then(function (pdf) {
