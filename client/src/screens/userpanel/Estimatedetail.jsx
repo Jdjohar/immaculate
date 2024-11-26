@@ -891,14 +891,14 @@ thead{
 
                       <div class="invoice-details fs12 ps py-2 bg-light">
                         <div>
-                          <p className='m-0'><strong>Prepared For</strong></p>
+                          <p className='m-0 text-green'><strong>Prepared For</strong></p>
                           <p className='m-0'> {estimateData.customername}</p>
                           <p className='m-0'>{estimateData.customeremail}</p>
                           <p className='m-0'>{estimateData.customerphone || ''}</p>
                         </div>
                         <div>
-                          <p className='m-0'><strong>Estimate #:</strong> {estimateData.EstimateNumber}</p>
-                          <p className='m-0'><strong>Date:</strong> {formatCustomDate(estimateData.date)}</p>
+                          <p className='m-0 text-green'><strong>Estimate #:</strong> {estimateData.EstimateNumber}</p>
+                          <p className='m-0 text-green'><strong>Date:</strong> {formatCustomDate(estimateData.date)}</p>
          
 
                           {
@@ -906,7 +906,7 @@ thead{
                               ?
                               ""
                               :
-                              <p className='m-0'><strong>Job: {estimateData.job}</strong></p>
+                              <p className='m-0'><strong className='text-green'>Job:</strong> {estimateData.job}</p>
                           }
                         </div>
                       </div>
@@ -916,11 +916,11 @@ thead{
                         <table className='fs12'>
                           <thead className='border-bottom'>
                             <tr>
-                              <th width="40%" className='text-left'>Item</th>
-                              <th className='  d-md-table-cell' width="15%">Quantity</th>
-                              <th className='  d-md-table-cell' width="15%" >Unit</th>
-                              <th className='  d-md-table-cell' width="15%">Price</th>
-                              <th className=' e d-md-table-cell' width="15%" style={{ textAlign: 'right' }}>Amount</th>
+                              <th width="40%" className='text-green text-left'>Item</th>
+                              <th className='text-green  d-md-table-cell' width="15%">Quantity</th>
+                              <th className='text-green  d-md-table-cell' width="15%" >Unit</th>
+                              <th className='text-green  d-md-table-cell' width="15%">Price</th>
+                              <th className='text-green d-md-table-cell' width="15%" style={{ textAlign: 'right' }}>Amount</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -995,7 +995,7 @@ thead{
 
 
                       <div className='ps text-right' >
-                        <p className='text-end'> <span className='p-3' style={{ background: '#f0f3f4' }} >Estimate Total: <strong><CurrencySign />{roundOff(estimateData.total - transactions.reduce((total, payment) => total + payment.paidamount, 0))}</strong></span></p>
+                        <p className='text-end'> <span className='p-3 text-green' style={{ background: '#f0f3f4' }} >Estimate Total: <strong><CurrencySign />{roundOff(estimateData.total - transactions.reduce((total, payment) => total + payment.paidamount, 0))}</strong></span></p>
                       </div>
 
                       <div className='invoice-body invoice-body-text'>

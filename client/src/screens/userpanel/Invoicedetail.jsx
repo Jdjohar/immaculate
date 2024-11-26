@@ -1558,8 +1558,8 @@ thead{
       const opt = {
         filename: 'myfile.pdf',
         margin: 0.2, // [top, bottom] margin in millimeters
-        html2canvas: { scale: 6, useCORS: true }, // Increase scale for better resolution
-        jsPDF: { unit: 'mm', format: 'A4', orientation: 'portrait' },
+        html2canvas: { scale: 3, useCORS: true }, // Increase scale for better resolution
+        jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' },
         userUnit: 450 / 210
       };
 
@@ -1723,7 +1723,7 @@ thead{
                     )}
 
 
-                    <div class="page" style={{display:'none'}} id='invoiceContent'>
+                    <div class="page" style={{display:'block'}} id='invoiceContent'>
                       <div class="header ps pt-5" >
                         {signupdata.companyImageUrl !== "" ?
                           <img src={signupdata.companyImageUrl} style={{ height: '85px' }} className='logoimage' alt="" /> :
