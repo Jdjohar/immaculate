@@ -107,6 +107,10 @@ export default function ExpenseEntries() {
         }
     };
 
+    const roundOff = (value) => {
+        return Math.round(value * 100) / 100;
+      };
+
     // Fetch all expense entries
     const fetchExpenseEntries = async () => {
         setLoading(true);
@@ -286,20 +290,7 @@ export default function ExpenseEntries() {
             receiptUrl: expense.receiptUrl,
             invoiceId: expense.invoiceId, // Set invoiceId if it exists
         });
-        console.log(JSON.stringify({
-            _id: expense._id,
-            expenseDate: expense.expenseDate,
-            expenseType: expense.expenseType._id,
-            transactionType: expense.transactionType,
-            vendor: expense.vendor._id,
-            amount: expense.amount,
-            description: expense.description,
-            paymentStatus: expense.paymentStatus,
-            receiptUrl: expense.receiptUrl,
-            invoiceId: expense.invoiceId ? expense.invoiceId._id : '',
-        }, "sd Update"
-
-        ));
+      
 
         setShowModal(true);
     };
@@ -695,7 +686,7 @@ export default function ExpenseEntries() {
                                                                         }}
                                                                     >
                                                                         {entry.transactionType === "Expense" ? " - " : " + "}
-                                                                        <CurrencySign /> {entry.amount}
+                                                                        <CurrencySign /> {roundOff(entry.amount)}
                                                                     </td>
                                                                     <td>{getInvoiceName(entry.invoiceId)}</td>
                                                                     <td>{entry.transactionType === "Credit" ? "" : getVendorName(entry.vendor)}</td>
@@ -729,7 +720,7 @@ export default function ExpenseEntries() {
                                                                     <CurrencySign />
                                                                     {filteredExpenseEntries
                                                                         .filter(entry => entry.transactionType === "Expense")
-                                                                        .reduce((total, entry) => total + entry.amount, 0)}
+                                                                        .reduce((total, entry) => roundOff(total + entry.amount), 0)}
                                                                 </td>
                                                                 <td colSpan="5"></td>
                                                             </tr>

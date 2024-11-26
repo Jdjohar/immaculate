@@ -85,7 +85,7 @@ export default function Invoicedetail() {
   let navigate = useNavigate();
 
   const roundOff = (value) => {
-    return Math.round(value * 100) / 100;
+    return (Math.round(value * 100) / 100).toFixed(2);
   };
 
 
@@ -878,7 +878,7 @@ export default function Invoicedetail() {
   };
 
   const handlePrintContent = async () => {
-    const content = document.getElementById('invoiceContent').innerHTML;
+    const content = document.getElementById('invoiceContent1').innerHTML;
     const printWindow = window.open('', '_blank');
     printWindow.document.open();
     printWindow.document.write(`
@@ -1592,7 +1592,7 @@ thead{
     const content = document.getElementById('invoiceContent').innerHTML;
     const opt = {
       filename: 'invoice.pdf',
-      html2canvas: { scale: 4, useCORS: true },
+      html2canvas: { scale: 6, useCORS: true },
       enableLinks: true,
       image: { type: 'jpeg', quality: 0.98 },
       margin: 0.1,
@@ -1732,22 +1732,22 @@ thead{
 
                       <div class="invoice-details fs12 ps py-2 bg-light">
                         <div>
-                          <p className='m-0'><strong>Prepared For</strong></p>
+                          <p className='m-0 text-green'><strong>Prepared For</strong></p>
                           <p className='m-0'> {invoiceData.customername}</p>
                           <p className='m-0'>{invoiceData.customeremail}</p>
                           <p className='m-0'>{invoiceData.customerphone || ''}</p>
                         </div>
                         <div>
-                          <p className='m-0'><strong>Invoice #:</strong> {invoiceData.InvoiceNumber}</p>
-                          <p className='m-0'><strong>Date:</strong> {formatCustomDate(invoiceData.date)}</p>
-                          <p className='m-0'><strong>Due date:</strong> {formatCustomDate(invoiceData.duedate)}</p>
+                          <p className='m-0'><strong className='text-green'>Invoice #:</strong> {invoiceData.InvoiceNumber}</p>
+                          <p className='m-0'><strong className='text-green'>Date:</strong> {formatCustomDate(invoiceData.date)}</p>
+                          <p className='m-0'><strong className='text-green'>Due date:</strong> {formatCustomDate(invoiceData.duedate)}</p>
 
                           {
                             invoiceData.job == "" || invoiceData.job == null
                               ?
                               ""
                               :
-                              <p className='m-0'><strong>Job: {invoiceData.job}</strong></p>
+                              <p className='m-0'><strong className='text-green'>Job:</strong> {invoiceData.job}</p>
                           }
                         </div>
                       </div>
@@ -1756,7 +1756,7 @@ thead{
 
                         <table className='fs12'>
                           <thead className='border-bottom'>
-                            <tr>
+                            <tr className='text-green'>
                               <th className='text-left'>Item</th>
                               <th>Quantity</th>
                               <th>Unit</th>
@@ -1776,15 +1776,15 @@ thead{
                                 </td>
                                 <td >{item.itemquantity}</td>
                                 <td >{item.unit}</td>
-                                <td>{roundOff(item.price)}</td>
-                                <td className='text-end'>{roundOff(item.amount)}</td>
+                                <td><CurrencySign />{roundOff(item.price)}</td>
+                                <td className='text-end'><CurrencySign />{roundOff(item.amount)}</td>
                               </tr>
                             ))}
                           </tbody>
                         </table>
                       </div>
                       <div class="totals ps">
-                        <table>
+                        <table className='fs12'>
                           <tr className='pb-2'>
                             <td className='text-end'>Subtotal:</td>
                             <td style={{ textAlign: 'right' }}><CurrencySign />{roundOff(invoiceData.subtotal)}</td>
@@ -1833,8 +1833,16 @@ thead{
 
 
                       <div className='ps text-right' >
-                        <p className='text-end'> <span className='p-3' style={{background:'#f0f3f4'}} >Amount Due: <strong><CurrencySign />{roundOff(invoiceData.total - transactions.reduce((total, payment) => total + payment.paidamount, 0))}</strong></span></p>
+                        <p className='text-end'> <span className='p-3 ' style={{background:'#f0f3f4'}} ><span className='text-green'>Amount Due:</span> <strong><CurrencySign />{roundOff(invoiceData.total - transactions.reduce((total, payment) => total + payment.paidamount, 0))}</strong></span></p>
                       </div>
+
+                      <div className='invoice-body invoice-body-text'>
+                            <div className='mt-1'>
+                              <span>{invoiceData.information == '' ? '' : 'Note:'}</span>
+                              <div className='information-content' dangerouslySetInnerHTML={{ __html: invoiceData.information }} />
+
+                            </div>
+                          </div>
                     </div>
 
 

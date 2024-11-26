@@ -6,9 +6,12 @@
   height: 40vmin;
   pointer-events: none;
 }
+.text-green{
+  color: #1e824c;
+}
 
 .ps {
-  padding-top: 30px 50px;
+  padding: 30px 50px;
 }
 .information-content p {
   margin: 0;

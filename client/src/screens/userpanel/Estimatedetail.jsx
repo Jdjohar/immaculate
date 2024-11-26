@@ -861,13 +861,13 @@ thead{
 
                     )}
 
-                    <div class="page" style={{ display: 'none' }} id='invoiceContent'>
+                    <div class="page" style={{ display: 'block' }} id='invoiceContent'>
                       <div class="header ps pb-0" >
                         {signupdata.companyImageUrl !== "" ?
                           <img src={signupdata.companyImageUrl} style={{ height: '85px' }} className='logoimage' alt="" /> :
                           <p className='h4 fw-bold'>{signupdata.companyname}</p>
                         }
-                        <div class="company-info">
+                        <div class="company-info fs12">
                           <h1 className='m-0 ' style={{ fontSize: '26px' }}>Estimate</h1>
                           <p className='m-0'><strong>{signupdata.companyname}</strong></p>
                           <p className='m-0'>{signupdata.address}</p>
@@ -889,7 +889,7 @@ thead{
                         </div>
                       </div>
 
-                      <div class="invoice-details ps py-2 bg-light">
+                      <div class="invoice-details fs12 ps py-2 bg-light">
                         <div>
                           <p className='m-0'><strong>Prepared For</strong></p>
                           <p className='m-0'> {estimateData.customername}</p>
@@ -943,7 +943,7 @@ thead{
                         </table>
                       </div>
                       <div class="totals ps">
-                        <table>
+                        <table className='fs12'>
                           <tr>
                             <td className='text-end'>Subtotal:</td>
                             <td style={{ textAlign: 'right' }}><CurrencySign />{roundOff(estimateData.subtotal)}</td>
@@ -994,7 +994,7 @@ thead{
 
 
                       <div className='ps text-right' >
-                        <p className='text-end'> <span className='p-3' style={{ background: '#f0f3f4' }} >Amount Due: <strong><CurrencySign />{roundOff(estimateData.total - transactions.reduce((total, payment) => total + payment.paidamount, 0))}</strong></span></p>
+                        <p className='text-end'> <span className='p-3' style={{ background: '#f0f3f4' }} >Estimate Total: <strong><CurrencySign />{roundOff(estimateData.total - transactions.reduce((total, payment) => total + payment.paidamount, 0))}</strong></span></p>
                       </div>
 
                       <div className='invoice-body invoice-body-text'>
