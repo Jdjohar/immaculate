@@ -861,7 +861,7 @@ thead{
 
                     )}
 
-                    <div class="page" style={{ display: 'block' }} id='invoiceContent'>
+                    <div class="page" style={{ display: 'none' }} id='invoiceContent'>
                       <div class="header ps pb-0" >
                         {signupdata.companyImageUrl !== "" ?
                           <img src={signupdata.companyImageUrl} style={{ height: '85px' }} className='logoimage' alt="" /> :
