@@ -519,7 +519,7 @@ export default function Createinvoice() {
 
     const calculateTaxAmount = () => {
         const subtotal = calculateSubtotal();
-        const totalDiscountedAmount = subtotal - discountTotal; // Apply overall discount first
+        const totalDiscountedAmount = subtotal; // Apply overall discount first
 
         // Calculate tax amount on the discounted amount
         const taxAmount = (totalDiscountedAmount * signUpData.percentage) / 100;
@@ -533,7 +533,8 @@ export default function Createinvoice() {
         const subtotal = calculateSubtotal();
         const taxAmount = calculateTaxAmount();
         const discountAmount = discountTotal;
-        const totalAmount = subtotal + taxAmount - discountAmount;
+        const totalAmount2 = subtotal + taxAmount;
+        const totalAmount = totalAmount2 - discountAmount;
         return roundOff(totalAmount);
     };
 

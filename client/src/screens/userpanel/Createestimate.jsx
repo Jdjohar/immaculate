@@ -37,16 +37,16 @@ class MyCustomUploadAdapter {
                     method: 'POST',
                     body: formData,
                 })
-                .then(response => response.json())
-                .then(data => {
-                    resolve({
-                        default: data.secure_url
+                    .then(response => response.json())
+                    .then(data => {
+                        resolve({
+                            default: data.secure_url
+                        });
+                        console.log(data.secure_url, "================================================================");
+                    })
+                    .catch(error => {
+                        reject(error.message || 'Failed to upload image to Cloudinary');
                     });
-                    console.log(data.secure_url, "================================================================");
-                })
-                .catch(error => {
-                    reject(error.message || 'Failed to upload image to Cloudinary');
-                });
             });
         });
     }
@@ -75,7 +75,7 @@ export default function Createestimate() {
     const [alertShow, setAlertShow] = useState("");
     const [SelectedCustomerId, setSelectedCustomerId] = useState("");
     const [selectedCustomerDetails, setSelectedCustomerDetails] = useState({
-        name: '', email: '', number:''
+        name: '', email: '', number: ''
     });
     const [isCustomerSelected, setIsCustomerSelected] = useState(false);
     const [editedName, setEditedName] = useState('');
@@ -85,7 +85,7 @@ export default function Createestimate() {
     const [signUpData, setsignUpData] = useState(0);
     const [discountTotal, setdiscountTotal] = useState(0);
     const [estimateData, setestimateData] = useState({
-        customername: '', itemname: '', customeremail: '',customerphone:'', estimate_id: '', EstimateNumber: '', purchaseorder: '',
+        customername: '', itemname: '', customeremail: '', customerphone: '', estimate_id: '', EstimateNumber: '', purchaseorder: '',
         job: '', date: format(new Date(), 'yyyy-MM-dd'), description: '', itemquantity: '', price: '', discount: '',
         amount: '', tax: '', discountTotal: '', taxpercentage: '', subtotal: '', total: '', amountdue: '', information: '',
     });
@@ -119,7 +119,7 @@ export default function Createestimate() {
         <p><b>$4,950</b> After Final Inspections</p>
 
 `);
-    const [noteimageUrl, setnoteImageUrl] = useState(''); 
+    const [noteimageUrl, setnoteImageUrl] = useState('');
     const [alertMessage, setAlertMessage] = useState('');
     const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false);
     const [hasSignature, setHasSignature] = useState(false);
@@ -230,7 +230,7 @@ export default function Createestimate() {
 
     const roundOff = (value) => {
         return Math.round(value * 100) / 100;
-      };
+    };
 
     const fetchLastEstimateNumber = async () => {
         try {
@@ -298,38 +298,38 @@ export default function Createestimate() {
             console.error('Error fetching data:', error);
         }
     }
-    
+
     const fetchsignupdata = async () => {
         try {
-          const userid = localStorage.getItem("userid");
-          const authToken = localStorage.getItem('authToken');
-          const response = await fetch(`https://immaculate.onrender.com/api/getsignupdata/${userid}`, {
-            headers: {
-              'Authorization': authToken,
+            const userid = localStorage.getItem("userid");
+            const authToken = localStorage.getItem('authToken');
+            const response = await fetch(`https://immaculate.onrender.com/api/getsignupdata/${userid}`, {
+                headers: {
+                    'Authorization': authToken,
+                }
+            });
+
+            if (response.status === 401) {
+                const json = await response.json();
+                setAlertMessage(json.message);
+                setloading(false);
+                window.scrollTo(0, 0);
+                return; // Stop further execution
             }
-          });
-    
-          if (response.status === 401) {
-            const json = await response.json();
-            setAlertMessage(json.message);
-            setloading(false);
-            window.scrollTo(0, 0);
-            return; // Stop further execution
-          }
-          else {
-            const json = await response.json();
-    
-            // if (Array.isArray(json)) {
-            // setTaxPercentage(json.taxPercentage);
-            // setsignUpData(json)
-            console.log("json: ",json.taxPercentage);
-            // }
-          }
-    
+            else {
+                const json = await response.json();
+
+                // if (Array.isArray(json)) {
+                // setTaxPercentage(json.taxPercentage);
+                // setsignUpData(json)
+                console.log("json: ", json.taxPercentage);
+                // }
+            }
+
         } catch (error) {
-          console.error('Error fetching data:', error);
+            console.error('Error fetching data:', error);
         }
-      }
+    }
 
     const fetchitemdata = async () => {
         try {
@@ -418,9 +418,9 @@ export default function Createestimate() {
         const selectedCustomerId = event.value;
         setSelectedCustomerId(selectedCustomerId);
         const selectedCustomer = customers.find((customer) => customer._id === selectedCustomerId);
-        
-        console.log(selectedCustomer,"Selected Customer");
-        
+
+        console.log(selectedCustomer, "Selected Customer");
+
         if (selectedCustomer) {
             setestimateData({
                 ...estimateData,
@@ -464,7 +464,7 @@ export default function Createestimate() {
             console.error('Unable to determine SelectedCustomerId');
             return;
         }
-    
+
         const updatedCustomerDetails = {
             name: editedName,
             email: editedEmail,
@@ -476,10 +476,10 @@ export default function Createestimate() {
             email: editedEmail,
             number: editedNumber
         });
-    
+
         console.log(SelectedCustomerId, 'edited SelectedCustomerId');
         console.log('Updated customer details:', updatedCustomerDetails);
-    
+
     };
 
     // const handleEditCustomer = () => {
@@ -568,7 +568,7 @@ export default function Createestimate() {
 
     const calculateTaxAmount = () => {
         const subtotal = calculateSubtotal();
-        const totalDiscountedAmount = subtotal - discountTotal; // Apply overall discount first
+        const totalDiscountedAmount = subtotal; // Apply overall discount first
 
         // Calculate tax amount on the discounted amount
         const taxAmount = (totalDiscountedAmount * signUpData.percentage) / 100;
@@ -579,11 +579,14 @@ export default function Createestimate() {
 
     // Function to calculate total amount
     const calculateTotal = () => {
-        const subtotal = calculateSubtotal();
-        const taxAmount = calculateTaxAmount();
-        const discountAmount = discountTotal;
-        const totalAmount = subtotal + taxAmount - discountAmount;
-        return roundOff(totalAmount);
+        const subtotal = calculateSubtotal(); // Assume this function calculates and returns the subtotal
+        const taxAmount = calculateTaxAmount(); // Assume this function calculates and returns the tax amount
+        const discountAmount = discountTotal; // Ensure `discountTotal` is defined globally or passed in properly
+        // Calculate totalAmount2 (subtotal + taxAmount)
+        const totalAmount2 = subtotal + taxAmount;
+        // Calculate totalAmount (totalAmount2 - discountAmount)
+        const totalAmount = totalAmount2 - discountAmount;
+        return roundOff(totalAmount); // Assume roundOff() rounds the value properly
     };
 
     const handleSubmit = async (e) => {
@@ -646,10 +649,10 @@ export default function Createestimate() {
                 taxpercentage: signUpData.percentage,
                 amountdue: amountdue,
                 noteimageUrl: noteimageUrl,
-                isAddSignature: isAddSignatureSwitchOn, 
+                isAddSignature: isAddSignatureSwitchOn,
                 isCustomerSign: isCustomerSignSwitchOn,
             };
-            console.log(data,"Data sdsdfsdsfsdf");
+            console.log(data, "Data sdsdfsdsfsdf");
 
             // Sending estimate data to the backend API
             const response = await fetch('https://immaculate.onrender.com/api/savecreateestimate', {
@@ -670,8 +673,8 @@ export default function Createestimate() {
             else {
                 if (response.ok) {
                     const responseData = await response.json();
-                    console.log(responseData,"responseData");
-                    
+                    console.log(responseData, "responseData");
+
                     if (responseData.success) {
                         const estimateid = responseData.estimate._id;
                         navigate('/userpanel/Estimatedetail', { state: { estimateid } });
@@ -880,8 +883,8 @@ export default function Createestimate() {
                                             </div>
                                         </div>
                                         <div className="row">
-                                            
-                                        <div className="col-lg-3 col-12">
+
+                                            <div className="col-lg-3 col-12">
                                                 <div className='box1 rounded adminborder p-4 my-2 mx-0 mb-5'>
                                                     <div className="form-check form-switch">
                                                         <div>
@@ -930,7 +933,7 @@ export default function Createestimate() {
                                                     />
                                                 )}
                                             </div>
-                                            <div className="col-lg-12 col-12 order-2 order-lg-1"> 
+                                            <div className="col-lg-12 col-12 order-2 order-lg-1">
                                                 <div className='box1 rounded adminborder p-4 m-2 mb-5'>
                                                     <div className='row me-2'>
                                                         <div className="col-md-6 col-lg-7 col-12">
@@ -971,7 +974,7 @@ export default function Createestimate() {
                                                                                 placeholder=""
                                                                                 required
                                                                             />
-                                                                        </div> 
+                                                                        </div>
                                                                         <div className="col-3">
                                                                             <a role='button' className="btn btn-success btn-sm me-2 text-white mt-1" data-bs-toggle="modal" data-bs-target="#exampleModal1">
                                                                                 <i class="fa-solid fa-plus"></i>
@@ -1128,10 +1131,10 @@ export default function Createestimate() {
                                                                                     />
                                                                                 </td>
                                                                                 <td>
-                                                                                {selectedItem?.unit}
+                                                                                    {selectedItem?.unit}
                                                                                 </td>
                                                                                 <td>
-                                                                
+
                                                                                     <input
                                                                                         type="text"
                                                                                         name={`price-${itemId}`}
@@ -1143,7 +1146,7 @@ export default function Createestimate() {
                                                                                     />
 
                                                                                 </td>
-                                                                               
+
                                                                                 {/* <td className="text-center">
                                                                                     <p><CurrencySign />{discountTotal.toFixed(2)}</p>
                                                                                 </td> */}
@@ -1280,7 +1283,7 @@ export default function Createestimate() {
                                                     </div>
                                                 </div>
                                             </div>
-                                         
+
                                         </div>
 
                                     </form>
