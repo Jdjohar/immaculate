@@ -983,6 +983,30 @@ export default function Editestimate() {
                                                         </div>
                                                     </div>
                                                 </div>
+
+                                                <div className='row'>
+                                                <label htmlFor="" className='fs-4 ms-2 mt-5'>Note</label>
+                                                    <div className='box1 rounded adminborder m-2'>
+                                                        <CKEditor
+                                                            editor={ClassicEditor}
+                                                            data={estimateData.information}
+                                                            // onReady={ editor => {
+                                                            //     console.log( 'Editor is ready to use!', editor );
+                                                            // } }
+
+                                                            onChange={handleEditorChange}
+                                                            config={{
+                                                                extraPlugins: [MyCustomUploadAdapterPlugin],
+                                                            }}
+                                                            onBlur={(event, editor) => {
+                                                                console.log('Blur.', editor);
+                                                            }}
+                                                            onFocus={(event, editor) => {
+                                                                console.log('Focus.', editor);
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
