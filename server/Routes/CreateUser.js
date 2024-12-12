@@ -1725,6 +1725,54 @@ router.get('/userEntries/:userid', async (req, res) => {
     }
 });
 
+// Update time entry
+router.put('/userEntries/:entryId', async (req, res) => {
+    try {
+        const { entryId } = req.params;
+        const { startTime, endTime } = req.body;
+        const authToken = req.headers.authorization;
+
+        // Verify JWT token
+        const decodedToken = jwt.verify(authToken, jwrsecret);
+
+        if (!decodedToken) {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+
+        // Update the entry in the database
+        const updatedEntry = await Timeschema.findByIdAndUpdate(
+            entryId,
+            { startTime, endTime },
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedEntry) {
+            return res.status(404).json({ message: 'Entry not found' });
+        }
+
+        // Recalculate totalTime and timeInSeconds
+        const start = new Date(startTime).getTime();
+        const end = new Date(endTime).getTime();
+        const timeInSeconds = Math.floor((end - start) / 1000);
+
+        updatedEntry.timeInSeconds = timeInSeconds;
+
+        const hours = Math.floor(timeInSeconds / 3600);
+        const minutes = Math.floor((timeInSeconds % 3600) / 60);
+        const seconds = timeInSeconds % 60;
+
+        updatedEntry.totalTime = `${hours} hours ${minutes} minutes ${seconds} seconds`;
+
+        await updatedEntry.save();
+
+        res.json({ message: 'Time updated successfully', updatedEntry });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
 router.get('/allEntries', async (req, res) => {
     try {
         const allEntries = await Timeschema.find().sort({ startTime: 1 });

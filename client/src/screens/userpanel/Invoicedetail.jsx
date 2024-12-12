@@ -1558,7 +1558,7 @@ thead{
       const opt = {
         filename: 'myfile.pdf',
         margin: 0.2, // [top, bottom] margin in millimeters
-        html2canvas: { scale: 3, useCORS: true }, // Increase scale for better resolution
+        html2canvas: { scale: 3, useCORS: true, imageTimeout: 10000  }, // Increase scale for better resolution
         jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' },
         userUnit: 450 / 210
       };
@@ -1573,38 +1573,7 @@ thead{
     });
   };
 
-  // const convertToPdf = () => {
-
-  //   // await timeout(5000);
-  //   const content = document.getElementById('invoiceContent').innerHTML;
-  //   // console.log(content);
-  //   const opt = {
-  //     filename: 'invoice.pdf',
-  //     html2canvas: { scale: 1, useCORS: true }, // Increase scale for better resolution
-  //     image: { type: 'jpeg', quality: 0.98 },
-  //     jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' },
-  //     margin: { top: 20, bottom: 30 }, // Adjust top and bottom margin
-  //     userUnit: 450 / 210
-  //   };
-  //   html2pdf().from(content).set(opt).save(); // Convert to PDF and save automatically
-  // };
-  // const convertToPdf = () => {
-  //   const content = document.getElementById('invoiceContent').innerHTML;
-  //   const opt = {
-  //     filename: 'invoice.pdf',
-  //     html2canvas: { scale: 6, useCORS: true },
-  //     enableLinks: true,
-  //     image: { type: 'jpeg', quality: 0.98 },
-  //     margin: 0.1,
-  //     jsPDF: {
-  //       unit: 'mm',
-  //       format: 'A4',
-  //       orientation: 'portrait'
-  //     },
-  //     userUnit: 450 / 210
-  //   };
-  //   html2pdf().from(content).set(opt).save();
-  // };
+  
 
   const convertToPdf = async () => {
     try {
