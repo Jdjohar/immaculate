@@ -1773,6 +1773,48 @@ router.put('/userEntries/:entryId', async (req, res) => {
 });
 
 
+// Update an entry
+router.put('/userEntriesUpdate/:entryId', async (req, res) => {
+    try {
+        const entryId = req.params.entryId; // Extract entry ID from the URL
+        const updatedData = req.body; // The updated fields from the frontend
+
+        // Update the entry in the database
+        const updatedEntry = await Timeschema.findByIdAndUpdate(
+            entryId,
+            updatedData,
+            { new: true } // Return the updated document
+        );
+
+        if (updatedEntry) {
+            res.json({ success: true, message: 'Entry updated successfully', updatedEntry });
+        } else {
+            res.status(404).json({ success: false, message: 'Entry not found' });
+        }
+    } catch (error) {
+        console.error('Error updating entry:', error);
+        res.status(500).json({ success: false, message: 'Failed to update entry' });
+    }
+});
+
+
+// Delete a category
+router.delete('/userEntries/:entryId', async (req, res) => {
+    try {
+        const entryId = req.params.entryId;
+        const result = await Timeschema.findByIdAndDelete(entryId);
+        if (result) {
+            res.json({ success: true, message: 'Entry deleted successfully' });
+        } else {
+            res.status(404).json({ success: false, message: 'Entry not found' });
+        }
+    } catch (error) {
+        console.error('Error deleting category:', error);
+        res.status(500).json({ success: false, message: 'Failed to delete category' });
+    }
+});
+
+
 router.get('/allEntries', async (req, res) => {
     try {
         const allEntries = await Timeschema.find().sort({ startTime: 1 });

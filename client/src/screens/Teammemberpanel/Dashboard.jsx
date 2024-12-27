@@ -23,10 +23,13 @@ export default function Dashboard() {
   const [alertMessage, setAlertMessage] = useState('');
   const userid = localStorage.getItem('userid');
   const currentDate = new Date(); // Get the current date
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const currentMonth = format(currentDate, 'MMMM');
 
   const handleClockIn = async () => {
+    if (isProcessing) return; // Prevent additional clicks
+    setIsProcessing(true); // Set processing to true
     try {
       let userid = localStorage.getItem('userid');
       let username = localStorage.getItem('username');
@@ -66,9 +69,14 @@ export default function Dashboard() {
     } catch (error) {
       console.error(error);
     }
+    finally {
+      setIsProcessing(false); // Reset processing state
+    }
   };
 
   const handleClockOut = async () => {
+    if (isProcessing) return; // Prevent additional clicks
+    setIsProcessing(true); // Set processing to true
     try {
       let userid = localStorage.getItem('userid');
       let username = localStorage.getItem('username');
@@ -122,6 +130,9 @@ export default function Dashboard() {
     } catch (error) {
       console.error(error);
       setloading(false);
+    }
+    finally {
+      setIsProcessing(false); // Reset processing state
     }
   };
 
@@ -284,9 +295,17 @@ export default function Dashboard() {
                     <p className='fs-25 fw-bold'>Clock In/Out</p>
                     <div className="d-flex">
                       {isClockedIn ? (
-                        <button className="btn btn-danger text-white" onClick={handleClockOut}>Stop</button>
+                        <button 
+                        className="btn btn-danger text-white" 
+                        onClick={handleClockOut}
+                        disabled={isProcessing} // Disable button when processing
+                        > {isProcessing ? "Stopping..." : "Stop"}</button>
                       ) : (
-                        <button className="btn btn-primary text-white mx-2" onClick={handleClockIn}>Start</button>
+                        <button 
+                        className="btn btn-primary text-white mx-2" 
+                        onClick={handleClockIn}
+                        disabled={isProcessing}
+                        >{isProcessing ? "Starting..." : "Start"}</button>
                       )}
                     </div>
 
