@@ -95,6 +95,21 @@ th {
   color: white;
 }
 
+.page {
+  page-break-after: always;
+  page-break-inside: avoid;
+}
+.page, .invoice-body {
+  page-break-inside: avoid;
+}
+
+table, tr, td {
+  page-break-inside: avoid;
+}
+
+.no-split {
+  page-break-inside: avoid;
+}
 .App-link {
   color: #61dafb;
 }

@@ -11,6 +11,9 @@ import CurrencySign from '../../components/CurrencySign ';
 import Alertauthtoken from '../../components/Alertauthtoken';
 // import { PDFViewer, pdf, PDFDownloadLink, Document, Image, Page, Text, Font, View, StyleSheet } from '@react-pdf/renderer';   
 import sign from '../../../public/signs.png'
+
+
+
 export default function Estimatedetail() {
   const [loading, setloading] = useState(true);
   const [signupdata, setsignupdata] = useState([]);
@@ -222,6 +225,7 @@ export default function Estimatedetail() {
   }
 
 
+
   const formatCustomDate = (dateString) => {
     const options = { day: 'numeric', month: 'short', year: 'numeric' };
     const date = new Date(dateString);
@@ -229,7 +233,7 @@ export default function Estimatedetail() {
   };
 
   const handlePrintContent = async () => {
-    const content = document.getElementById('invoiceContent').innerHTML;
+    const content = document.getElementById('invoiceContent1').innerHTML;
     const printWindow = window.open('', '_blank');
     printWindow.document.open();
     printWindow.document.write(`
@@ -557,10 +561,19 @@ thead{
   };
 
   const handleRemove = async (estimateid, estimateIdpass) => {
+    // Show confirmation dialog
+    const confirmDelete = window.confirm('Are you sure you want to delete this invoice?');
+  
+    // If the user cancels, stop execution
+    if (!confirmDelete) {
+      console.log('Invoice deletion cancelled by the user.');
+      return;
+    }
+  
     try {
       // Check if there's a customer signature
       const signatureData = await checkCustomerSignature(estimateIdpass);
-
+  
       // If a signature exists, delete it
       if (signatureData) {
         const authToken = localStorage.getItem('authToken');
@@ -570,7 +583,7 @@ thead{
             'Authorization': authToken,
           }
         });
-
+  
         if (!deleteSignatureResponse.ok) {
           const json = await deleteSignatureResponse.json();
           console.error('Error deleting customer signature:', json.message);
@@ -579,7 +592,7 @@ thead{
           console.log('Customer signature deleted successfully!');
         }
       }
-
+  
       // Proceed with deleting the estimate data
       const authToken = localStorage.getItem('authToken');
       const response = await fetch(`https://immaculate.onrender.com/api/delestimatedata/${estimateid}`, {
@@ -588,7 +601,7 @@ thead{
           'Authorization': authToken,
         }
       });
-
+  
       if (response.status === 401) {
         const json = await response.json();
         setAlertMessage(json.message);
@@ -597,19 +610,20 @@ thead{
         return; // Stop further execution
       } else {
         const json = await response.json();
-
+  
         if (json.success) {
           console.log('Data removed successfully!');
           navigate('/userpanel/Userdashboard');
         } else {
-          console.error('Error deleting Invoice:', json.message);
+          console.error('Error deleting invoice:', json.message);
         }
       }
-
+  
     } catch (error) {
-      console.error('Error deleting Invoice:', error);
+      console.error('Error deleting invoice:', error);
     }
   };
+  
 
   // const handleRemove = async (estimateid) => {
   //   try {
@@ -746,6 +760,35 @@ thead{
     setShowEmailAlert(false); // Close the alert
   };
 
+  const convertToPdf = async () => {
+    console.log("Convert to PDF");
+    try {
+      const content = document.getElementById('invoiceContent').outerHTML;
+
+      const opt = {
+        filename: 'Estimate.pdf',
+        html2canvas: {
+          scale: 2, // Improves rendering quality
+          useCORS: true,
+          scrollX: 0,
+          scrollY: 0,
+        },
+        image: { type: 'jpeg', quality: 0.98 },
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait',
+        },
+      };
+
+      await html2pdf().from(content).set(opt).save();
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
+
+
+
   const generatePdfFromHtml = async () => {
     return new Promise((resolve, reject) => {
       const content = document.getElementById('invoiceContent').innerHTML;
@@ -823,6 +866,7 @@ thead{
 
                             <li><a className="dropdown-item" onClick={handlePrintContent}>Print</a></li>
                             <li><a className="dropdown-item" onClick={() => handleEditContent(estimateData)}>Edit</a></li>
+                            <li><a className="dropdown-item" onClick={convertToPdf}>Pdf</a></li>
                             <li><a className="dropdown-item" onClick={() => handleRemove(estimateData._id, estimateData.customeremail)}>Remove</a></li>
                           </ul>
                         </div>
@@ -861,7 +905,7 @@ thead{
 
                     )}
 
-                    <div class="page" style={{ display: 'none' }} id='invoiceContent'>
+                    <div class="page" style={{display:'none'}} id='invoiceContent'>
                       <div class="header ps pb-0" >
                         {signupdata.companyImageUrl !== "" ?
                           <img src={signupdata.companyImageUrl} style={{ height: '85px' }} className='logoimage' alt="" /> :
@@ -889,7 +933,7 @@ thead{
                         </div>
                       </div>
 
-                      <div class="invoice-details fs12 ps py-2 bg-light">
+                      <div class="invoice-details fs12 ps py-2 bg-light no-split">
                         <div>
                           <p className='m-0 text-green'><strong>Prepared For</strong></p>
                           <p className='m-0'> {estimateData.customername}</p>
@@ -899,7 +943,7 @@ thead{
                         <div>
                           <p className='m-0 text-green'><strong>Estimate #:</strong> {estimateData.EstimateNumber}</p>
                           <p className='m-0 text-green'><strong>Date:</strong> {formatCustomDate(estimateData.date)}</p>
-         
+
 
                           {
                             estimateData.job == "" || estimateData.job == null
@@ -924,7 +968,7 @@ thead{
                             </tr>
                           </thead>
                           <tbody>
-                            {console.log(items,"items")}
+                            {console.log(items, "items")}
                             {items.map((item) => (
                               <tr className='border-bottom' key={item._id}>
                                 <td className='  d-md-table-cell' width="15%">
@@ -943,7 +987,7 @@ thead{
                           </tbody>
                         </table>
                       </div>
-                      <div class="totals ps">
+                      <div class="totals ps no-split">
                         <table className='fs12'>
                           <tr>
                             <td className='text-end'>Subtotal:</td>
@@ -1014,7 +1058,7 @@ thead{
 
 
                       {estimateData.isAddSignature || estimateData.isCustomerSign ?
-                        <div className="invoice-body">
+                        <div className="invoice-body no-split">
                           <p>By signing this document, the customer agrees to the services and conditions described in this document.</p>
                           <div className="row">
                             {console.log(ownerData, "ownerData")
@@ -1053,7 +1097,7 @@ thead{
 
                     <div className="row">
                       <div className="col-12 col-sm-12 col-md-12 col-lg-8" id="">
-                        <div className='print' id='invoiceContent'>
+                        <div className='print' id='invoiceContent1'>
                           <div className="invoice-body">
                             <div className='row'>
                               <div className='col-sm-12 col-md-6 mb-3 mb-md-0 pt-3'>

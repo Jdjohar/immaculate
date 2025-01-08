@@ -1720,7 +1720,7 @@ thead{
                         </div>
                       </div>
 
-                      <div class="invoice-details fs12 ps py-2 bg-light">
+                      <div class="invoice-details fs12 ps py-2 bg-light  no-split">
                         <div>
                           <p className='m-0 text-green'><strong>Prepared For</strong></p>
                           <p className='m-0'> {invoiceData.customername}</p>
@@ -1773,7 +1773,7 @@ thead{
                           </tbody>
                         </table>
                       </div>
-                      <div class="totals ps">
+                      <div class="totals ps  no-split">
                         <table className='fs12'>
                           <tr className='pb-2'>
                             <td className='text-end'>Subtotal:</td>
@@ -1826,7 +1826,7 @@ thead{
                         <p className='text-end'> <span className='p-3 ' style={{background:'#f0f3f4'}} ><span className='text-green'>Amount Due:</span> <strong><CurrencySign />{roundOff(invoiceData.total - transactions.reduce((total, payment) => total + payment.paidamount, 0))}</strong></span></p>
                       </div>
 
-                      <div className='invoice-body invoice-body-text'>
+                      <div className='invoice-body invoice-body-text  no-split'>
                             <div className='mt-1'>
                               <span>{invoiceData.information == '' ? '' : 'Note:'}</span>
                               <div className='information-content' dangerouslySetInnerHTML={{ __html: invoiceData.information }} />

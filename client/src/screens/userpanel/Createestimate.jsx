@@ -388,15 +388,7 @@ export default function Createestimate() {
         setEditorData(data);
     };
 
-    // const onChangeQuantity = (event, itemId) => {
-    //     const newQuantity = event.target.value ? parseFloat(event.target.value) : 1;
-
-    //     // Update quantity for the corresponding item
-    //     setQuantityMap((prevMap) => ({
-    //       ...prevMap,
-    //       [itemId]: newQuantity,
-    //     }));
-    //   };
+   
 
     const onChangeQuantity = (event, itemId) => {
         let newQuantity = event.target.value ? parseFloat(event.target.value) : 1;
@@ -450,14 +442,7 @@ export default function Createestimate() {
         }
     };
 
-    // const handleNameChange = (event) => {
-    //     const selectedName = event.target.value;
-    //     const selectedCustomer = customers.find(customer => customer.name === selectedName);
-    //     if (selectedCustomer) {
-    //         setEditedName(selectedName);
-    //         setEditedEmail(selectedCustomer.email);
-    //     }
-    // };
+
 
     const handleEditCustomer = () => {
         if (!SelectedCustomerId) {
@@ -482,18 +467,7 @@ export default function Createestimate() {
 
     };
 
-    // const handleEditCustomer = () => {
-    //     const updatedCustomerDetails = {
-    //         name: editedName,
-    //         email: editedEmail,
-    //     };
-
-    //     setSelectedCustomerDetails({
-    //         name: editedName,
-    //         email: editedEmail
-    //     });
-    //     console.log("Updated customer details:", updatedCustomerDetails);
-    // };
+    
 
     const calculateDiscountedAmount = (price, quantity, discount) => {
         const totalAmount = price * quantity;
@@ -501,32 +475,6 @@ export default function Createestimate() {
         return discountedAmount > 0 ? discountedAmount : 0;
     };
 
-
-    const onDiscountChange = (event, itemId) => {
-        const discountValue = event.target.value;
-        const regex = /^\d*\.?\d{0,2}$/; // Regex to allow up to two decimal places
-
-        // Check if the input matches the allowed format
-        if (regex.test(discountValue)) {
-            const newDiscount = discountValue !== '' ? parseFloat(discountValue) : 0;
-            const selectedPrice = items.find((i) => i._id === itemId)?.price || 0;
-            const quantity = quantityMap[itemId] || 1;
-            const totalAmount = selectedPrice * quantity;
-
-            const discountedAmount = totalAmount - (totalAmount * newDiscount) / 100;
-
-            setDiscountMap((prevMap) => ({
-                ...prevMap,
-                [itemId]: newDiscount,
-            }));
-
-            // Use discountedAmount in your code where needed
-            // console.log('Discounted Amount:', discountedAmount.toFixed(2)); // Output the discounted amount
-        } else {
-            // Handle invalid input (e.g., show a message to the user)
-            console.log('Invalid input for discount');
-        }
-    };
 
     const calculateSubtotal = () => {
         let subtotal = 0;
@@ -622,6 +570,8 @@ export default function Createestimate() {
 
             const selectedCustomer = customers.find((customer) => customer._id === SelectedCustomerId);
 
+            console.log(selectedCustomer,"selectedCustomerDetails selectedCustomerDetails");
+            
             // Summing up subtotal, total, and amount due for the entire estimate
             const subtotal = estimateItems.reduce((acc, curr) => acc + curr.amount, 0);
             const total = calculateTotal();
@@ -632,9 +582,9 @@ export default function Createestimate() {
 
             const data = {
                 userid: userid,
-                customername: estimateData.customername,
-                customeremail: estimateData.customeremail,
-                customerphone: estimateData.customerphone,
+                customername: selectedCustomer.name,
+                customeremail: selectedCustomer.email,
+                customerphone: selectedCustomer.number,
                 estimate_id: estimateData.estimate_id,
                 EstimateNumber: estimateData.EstimateNumber,
                 purchaseorder: estimateData.purchaseorder,
@@ -653,6 +603,7 @@ export default function Createestimate() {
                 isCustomerSign: isCustomerSignSwitchOn,
             };
             console.log(data, "Data sdsdfsdsfsdf");
+            console.log("Estimate Data before submission:", estimateData);
 
             // Sending estimate data to the backend API
             const response = await fetch('https://immaculate.onrender.com/api/savecreateestimate', {
@@ -953,17 +904,7 @@ export default function Createestimate() {
                                                                     <p className='fs-20 mb-0'>Select Customers</p>
                                                                     <div className="row">
                                                                         <div className="col-8">
-                                                                            {/*<VirtualizedSelect
-                                                                                id="searchitems"
-                                                                                name="customername"
-                                                                                className="form-control zindex op pl-0"
-                                                                                placeholder=""
-                                                                                onChange={onChangecustomer}
-                                                                                required
-                                                                                options={customers.map((customer, index) =>
-                                                                                    ({ label: customer.name, value: customer._id })
-                                                                                )}
-                                                                            />*/}
+                                                                           
                                                                             <Select
                                                                                 value={searchcustomerResults}
                                                                                 onChange={onChangecustomer}
