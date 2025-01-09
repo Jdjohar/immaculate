@@ -760,32 +760,24 @@ thead{
     setShowEmailAlert(false); // Close the alert
   };
 
-  const convertToPdf = async () => {
-    console.log("Convert to PDF");
-    try {
-      const content = document.getElementById('invoiceContent').outerHTML;
-
-      const opt = {
-        filename: 'Estimate.pdf',
-        html2canvas: {
-          scale: 2, // Improves rendering quality
-          useCORS: true,
-          scrollX: 0,
-          scrollY: 0,
-        },
-        image: { type: 'jpeg', quality: 0.98 },
-        jsPDF: {
-          unit: 'mm',
-          format: 'a4',
-          orientation: 'portrait',
-        },
-      };
-
-      await html2pdf().from(content).set(opt).save();
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-    }
+  const convertToPdf = () => {
+    const content = document.getElementById('invoiceContent').innerHTML;
+    const opt = {
+      filename: `${estimateData.EstimateNumber}.pdf`,
+      html2canvas: { scale: 3, useCORS: true },
+      enableLinks: true,
+      image: { type: 'jpeg', quality: 0.98 },
+      margin: 0.2,
+      jsPDF: {
+        unit: 'in',
+        format: 'A4',
+        orientation: 'portrait'
+      },
+      userUnit: 450 / 210
+    };
+    html2pdf().from(content).set(opt).save();
   };
+
 
 
 

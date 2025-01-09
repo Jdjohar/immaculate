@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useSearchParams,useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ColorRing } from 'react-loader-spinner'
 import CurrencySign from '../../components/CurrencySign ';
 import SignatureModal from '../../components/SignatureModal';
@@ -14,19 +14,19 @@ const Customersigninvoice = () => {
   const [loading, setloading] = useState(true);
   const [error, setError] = useState(null);
   const [signupdata, setsignupdata] = useState({
-    Businesstype:"",
-    CurrencyType:"",
-    FirstName:"",
-    LastName:"",
-    TaxName:"",
-    address:"",
-    city:"",
-    companyImageUrl:"",
-    companyname:"",
-    country:"",
-    email:"",
-    state:"",
-    taxPercentage:"",
+    Businesstype: "",
+    CurrencyType: "",
+    FirstName: "",
+    LastName: "",
+    TaxName: "",
+    address: "",
+    city: "",
+    companyImageUrl: "",
+    companyname: "",
+    country: "",
+    email: "",
+    state: "",
+    taxPercentage: "",
   });
   const [transactions, setTransactions] = useState([]);
   const [items, setitems] = useState([]);
@@ -60,7 +60,7 @@ const Customersigninvoice = () => {
       fetchsignupdata();
       fetchtransactiondata();
       fetchOwnerData();
-      
+
 
       if (invoiceData.isAddSignature || invoiceData.isCustomerSign) {
         checkCustomerSignature(invoiceData._id);
@@ -95,7 +95,7 @@ const Customersigninvoice = () => {
     return new Promise((resolve, reject) => {
       const content = document.getElementById('invoiceContent').innerHTML;
       const opt = {
-        margin: 0.2, 
+        margin: 0.2,
         filename: 'myfile.pdf',
         html2canvas: { scale: 3, useCORS: true }, // Increase scale for better resolution
         jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' },
@@ -464,23 +464,23 @@ thead{
       }
       else {
         const json = await response.json();
-       
+
 
         setinvoiceData(json);
         // fetchsignupdata();
         // fetchtransactiondata();
         //   fetchOwnerData(); 
 
-      if (json.isAddSignature || json.isCustomerSign) {
-        // Wait for invoiceData to be set before checking customer signature
-        setTimeout(() => {
-          checkCustomerSignature(json._id);
-        }, 0);
-      }
+        if (json.isAddSignature || json.isCustomerSign) {
+          // Wait for invoiceData to be set before checking customer signature
+          setTimeout(() => {
+            checkCustomerSignature(json._id);
+          }, 0);
+        }
         if (Array.isArray(json.items)) {
           setitems(json.items);
         }
-      setloading(false);
+        setloading(false);
       }
 
     } catch (error) {
@@ -491,7 +491,7 @@ thead{
 
   const fetchsignupdata = async () => {
     try {
-      const userId =  invoiceData.userid;  // localStorage.getItem("userid");
+      const userId = invoiceData.userid;  // localStorage.getItem("userid");
       // const userid =   localStorage.getItem("userid");
       // const authToken = localStorage.getItem('authToken');
       const response = await fetch(`https://immaculate.onrender.com/api/getemailsignupdata/${userId}`, {
@@ -509,8 +509,8 @@ thead{
       }
       else {
         const json = await response.json();
-        if(json != null){
-        setsignupdata(json);
+        if (json != null) {
+          setsignupdata(json);
         }
       }
     } catch (error) {
@@ -587,16 +587,16 @@ thead{
       console.error('Customer invoiceId is not defined');
       return;
     }
-  
+
     try {
       const response = await fetch(`https://immaculate.onrender.com/api/checkcustomersignatureusinginvoice/${encodeURIComponent(invoiceIdpass)}`);
       const json = await response.json();
       console.log('Customer signature response:', json);
       console.log('Customer signature response:', response.ok);
       if (response.ok && json.hasSignature) {
-        setsignatureData(json.signatureData); 
+        setsignatureData(json.signatureData);
       } else {
-        setsignatureData(null); 
+        setsignatureData(null);
       }
     } catch (error) {
       console.error('Error fetching customer signature:', error);
@@ -605,13 +605,13 @@ thead{
 
   const handleSignatureClick = async () => {
     setIsSignatureModalOpen(true);
-    
+
 
     try {
       // Check if customer signature already exists
       const checkResponse = await fetch(`https://immaculate.onrender.com/api/checkcustomersignatureusinginvoice/${encodeURIComponent(invoiceData._id)}`);
       const checkJson = await checkResponse.json();
-  
+
       if (checkJson.hasSignature) {
         // Update the existing customer signature
         const updateResponse = await fetch(`https://immaculate.onrender.com/api/updatecustomersigninv/${encodeURIComponent(invoiceData._id)}`, {
@@ -624,7 +624,7 @@ thead{
             lastupdated: 'Viewed' || '',
           }),
         });
-  
+
         // if (updateResponse.ok) {
         //   alert('Signature updated successfully');
         //   // checkCustomerSignature();
@@ -641,47 +641,47 @@ thead{
       // setIsSignatureModalOpen(false);
     }
   };
-  
+
   const handleSaveSignature = async (signatureData) => {
 
     const authToken = localStorage.getItem('authToken');
     const userEmail = invoiceData.userid;
-    const ownerId= invoiceData.userid;
-  
+    const ownerId = invoiceData.userid;
+
     try {
       // Check if customer signature already exists
       const checkResponse = await fetch(`https://immaculate.onrender.com/api/checkcustomersignatureusinginvoice/${encodeURIComponent(invoiceData._id)}`);
       const checkJson = await checkResponse.json();
-  
+
       // if (checkJson.ok) {
-        // Update the existing customer signature
-        const updateResponse = await fetch(`https://immaculate.onrender.com/api/updatecustomersigninv/${encodeURIComponent(invoiceData._id)}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            // 'Authorization': authToken,
-          },
-          
-          body: JSON.stringify({
-            customersign: signatureData,
-            invoiceId: invoiceId,
-            userid: invoiceData?.userid || '',
-            customerName: invoiceData?.customername || '',
-            customerEmail: invoiceData?.customeremail || '', 
-            documentNumber: invoiceData?.InvoiceNumber || '', 
-            lastupdated: 'Signed' || '',
-            status: 'Signed', 
-            completeButtonVisible: true,
-          }),
-        });
-  
-        if (updateResponse.ok) {
-          alert('Signature updated successfully');
-          checkCustomerSignature(invoiceId);
-          setIsCompleteButtonVisible(true)
-        } else {
-          alert('Error updating signature');
-        }
+      // Update the existing customer signature
+      const updateResponse = await fetch(`https://immaculate.onrender.com/api/updatecustomersigninv/${encodeURIComponent(invoiceData._id)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          // 'Authorization': authToken,
+        },
+
+        body: JSON.stringify({
+          customersign: signatureData,
+          invoiceId: invoiceId,
+          userid: invoiceData?.userid || '',
+          customerName: invoiceData?.customername || '',
+          customerEmail: invoiceData?.customeremail || '',
+          documentNumber: invoiceData?.InvoiceNumber || '',
+          lastupdated: 'Signed' || '',
+          status: 'Signed',
+          completeButtonVisible: true,
+        }),
+      });
+
+      if (updateResponse.ok) {
+        alert('Signature updated successfully');
+        checkCustomerSignature(invoiceId);
+        setIsCompleteButtonVisible(true)
+      } else {
+        alert('Error updating signature');
+      }
       // } else {
       //   console.error('Error saving signature:', error);
       // }
@@ -708,9 +708,9 @@ thead{
     window.removeEventListener('scroll', onScroll);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-}, []);
+  }, []);
 
-console.log(offset); 
+  console.log(offset);
   const handleScroll = () => {
     setScrollPosition(window.pageYOffset);
     if (signatureButtonRef.current) {
@@ -724,46 +724,46 @@ console.log(offset);
       }
     }
   };
-  
 
-//   const handleSaveSignature = async (signatureData) => {
-//     // signatureData.preventDefault();
-//     const authToken = localStorage.getItem('authToken');
 
-//     try {
-//         const response = await fetch('https://immaculate.onrender.com/api/customersignature', {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 // 'Authorization': authToken,
-//             },
-//             body: JSON.stringify({
-//                 customersign: signatureData,
-//                 invoiceId,
-//                 customerName: invoiceData?.customername || '',
-//                 customerEmail: invoiceData?.customeremail || '', 
-//                 documentNumber: invoiceData?.InvoiceNumber || '', 
-//             }),
-//         });
+  //   const handleSaveSignature = async (signatureData) => {
+  //     // signatureData.preventDefault();
+  //     const authToken = localStorage.getItem('authToken');
 
-//         if (response.ok) {
-//             const result = await response.json();
-//             alert('Signature saved successfully');
-//             checkCustomerSignature()
-//         } else {
-//             alert('Error saving signature');
-//         }
-//     } catch (error) {
-//         console.error('Error saving signature:', error);
-//         alert('Error saving signature');
-//     } finally {
-//         setIsSignatureModalOpen(false);
-//     }
-// };
+  //     try {
+  //         const response = await fetch('https://immaculate.onrender.com/api/customersignature', {
+  //             method: 'POST',
+  //             headers: {
+  //                 'Content-Type': 'application/json',
+  //                 // 'Authorization': authToken,
+  //             },
+  //             body: JSON.stringify({
+  //                 customersign: signatureData,
+  //                 invoiceId,
+  //                 customerName: invoiceData?.customername || '',
+  //                 customerEmail: invoiceData?.customeremail || '', 
+  //                 documentNumber: invoiceData?.InvoiceNumber || '', 
+  //             }),
+  //         });
+
+  //         if (response.ok) {
+  //             const result = await response.json();
+  //             alert('Signature saved successfully');
+  //             checkCustomerSignature()
+  //         } else {
+  //             alert('Error saving signature');
+  //         }
+  //     } catch (error) {
+  //         console.error('Error saving signature:', error);
+  //         alert('Error saving signature');
+  //     } finally {
+  //         setIsSignatureModalOpen(false);
+  //     }
+  // };
 
   const roundOff = (value) => {
     return Math.round(value * 100) / 100;
-};
+  };
 
   const formatCustomDate = (dateString) => {
     const options = { day: 'numeric', month: 'short', year: 'numeric' };
@@ -802,7 +802,7 @@ console.log(offset);
         console.error('Failed to send email');
         return;
       }
-      
+
       console.log('Email sent successfully');// Update customer signature
       const updateResponse = await fetch(`https://immaculate.onrender.com/api/updatecustomersigninv/${encodeURIComponent(invoiceData._id)}`, {
         method: 'PUT',
@@ -820,12 +820,12 @@ console.log(offset);
           lastupdated: 'Completed' || '',
         }),
       });
-  
+
       if (!updateResponse.ok) {
         console.error('Failed to update customer signature');
         return;
       }
-      
+
       console.log('Customer signature updated successfully');
       navigate(`/completedocument?invoiceId=${invoiceId}`);
 
@@ -869,247 +869,262 @@ console.log(offset);
   // };
 
   return (
-    
-    <div className='bg'>
-    {
-      loading ?
-        <div className='row position-relative'>
-          <ColorRing
-            loading={loading}
-            display="flex"
-            justify-content="center"
-            align-items="center"
-            aria-label="Loading Spinner"
-            data-testid="loader"
-          />
-        </div> :
-        <div className='container-fluid'>
-            <div className="row">
-                <div className='m-auto'>
-                  <div className='text-center pt-5'>
-                    <button className='pdfbtn text-center' onClick={handlePrintContent}><i class="fa-solid fa-print mx-2"></i>Pdf</button>
-                  </div>
 
-                    <div className="row py-4 px-2">
-                    <div className="col-12 col-sm-12 col-md-12 col-lg-12" id="">
-                        <div className='print' id='invoiceContent'>
-                        <div className="invoice-body">
-                            <div className='row'>
-                              <div className='col-sm-12 col-md-6 mb-3 mb-md-0 pt-3'>
-                                {signupdata != null ? signupdata.companyImageUrl != "" && signupdata.companyImageUrl != undefined && signupdata.companyImageUrl != null  ?
-                                  <img src={signupdata.companyImageUrl} className='w-50 logoimage' alt="testing imahe" /> :
-                                  <p className='h4 fw-bold'>{signupdata.companyname}</p>
-                                  :""
-                                }
-                              </div>
-                              <div className='col-sm-12 col-md-6 text-md-end'>
-                                <h2>Invoice</h2>
-                                <div className='text-inverse mb-1'>
-                                  <strong>{signupdata != null ? signupdata.companyname : ""}</strong>
-                                  <address className='m-t-5 m-b-5'>
-                                  <div className='mb-2'>
-                                    <div className=''>{signupdata.address} </div>
-                                      {signupdata.city ? JSON.parse(signupdata.city).name+',' : ' '}
-                                      {signupdata.state ? JSON.parse(signupdata.state).name : ' '}
-                                     {/* <div className=''>{JSON.parse(signupdata.city).name}, {JSON.parse(signupdata.state).name}</div>
+    <div className='bg'>
+      {
+        loading ?
+          <div className='row position-relative'>
+            <ColorRing
+              loading={loading}
+              display="flex"
+              justify-content="center"
+              align-items="center"
+              aria-label="Loading Spinner"
+              data-testid="loader"
+            />
+          </div> :
+          <div className='container-fluid'>
+            <div className="row">
+              <div className='m-auto'>
+                <div className='text-center pt-5'>
+                  <button className='pdfbtn text-center' onClick={handlePrintContent}><i class="fa-solid fa-print mx-2"></i>Pdf</button>
+                </div>
+
+                <div className="row py-4 px-2">
+                  <div className="col-12 col-sm-12 col-md-12 col-lg-12" id="">
+                    <div className='print' id='invoiceContent'>
+                      <div className="invoice-body">
+                        <div className='row'>
+                          <div className='col-sm-12 col-md-6 mb-3 mb-md-0 pt-3'>
+                            {signupdata != null ? signupdata.companyImageUrl != "" && signupdata.companyImageUrl != undefined && signupdata.companyImageUrl != null ?
+                              <img src={signupdata.companyImageUrl} className='w-50 logoimage' alt="testing imahe" /> :
+                              <p className='h4 fw-bold'>{signupdata.companyname}</p>
+                              : ""
+                            }
+                          </div>
+                          <div className='col-sm-12 col-md-6 text-md-end'>
+                            <h2>Invoice</h2>
+                            <div className='text-inverse mb-1'>
+                              <strong>{signupdata != null ? signupdata.companyname : ""}</strong>
+                              <address className='m-t-5 m-b-5'>
+                                <div className='mb-2'>
+                                  <div className=''>{signupdata.address} </div>
+                                  {signupdata.city ? JSON.parse(signupdata.city).name + ',' : ' '}
+                                  {signupdata.state ? JSON.parse(signupdata.state).name : ' '}
+                                  {/* <div className=''>{JSON.parse(signupdata.city).name}, {JSON.parse(signupdata.state).name}</div>
                                     <div className=''>{JSON.parse(signupdata.country).emoji}</div> */}
-                                  </div>
-                                  <div>{signupdata.email}</div>
-                                  <div>{signupdata.website} </div>
-                                  <div>
-                                    {signupdata.gstNumber == ''
+                                </div>
+                                <div>{signupdata.email}</div>
+                                <div>{signupdata.website} </div>
+                                <div>
+                                  {signupdata.gstNumber == ''
                                     ?
-                                  ""
-                                  :
-                                  `${signupdata.TaxName } ${signupdata.gstNumber}`
+                                    ""
+                                    :
+                                    `${signupdata.TaxName} ${signupdata.gstNumber}`
                                   }
 
-                                    </div>
-
-                                </address>
                                 </div>
-                              </div>
 
+                              </address>
                             </div>
-                            <div class="clr"></div>
-                          </div>
-                          <div className='invoice-header'>
-                            <div className='row'>
-                              <div className='invoice-to col-sm-12 col-md-6'>
-                                <strong>Bill To</strong>
-                                <div className='text-inverse mb-1'>
-                                  {invoiceData?.customername || ''}
-                                </div>
-                                <address className='m-t-5 m-b-5'>
-                                  <div>{invoiceData?.customeremail || ''}</div>
-                                  <div>{invoiceData?.customerphone || ''}</div>
-
-                                </address>
-                              </div>
-                              <div className='invoice-date col-sm-12 col-md-6'>
-                                <div className='row text-md-end'>
-                                  <div className='col-6 col-md'>
-                                    <strong>Invoice #</strong>
-                                  </div>
-                                  <div className='col-6 col-md invoice-detail-right'>{invoiceData?.InvoiceNumber || ''}</div>
-                                </div>
-                                <div className='row text-md-end'>
-                                  <div className='col-6 col-md'>
-                                    <strong>Date</strong>
-                                  </div>
-                                  <div className='col-6 col-md invoice-detail-right'>{formatCustomDate(invoiceData?.date || '')}</div>
-                                </div>
-                                <div className='row text-md-end'>
-                                  <div className='col-6 col-md'>
-                                    <strong>Job</strong>
-                                  </div>
-                                  <div className='col-6 col-md invoice-detail-right'>{invoiceData?.job || ''}</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="clr"></div>
                           </div>
 
-                          <div className='invoice-table'>
-                            <div className='table-responsive'>
-                              <table className='table table-invoice'>
-                                <thead>
-                                  <tr className='table table-invoice'>
-                                    <th className='text-start'>Item</th>
-                                    <th className='text-center d-none d-md-table-cell' width="15%">Quantity</th>
-                                    <th className='text-end d-none d-md-table-cell' width="15%"> Price</th>
-                                    <th className='text-end' width="15%"> Amount</th>
-                                  </tr>
-                                </thead>
+                        </div>
+                        <div class="clr"></div>
+                      </div>
+                      <div className='invoice-header'>
+                        <div className='row'>
+                          <div className='invoice-to col-sm-12 col-md-6'>
+                            <strong>Bill To</strong>
+                            <div className='text-inverse mb-1'>
+                              {invoiceData?.customername || ''}
+                            </div>
+                            <address className='m-t-5 m-b-5'>
+                              <div>{invoiceData?.customeremail || ''}</div>
+                              <div>{invoiceData?.customerphone || ''}</div>
 
-                                <tbody>
-                                  {items.map((item) => (
-                                    <tr key={item._id}>
-                                      <td>
-                                        <div>
-                                          <span><strong>{item.itemname}</strong></span>
-                                          <div dangerouslySetInnerHTML={{ __html: item.description }} />
-                                        </div>
-                                      </td>
-                                      <td className="text-center d-none d-md-table-cell">{item.itemquantity}</td>
-                                      <td className="text-end d-none d-md-table-cell"><CurrencySign />{roundOff(item.price)}</td>
-                                      <td className='text-end'><CurrencySign />{roundOff(item.amount)}</td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            </div>
-                            <hr />
-                            <div className='row'>
-                              <div className='col-12'>
-                                <table className='table table-borderless table-small'>
-                                  <tbody>
-                                    <tr>
-                                      <td className='d-none d-md-table-cell' rowspan="5"></td>
-                                      <td className='text-md-end' width="22%">Subtotal</td>
-                                      <td className='text-end' width="22%"><CurrencySign />{roundOff(invoiceData?.subtotal || '')}</td>
-                                    </tr>
-                                    {
-                                      invoiceData.discountTotal > 0 
-                                      ?
-                                        <tr>
-                                          <td className='text-md-end' width="22%">Discount</td>
-                                          <td className='text-end' width="22%"><CurrencySign />{roundOff(invoiceData.discountTotal)}</td>
-                                        </tr>
-                                      :
-                                        null
-                                    }
-                                    <tr>
-                                    </tr>
-                                    {transactions.map((transaction) => (
-                                      <tr key={transaction._id}>
-                                        <td className='text-md-end' width="22%">{transaction.method == "deposit" ? "Deposit" : "Paid"} on {formatCustomDate(transaction.paiddate)}</td>
-                                        <td className='text-end' width="22%" style={{ borderBottom: '1px solid #ddd' }}><CurrencySign />{transaction.paidamount}</td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
-                            <div class="clr"></div>
+                            </address>
                           </div>
-
-                          <div className='invoice-price page-not-break'>
-                            <div className='invoice-price-left text-end'>
-                              <div className='d-none d-md-block'></div>
-                            </div>
-                            <div className='invoice-price-right'>
-                              <small>Amount Due</small>
-                              <span class="f-w-600 mt-3"><CurrencySign />{roundOff(invoiceData.total - transactions.reduce((total, payment) => total + payment.paidamount, 0))}</span>
-                            </div>
-                          </div>
-                          {invoiceData.isAddSignature || invoiceData.isCustomerSign  ? 
-                            <div className="invoice-body margin-top-sign">
-                              <p>By signing this document, the customer agrees to the services and conditions described in this document.</p>
-                              <div className="row ">
-                                  <div className="col-6">
-                                    {ownerData && (
-                                      <div className="my-2">
-                                        <div>
-                                          <p className='text-center fw-bold fs-5 margin-top-sign txt-center center'>{ownerData.companyname}</p>
-                                          <img src={ownerData.data} alt="Saved Signature" style={{ width: "100%" }} /><hr/>
-                                          <p className='text-center txt-center center'>{formatCustomDate(invoiceData.createdAt)}</p>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="col-6">
-                                    <div className="my-2">
-                                      <div className='text-center txt-center center'>
-                                        <p className='fw-bold fs-5 margin-top-sign txt-center center'>{invoiceData.customername}</p>
-                                        {console.log(signatureData, "signatureData ==========")}
-                                        {signatureData != null ? 
-                                        signatureData.customersign== ''?(
-                                          <button className="signbtn" ref={signatureButtonRef} onClick={() => handleSignatureClick()}>Signature</button>
-                                        ):(
-                                            <div className="signature-section">
-                                              <img src={`${signatureData.customersign}`} alt="Customer Signature" style={{ width: "100%" }} /><hr/>
-                                              <p className='text-center txt-center center'>{formatCustomDate(signatureData.createdAt)}</p>
-                                            </div>
-                                        )
-                                      : (
-                                        ''
-                                      )
-                                        }
-                                      </div>
-                                    </div>
-                                  </div>
+                          <div className='invoice-date col-sm-12 col-md-6'>
+                            <div className='row text-md-end'>
+                              <div className='col-6 col-md'>
+                                <strong>Invoice #</strong>
                               </div>
-                            </div>: ''
-                          }
-                          {isSignatureModalOpen.toString() == "true" && (
-                              <SignatureModal
-                                  onSave={handleSaveSignature}
-                                  onClose={() => setIsSignatureModalOpen(false)}
-                              />
-                          )}
-                          <div className='invoice-body invoice-body-text'>
-                            <div className='mt-1'>
-                              <span>{invoiceData.information == '' ? '' : 'Note:'}</span> 
-                              <div className='information-content' dangerouslySetInnerHTML={{ __html: invoiceData.information }} />
+                              <div className='col-6 col-md invoice-detail-right'>{invoiceData?.InvoiceNumber || ''}</div>
+                            </div>
+                            <div className='row text-md-end'>
+                              <div className='col-6 col-md'>
+                                <strong>Date</strong>
+                              </div>
+                              <div className='col-6 col-md invoice-detail-right'>{formatCustomDate(invoiceData?.date || '')}</div>
+                            </div>
+                            <div className='row text-md-end'>
+                              <div className='col-6 col-md'>
+                                <strong>Job</strong>
+                              </div>
+                              <div className='col-6 col-md invoice-detail-right'>{invoiceData?.job || ''}</div>
                             </div>
                           </div>
                         </div>
+                        <div class="clr"></div>
+                      </div>
+
+                      <div className='invoice-table'>
+                        <div className='table-responsive'>
+                          <table className='table table-invoice'>
+                            <thead>
+                              <tr className='table table-invoice'>
+                                <th className='text-start'>Item</th>
+                                <th className='text-center d-none d-md-table-cell' width="15%">Quantity</th>
+                                <th className='text-end d-none d-md-table-cell' width="15%"> Price</th>
+                                <th className='text-end' width="15%"> Amount</th>
+                              </tr>
+                            </thead>
+
+                            <tbody>
+                              {items.map((item) => (
+                                <tr key={item._id}>
+                                  <td>
+                                    <div>
+                                      <span><strong>{item.itemname}</strong></span>
+                                      <div dangerouslySetInnerHTML={{ __html: item.description }} />
+                                    </div>
+                                  </td>
+                                  <td className="text-center d-none d-md-table-cell">{item.itemquantity}</td>
+                                  <td className="text-end d-none d-md-table-cell"><CurrencySign />{roundOff(item.price)}</td>
+                                  <td className='text-end'><CurrencySign />{roundOff(item.amount)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                        <hr />
+                        <div className='row'>
+                          <div className='col-12'>
+                            <table className='table table-borderless table-small'>
+                              <tbody>
+                                <tr>
+                                  <td className='d-none d-md-table-cell' rowspan="5"></td>
+                                  <td className='text-md-end' width="22%">Subtotal</td>
+                                  <td className='text-end' width="22%"><CurrencySign />{roundOff(invoiceData?.subtotal || '')}</td>
+                                </tr>
+                                {
+                                  invoiceData.tax > 0
+                                    ?
+                                    <tr>
+                                      <td className='text-md-end' width="22%">{signupdata.TaxName} ({signupdata.taxPercentage}%) </td>
+                                      <td className='text-end' width="22%"><CurrencySign />{roundOff(invoiceData.tax)}</td>
+                                    </tr>
+                                    :
+                                    null
+                                }
+                                {
+                                  invoiceData.discountTotal > 0
+                                    ?
+                                    <tr>
+                                      <td className='text-md-end' width="22%">Discount</td>
+                                      <td className='text-end' width="22%"><CurrencySign />{roundOff(invoiceData.discountTotal)}</td>
+                                    </tr>
+                                    :
+                                    null
+                                }
+                                <tr>
+
+                                  <td className='text-md-end' width="22%" style={{ borderBottom: '1px solid #ddd' }}>Total</td>
+                                  <td className='text-end' width="22%" style={{ borderBottom: '1px solid #ddd' }}><CurrencySign />{roundOff(invoiceData.total)}</td>
+                                </tr>
+                                <tr>
+                                </tr>
+                                {transactions.map((transaction) => (
+                                  <tr key={transaction._id}>
+                                    <td className='text-md-end' width="22%">{transaction.method == "deposit" ? "Deposit" : "Paid"} on {formatCustomDate(transaction.paiddate)}</td>
+                                    <td className='text-end' width="22%" style={{ borderBottom: '1px solid #ddd' }}><CurrencySign />{transaction.paidamount}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                        <div class="clr"></div>
+                      </div>
+
+                      <div className='invoice-price page-not-break'>
+                        <div className='invoice-price-left text-end'>
+                          <div className='d-none d-md-block'></div>
+                        </div>
+                        <div className='invoice-price-right'>
+                          <small>Amount Due</small>
+                          <span class="f-w-600 mt-3"><CurrencySign />{roundOff(invoiceData.total - transactions.reduce((total, payment) => total + payment.paidamount, 0))}</span>
+                        </div>
+                      </div>
+                      {invoiceData.isAddSignature || invoiceData.isCustomerSign ?
+                        <div className="invoice-body margin-top-sign">
+                          <p>By signing this document, the customer agrees to the services and conditions described in this document.</p>
+                          <div className="row ">
+                            <div className="col-6">
+                              {ownerData && (
+                                <div className="my-2">
+                                  <div>
+                                    <p className='text-center fw-bold fs-5 margin-top-sign txt-center center'>{ownerData.companyname}</p>
+                                    <img src={ownerData.data} alt="Saved Signature" style={{ width: "100%" }} /><hr />
+                                    <p className='text-center txt-center center'>{formatCustomDate(invoiceData.createdAt)}</p>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                            <div className="col-6">
+                              <div className="my-2">
+                                <div className='text-center txt-center center'>
+                                  <p className='fw-bold fs-5 margin-top-sign txt-center center'>{invoiceData.customername}</p>
+                                  {console.log(signatureData, "signatureData ==========")}
+                                  {signatureData != null ?
+                                    signatureData.customersign == '' ? (
+                                      <button className="signbtn" ref={signatureButtonRef} onClick={() => handleSignatureClick()}>Signature</button>
+                                    ) : (
+                                      <div className="signature-section">
+                                        <img src={`${signatureData.customersign}`} alt="Customer Signature" style={{ width: "100%" }} /><hr />
+                                        <p className='text-center txt-center center'>{formatCustomDate(signatureData.createdAt)}</p>
+                                      </div>
+                                    )
+                                    : (
+                                      ''
+                                    )
+                                  }
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div> : ''
+                      }
+                      {isSignatureModalOpen.toString() == "true" && (
+                        <SignatureModal
+                          onSave={handleSaveSignature}
+                          onClose={() => setIsSignatureModalOpen(false)}
+                        />
+                      )}
+                      <div className='invoice-body invoice-body-text'>
+                        <div className='mt-1'>
+                          <span>{invoiceData.information == '' ? '' : 'Note:'}</span>
+                          <div className='information-content' dangerouslySetInnerHTML={{ __html: invoiceData.information }} />
+                        </div>
                       </div>
                     </div>
-                    <div className='text-center mb-4'>
-                      {signatureData != null ? 
-                        (signatureData.completeButtonVisible != "" && signatureData.completeButtonVisible != undefined && signatureData.completeButtonVisible != null ? 
-                          <button className="btn btn-primary" onClick={handleDocumentComplete}>
-                            Complete
-                          </button>
-                        : '')
-                      : ('')}
-                    </div>
+                  </div>
                 </div>
+                <div className='text-center mb-4'>
+                  {signatureData != null ?
+                    (signatureData.completeButtonVisible != "" && signatureData.completeButtonVisible != undefined && signatureData.completeButtonVisible != null ?
+                      <button className="btn btn-primary" onClick={handleDocumentComplete}>
+                        Complete
+                      </button>
+                      : '')
+                    : ('')}
+                </div>
+              </div>
             </div>
-        </div>
-        }
+          </div>
+      }
     </div>
   );
 };

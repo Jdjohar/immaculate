@@ -1245,6 +1245,13 @@ thead{
   };
 
   const handleRemove = async (invoiceid, invoiceIdpass) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this invoice?');
+  
+    // If the user cancels, stop execution
+    if (!confirmDelete) {
+      console.log('Invoice deletion cancelled by the user.');
+      return;
+    }
     try {
       // Check if there's a customer signature
       const signatureData = await checkCustomerSignature(invoiceIdpass);
@@ -1575,25 +1582,22 @@ thead{
 
   
 
-  const convertToPdf = async () => {
-    try {
-      const content = document.getElementById('invoiceContent').outerHTML;
-      const opt = {
-        filename: 'invoice.pdf',
-        html2canvas: { scale: 3, useCORS: true },
-        enableLinks: true,
-        image: { type: 'jpeg', quality: 0.98 },
-        margin: 0.1,
-        jsPDF: {
-          unit: 'mm',
-          format: 'A4',
-          orientation: 'portrait'
-        }
-      };
-      await html2pdf().from(content).set(opt).save();
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-    }
+  const convertToPdf = () => {
+    const content = document.getElementById('invoiceContent').innerHTML;
+    const opt = {
+      filename: `${invoiceData.InvoiceNumber}.pdf`,
+      html2canvas: { scale: 3, useCORS: true },
+      enableLinks: true,
+      image: { type: 'jpeg', quality: 0.98 },
+      margin: 0.2,
+      jsPDF: {
+        unit: 'in',
+        format: 'A4',
+        orientation: 'portrait'
+      },
+      userUnit: 450 / 210
+    };
+    html2pdf().from(content).set(opt).save();
   };
   
 
