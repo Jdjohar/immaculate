@@ -2245,55 +2245,47 @@ thead{
       {/* transaction modal  */}
 
       <div class="modal fade" id="exampleModal1" tabindex="-1" ref={modalRef} aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="exampleModalLabel">View Transactions</h1>
-              <button type="button" class="btn-close" id="closebutton" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <div className="row px-2 text-center">
-                <div className="col-3">
-                  <p>DATE</p>
-                </div>
-                <div className="col-3">
-                  <p>NOTE</p>
-                </div>
-                <div className="col-3">
-                  <p>AMOUNT/METHOD</p>
-                </div>
-                <div className="col-3">
-                  <p>DELETE</p>
-                </div>
-              </div><hr />
-              {transactions.map((transaction) => (
-                <>
-                  <div className='row px-2  text-center' key={transaction._id}>
-                    <div className="col-3">
-                      <p className='mb-0'> {formatCustomDate(transaction.paiddate)}</p>
-                    </div>
-                    <div className="col-3">
-                      <p className='mb-0'>{transaction.note}</p>
-                    </div>
-                    <div className="col-3">
-                      <p className='mb-0'><CurrencySign />{transaction.paidamount}/{transaction.method}</p>
-                    </div>
-                    <div className="col-3">
-                      <button data-bs-dismiss="modal" type="button" className="btn btn-danger btn-sm me-2" onClick={() => handleDeleteTransClick(transaction._id)}>
-                        <i className="fas fa-trash"></i>
-                      </button>
-                    </div>
-                  </div><hr />
-                </>
-              ))}
-            </div>
-            <div class="modal-footer">
-              <a data-bs-dismiss="modal" className='pointer text-decoration-none text-dark'>Close</a>
-            </div>
-          </div>
-        </div>
-
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">View Transactions</h1>
+        <button type="button" class="btn-close" id="closebutton" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th scope="col">DATE</th>
+                <th scope="col">NOTE</th>
+                <th scope="col">AMOUNT/METHOD</th>
+                <th scope="col">DELETE</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.map((transaction) => (
+                <tr key={transaction._id}>
+                  <td>{formatCustomDate(transaction.paiddate)}</td>
+                  <td>{transaction.note}</td>
+                  <td><CurrencySign />{transaction.paidamount}/{transaction.method}</td>
+                  <td>
+                    <button data-bs-dismiss="modal" type="button" class="btn btn-danger btn-sm me-2" onClick={() => handleDeleteTransClick(transaction._id)}>
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a data-bs-dismiss="modal" class='pointer text-decoration-none text-dark'>Close</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 
       <div className="modal fade" id="exampleModal2" tabIndex="-1" ref={modalRef} aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-xl modal-dialog-scrollable">
