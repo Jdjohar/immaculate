@@ -54,6 +54,7 @@ export default function Invoicedetail() {
   const [pdfExportVisible, setPdfExportVisible] = useState(false);
   const [ownerData, setOwnerData] = useState(null);
   const [signatureData, setsignatureData] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   // const [signatureData, setsignatureData] = useState(null);
   const apiURL = 'https://immaculate.onrender.com/api/expense';
   const expenseTypeURL = 'https://immaculate.onrender.com/api/expensetype';
@@ -712,12 +713,16 @@ export default function Invoicedetail() {
   };
 
   const handleAddPayment = async () => {
+    if (isSubmitting) return; // Prevent multiple clicks
+    setIsSubmitting(true); // Set loading state
+
     // const invoiceid = 'your-invoice-id'; 
     const userid = localStorage.getItem("userid");
     const authToken = localStorage.getItem('authToken');
     // Check for errors
     if (transactionData.paidamount === '') {
       setpaidamounterror("Fill detail");
+      setIsSubmitting(false);
       return; // Exit the function early if there's an error
     } else {
       setpaidamounterror(""); // Clear the error if the field is filled
@@ -725,6 +730,7 @@ export default function Invoicedetail() {
 
     if (transactionData.paiddate === '') {
       setpaiddateerror("Fill detail");
+      setIsSubmitting(false);
       return;
     } else {
       setpaiddateerror("");
@@ -732,6 +738,7 @@ export default function Invoicedetail() {
 
     if (transactionData.method === '') {
       setmethoderror("Fill detail");
+      setIsSubmitting(false);
       return;
     } else {
       setmethoderror("");
@@ -753,6 +760,7 @@ export default function Invoicedetail() {
     if (paymentAmount > dueAmount) {
       console.error('Payment amount exceeds the due amount.');
       setexceedpaymenterror("Payment amount exceeds the amount.");
+      setIsSubmitting(false);
       return;
     } else {
       setexceedpaymenterror("");
@@ -2220,7 +2228,13 @@ thead{
               </div>
               <div class="modal-footer">
                 <a data-bs-dismiss="modal" className='pointer text-decoration-none text-dark'>Close</a>
-                <a className='greenclr ms-2 text-decoration-none pointer' onClick={handleAddPayment}>Add Payment</a>
+                <a
+    className={`greenclr ms-2 text-decoration-none pointer ${isSubmitting ? 'disabled' : ''}`}
+    onClick={!isSubmitting ? handleAddPayment : null}
+>
+    {isSubmitting ? 'Processing...' : 'Add Payment'}
+</a>
+                
               </div>
             </div>
           </div>
@@ -2246,7 +2260,7 @@ thead{
                   <p>NOTE</p>
                 </div>
                 <div className="col-3">
-                  <p>AMOUNT</p>
+                  <p>AMOUNT/METHOD</p>
                 </div>
                 <div className="col-3">
                   <p>DELETE</p>
@@ -2262,7 +2276,7 @@ thead{
                       <p className='mb-0'>{transaction.note}</p>
                     </div>
                     <div className="col-3">
-                      <p className='mb-0'><CurrencySign />{transaction.paidamount}</p>
+                      <p className='mb-0'><CurrencySign />{transaction.paidamount}/{transaction.method}</p>
                     </div>
                     <div className="col-3">
                       <button data-bs-dismiss="modal" type="button" className="btn btn-danger btn-sm me-2" onClick={() => handleDeleteTransClick(transaction._id)}>

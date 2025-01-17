@@ -224,8 +224,6 @@ export default function Estimatedetail() {
     }
   }
 
-
-
   const formatCustomDate = (dateString) => {
     const options = { day: 'numeric', month: 'short', year: 'numeric' };
     const date = new Date(dateString);
@@ -624,8 +622,6 @@ thead{
     }
   };
   
-
-  // const handleRemove = async (estimateid) => {
   //   try {
   //     const authToken = localStorage.getItem('authToken');
   //     const response = await fetch(`https://immaculate.onrender.com/api/delestimatedata/${estimateid}`, {
@@ -777,9 +773,6 @@ thead{
     };
     html2pdf().from(content).set(opt).save();
   };
-
-
-
 
   const generatePdfFromHtml = async () => {
     return new Promise((resolve, reject) => {

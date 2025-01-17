@@ -87,7 +87,7 @@ export default function Editinvoice() {
     const [hasSignature, setHasSignature] = useState(false);
     const [isAddSignatureSwitchOn, setIsAddSignatureSwitchOn] = useState(false);
     const [isCustomerSignSwitchOn, setIsCustomerSignSwitchOn] = useState(false);
-
+    const [signUpData, setsignUpData] = useState(0);
 
     useEffect(() => {
         if (!localStorage.getItem('authToken') || localStorage.getItem('isTeamMember') === 'true') {
@@ -98,6 +98,9 @@ export default function Editinvoice() {
             fetchcustomerdata();
             fetchSignatureStatus();
         }
+        const getTaxOptions = localStorage.getItem("taxOptions")
+        setsignUpData(JSON.parse(getTaxOptions)[0])
+
         if (isNaN(discountTotal)) {
             setdiscountTotal(0);
         }
@@ -610,9 +613,9 @@ export default function Editinvoice() {
     // Function to calculate tax amount
     const calculateTaxAmount = () => {
         const subtotal = calculateSubtotal();
-        const totalDiscountedAmount = subtotal - discountTotal;
-        const taxAmount = (totalDiscountedAmount * invoiceData.taxpercentage) / 100;
-        return taxAmount;
+        const totalDiscountedAmount = subtotal; // Apply overall discount first
+        const taxAmount = (totalDiscountedAmount * signUpData.percentage) / 100;
+        return roundOff(taxAmount);
     };
 
 
@@ -620,9 +623,9 @@ export default function Editinvoice() {
         const subtotal = calculateSubtotal();
         const taxAmount = calculateTaxAmount();
         const discountAmount = discountTotal;
-        // console.log(discountAmount,"- discountAmount");
-        const totalAmount = (subtotal - discountAmount) + taxAmount;
-        return totalAmount;
+        const totalAmount2 = subtotal + taxAmount;
+        const totalAmount = totalAmount2 - discountAmount;
+        return roundOff(totalAmount);
     };
 
     const onchange = (event) => {
@@ -866,110 +869,110 @@ export default function Editinvoice() {
                                                     </div>
                                                 </div>
 
-                                              
+
 
                                                 <div className="box1 rounded adminborder p-4 m-2">
-    {/* Table Header */}
-    <div className="table-responsive">
-        <table className="table table-bordered">
-            <thead className="table-light">
-                <tr>
-                    <th scope="col">ITEM</th>
-                    <th scope="col">QUANTITY</th>
-                    <th scope="col">UNIT</th>
-                    <th scope="col">PRICE</th>
-                    <th scope="col">AMOUNT</th>
-                </tr>
-            </thead>
-            <tbody>
-                {console.log(invoiceData.items, "invoiceData.items")}
-                {invoiceData.items &&
-                    invoiceData.items.map((item) => (
-                        <tr key={item.itemId}>
-                            {/* ITEM NAME WITH DELETE BUTTON */}
-                            <td>
-                                <div className="d-flex align-items-center justify-content-between">
-                                    <span>{item.itemname}</span>
-                                    <button
-                                        type="button"
-                                        className="btn btn-danger btn-sm"
-                                        onClick={() => handleDeleteClick(item.itemId)}
-                                    >
-                                        <i className="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                                {/* Description Field */}
-                                <div className="mt-3">
-                                    <label htmlFor={`description-${item.itemId}`} className="form-label">
-                                        Description
-                                    </label>
-                                    <CKEditor
-                                        editor={ClassicEditor}
-                                        data={item.description} // Ensure item.description is valid
-                                        onChange={(event, editor) => {
-                                            handleDescriptionChange(editor, item.itemId);
-                                        }}
-                                        onBlur={(event, editor) => {
-                                            console.log("Blur.", editor);
-                                        }}
-                                        onFocus={(event, editor) => {
-                                            console.log("Focus.", editor);
-                                        }}
-                                        style={{ width: '200px' }}
-                                    />
-                                </div>
-                            </td>
+                                                    {/* Table Header */}
+                                                    <div className="table-responsive">
+                                                        <table className="table table-bordered">
+                                                            <thead className="table-light">
+                                                                <tr>
+                                                                    <th scope="col">ITEM</th>
+                                                                    <th scope="col">QUANTITY</th>
+                                                                    <th scope="col">UNIT</th>
+                                                                    <th scope="col">PRICE</th>
+                                                                    <th scope="col">AMOUNT</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {console.log(invoiceData.items, "invoiceData.items")}
+                                                                {invoiceData.items &&
+                                                                    invoiceData.items.map((item) => (
+                                                                        <tr key={item.itemId}>
+                                                                            {/* ITEM NAME WITH DELETE BUTTON */}
+                                                                            <td>
+                                                                                <div className="d-flex align-items-center justify-content-between">
+                                                                                    <span>{item.itemname}</span>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        className="btn btn-danger btn-sm"
+                                                                                        onClick={() => handleDeleteClick(item.itemId)}
+                                                                                    >
+                                                                                        <i className="fas fa-trash"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                                {/* Description Field */}
+                                                                                <div className="mt-3">
+                                                                                    <label htmlFor={`description-${item.itemId}`} className="form-label">
+                                                                                        Description
+                                                                                    </label>
+                                                                                    <CKEditor
+                                                                                        editor={ClassicEditor}
+                                                                                        data={item.description} // Ensure item.description is valid
+                                                                                        onChange={(event, editor) => {
+                                                                                            handleDescriptionChange(editor, item.itemId);
+                                                                                        }}
+                                                                                        onBlur={(event, editor) => {
+                                                                                            console.log("Blur.", editor);
+                                                                                        }}
+                                                                                        onFocus={(event, editor) => {
+                                                                                            console.log("Focus.", editor);
+                                                                                        }}
+                                                                                        style={{ width: '200px' }}
+                                                                                    />
+                                                                                </div>
+                                                                            </td>
 
-                            {/* QUANTITY */}
-                            <td>
-                                <input
-                                    type="number"
-                                    name="quantity"
-                                    className="form-control"
-                                    value={item.itemquantity}
-                                    onChange={(event) => handleQuantityChange(event, item.itemId)}
-                                    id={`quantity-${item.itemId}`}
-                                    required
-                                />
-                            </td>
+                                                                            {/* QUANTITY */}
+                                                                            <td>
+                                                                                <input
+                                                                                    type="number"
+                                                                                    name="quantity"
+                                                                                    className="form-control"
+                                                                                    value={item.itemquantity}
+                                                                                    onChange={(event) => handleQuantityChange(event, item.itemId)}
+                                                                                    id={`quantity-${item.itemId}`}
+                                                                                    required
+                                                                                />
+                                                                            </td>
 
-                            {/* UNIT */}
-                            <td>{item.unit || "-"}</td>
+                                                                            {/* UNIT */}
+                                                                            <td>{item.unit || "-"}</td>
 
-                            {/* PRICE */}
-                            <td>
-                                <input
-                                    type="text"
-                                    name="price"
-                                    className="form-control"
-                                    value={item.price}
-                                    id={`price-${item.itemId}`}
-                                    required
-                                    onChange={(event) => handlePriceChange(event, item.itemId)}
-                                    onBlur={(event) => handlePriceBlur(event, item.itemId)}
-                                />
-                            </td>
+                                                                            {/* PRICE */}
+                                                                            <td>
+                                                                                <input
+                                                                                    type="text"
+                                                                                    name="price"
+                                                                                    className="form-control"
+                                                                                    value={item.price}
+                                                                                    id={`price-${item.itemId}`}
+                                                                                    required
+                                                                                    onChange={(event) => handlePriceChange(event, item.itemId)}
+                                                                                    onBlur={(event) => handlePriceBlur(event, item.itemId)}
+                                                                                />
+                                                                            </td>
 
-                            {/* AMOUNT */}
-                            <td>
-                                <CurrencySign />
-                                {item.amount}
-                            </td>
-                        </tr>
-                    ))}
-            </tbody>
-        </table>
-    </div>
+                                                                            {/* AMOUNT */}
+                                                                            <td>
+                                                                                <CurrencySign />
+                                                                                {item.amount}
+                                                                            </td>
+                                                                        </tr>
+                                                                    ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
 
-    {/* Warning Message */}
-    <div className="mt-3">
-        {itemExistsMessage && (
-            <div className="alert alert-warning" role="alert">
-                {itemExistsMessage}
-            </div>
-        )}
-    </div>
-</div>
+                                                    {/* Warning Message */}
+                                                    <div className="mt-3">
+                                                        {itemExistsMessage && (
+                                                            <div className="alert alert-warning" role="alert">
+                                                                {itemExistsMessage}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
 
                                                 <div className='box1 rounded adminborder m-2 mt-5'>
                                                     <CKEditor
@@ -989,8 +992,86 @@ export default function Editinvoice() {
                                                             console.log('Focus.', editor);
                                                         }}
                                                     />
+                                                
+                                                
+                                                
                                                 </div>
+                                                <div className="row pt-3">
+                                                    <div className="col-7">
+                                                        <div className="search-container forms">
+                                                            <p className="fs-20 mb-0">Select Item</p>
+                                                            <Select
+                                                                value={searchitemResults}
+                                                                onChange={onChangeitem}
+                                                                options={items.map((o) => ({ value: o._id, label: o.itemname }))}
+                                                                placeholder=""
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className="col-5">
+                                                        <div className="row">
+                                                            <div className="col-6">
+                                                                <p>Subtotal</p>
+                                                                <p className="mb-4">Discount</p>
+                                                                <p>GST {invoiceData.taxpercentage}%</p>
+                                                                <p>Total</p>
+                                                            </div>
+                                                            <div className="col-6 text-end">
+                                                                <p>
+                                                                    <CurrencySign />
+                                                                    {calculateSubtotal().toLocaleString("en-IN", {})}
+                                                                </p>
+                                                                <input
+                                                                    type="number"
+                                                                    name="totaldiscount"
+                                                                    className="form-control"
+                                                                    value={discountTotal}
+                                                                    onChange={handleDiscountChange}
+                                                                    placeholder="Enter Discount Total"
+                                                                    id="discountInput"
+                                                                    min="0"
+                                                                />
+                                                                <p>
+                                                                    <CurrencySign />
+                                                                    {calculateTaxAmount().toLocaleString("en-IN", {})}
+                                                                </p>
+                                                                <p>
+                                                                    <CurrencySign />
+                                                                    {calculateTotal().toLocaleString("en-IN", {})}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className='row'>
+                                                <label htmlFor="" className='fs-4 ms-2 mt-5'>Note</label>
+                                                    <div className='box1 rounded adminborder m-2'>
+                                                        <CKEditor
+                                                            editor={ClassicEditor}
+                                                            data={invoiceData.information}
+                                                            // onReady={ editor => {
+                                                            //     console.log( 'Editor is ready to use!', editor );
+                                                            // } }
+
+                                                            onChange={handleEditorChange}
+                                                            config={{
+                                                                extraPlugins: [MyCustomUploadAdapterPlugin],
+                                                            }}
+                                                            onBlur={(event, editor) => {
+                                                                console.log('Blur.', editor);
+                                                            }}
+                                                            onFocus={(event, editor) => {
+                                                                console.log('Focus.', editor);
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+
+
                                             </div>
+
+                                            
                                         </div>
 
                                         <div className="col-lg-3 col-12 order-1 order-lg-2">

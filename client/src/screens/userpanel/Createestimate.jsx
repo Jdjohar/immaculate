@@ -517,11 +517,7 @@ export default function Createestimate() {
     const calculateTaxAmount = () => {
         const subtotal = calculateSubtotal();
         const totalDiscountedAmount = subtotal; // Apply overall discount first
-
-        // Calculate tax amount on the discounted amount
         const taxAmount = (totalDiscountedAmount * signUpData.percentage) / 100;
-        // const taxAmount = ((subtotal-discountTotal) * taxPercentage) / 100;
-        // console.log("taxAmount:", taxAmount, "subtotal:", subtotal, "discountTotal:",discountTotal);
         return roundOff(taxAmount);
     };
 

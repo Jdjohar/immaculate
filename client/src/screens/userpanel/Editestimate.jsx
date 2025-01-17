@@ -87,10 +87,16 @@ export default function Editestimate() {
     const [hasSignature, setHasSignature] = useState(false);
     const [isAddSignatureSwitchOn, setIsAddSignatureSwitchOn] = useState(false);
     const [isCustomerSignSwitchOn, setIsCustomerSignSwitchOn] = useState(false);
+        const [signUpData, setsignUpData] = useState(0);
 
     useEffect(() => {
         if (!localStorage.getItem("authToken") || localStorage.getItem("isTeamMember") == "true") {
             navigate("/");
+        }
+        const getTaxOptions = localStorage.getItem("taxOptions")
+        setsignUpData(JSON.parse(getTaxOptions)[0])
+        if (isNaN(discountTotal)) {
+            setdiscountTotal(0);
         }
         if (estimateid) {
             fetchdata();
@@ -588,9 +594,9 @@ export default function Editestimate() {
     // Function to calculate tax amount
     const calculateTaxAmount = () => {
         const subtotal = calculateSubtotal();
-        const totalDiscountedAmount = subtotal - discountTotal;
-        const taxAmount = (totalDiscountedAmount * estimateData.taxpercentage) / 100;
-        return taxAmount;
+        const totalDiscountedAmount = subtotal; // Apply overall discount first
+        const taxAmount = (totalDiscountedAmount * signUpData.percentage) / 100;
+        return roundOff(taxAmount);
     };
 
 
@@ -598,9 +604,9 @@ export default function Editestimate() {
         const subtotal = calculateSubtotal();
         const taxAmount = calculateTaxAmount();
         const discountAmount = discountTotal;
-        // console.log(discountAmount,"- discountAmount");
-        const totalAmount = (subtotal - discountAmount) + taxAmount;
-        return totalAmount;
+        const totalAmount2 = subtotal + taxAmount;
+        const totalAmount = totalAmount2 - discountAmount;
+        return roundOff(totalAmount);
     };
 
     const onchange = (event) => {
