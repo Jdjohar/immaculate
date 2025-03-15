@@ -906,14 +906,14 @@ thead{
                           <div ><a className='text-decoration-none' href={`mailto:${signupdata.email}`}>{signupdata.email}</a></div>
                           <div ><a className='text-decoration-none' href='https://www.instagram.com/immaculate.homes'>https://www.instagram.com/immaculate.homes</a></div>
                           <div ><a className='text-decoration-none' href={`${signupdata.website}`}>{signupdata.website}</a></div>
-                          <div>
+                          {/* <div>
                             {signupdata.gstNumber == ''
                               ?
                               ""
                               :
                               `${signupdata.TaxName} ${signupdata.gstNumber}`
                             }
-                          </div>
+                          </div> */}
                           {/* <p className='m-0'>GST 774737217RT0001</p> */}
                         </div>
                       </div>
