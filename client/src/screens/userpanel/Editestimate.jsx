@@ -79,15 +79,23 @@ export default function Editestimate() {
         date: new Date(), description: '', itemquantity: '', price: '', discount: '', discountTotal: '',
         amount: '', tax: '', taxpercentage: '', subtotal: '', total: '', amountdue: '', information: '', items: []
     });
-    const location = useLocation();
-    const estimateid = location.state?.estimateid;
+    // const location = useLocation();
+    var estimateid = '' //location.state?.estimateid;
     const [editorData, setEditorData] = useState("<p></p>");
     const [alertMessage, setAlertMessage] = useState('');
     const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false);
     const [hasSignature, setHasSignature] = useState(false);
     const [isAddSignatureSwitchOn, setIsAddSignatureSwitchOn] = useState(false);
     const [isCustomerSignSwitchOn, setIsCustomerSignSwitchOn] = useState(false);
-        const [signUpData, setsignUpData] = useState(0);
+    const [signUpData, setsignUpData] = useState(0);
+
+    const location = useLocation();
+    if (estimateid == "") {
+
+        estimateid = location.state?.estimateid;
+    }
+
+
 
     useEffect(() => {
         if (!localStorage.getItem("authToken") || localStorage.getItem("isTeamMember") == "true") {
@@ -115,8 +123,8 @@ export default function Editestimate() {
             const ownerId = localStorage.getItem('userid');
             const response = await fetch(`https://immaculate.onrender.com/api/check-signature/${ownerId}`);
             const data = await response.json();
-            console.log(data,"data");
-            
+            console.log(data, "data");
+
             setIsAddSignatureSwitchOn(data.hasSignature);
             setIsCustomerSignSwitchOn(data.hasSignature);
         } catch (error) {
@@ -193,6 +201,7 @@ export default function Editestimate() {
                 }
             });
             if (response.status === 401) {
+                alert('Your session has expired. Please login again.');
                 const json = await response.json();
                 setAlertMessage(json.message);
                 setloading(false);
@@ -202,9 +211,9 @@ export default function Editestimate() {
             else {
                 const json = await response.json();
                 console.log(json, "estimate Json");
-
-
                 if (json.Success) {
+                    console.log(json.estimates,"json.estimates");
+
                     setestimateData(json.estimates);
                     setdiscountTotal(json.estimates.discountTotal);
                     // setdiscountTotal(json.invoices.discountTotal);
@@ -255,26 +264,7 @@ export default function Editestimate() {
         }
     }
 
-    const onChangecustomer = (event) => {
-        const selectedCustomerId = event.value;
-        const selectedCustomer = customers.find((customer) => customer._id === selectedCustomerId);
 
-        if (selectedCustomer) {
-            setestimateData({
-                ...estimateData,
-                customername: selectedCustomer.name,
-                customeremail: selectedCustomer.email,
-            });
-
-            setSelectedCustomerDetails({
-                name: selectedCustomer.name,
-                email: selectedCustomer.email
-            });
-            setIsCustomerSelected(true);
-        }
-
-        setSearchcustomerResults([...searchcustomerResults, event]);
-    };
 
     const fetchitemdata = async () => {
         try {
@@ -394,13 +384,13 @@ export default function Editestimate() {
         }
     };
 
-    // const onChangeitem = (selectedItem) => {
-    //     addSelectedItemToEstimate(selectedItem);
-    // };
-
     const handleEditorChange = (event, editor) => {
         const data = editor.getData();
-        setestimateData({ ...estimateData, information: data });
+        // Use the functional form of setestimateData to ensure you're working with the latest state
+        setestimateData((prevEstimateData) => ({
+            ...prevEstimateData, // Spread the previous state
+            information: data,   // Update only the `information` field
+        }));
     };
     const handledescChange = (event, editor) => {
         const data = editor.getData();
@@ -758,10 +748,14 @@ export default function Editestimate() {
                                                     {/* Customer Details */}
                                                     <div className="col-md-5 col-sm-12">
                                                         <div className="customerdetail p-3">
-                                                            <ul>
-                                                                <li className="fw-bold fs-4">{estimateData.customername}</li>
-                                                            </ul>
-                                                            <p>{estimateData.customeremail}</p>
+                                                            {console.log(estimateData,"frtch estimateDatasd sddssd")}
+                                                            
+                                                            {estimateData?.customername && (
+                                                                <ul>
+                                                                    <li className="fw-bold fs-4">{estimateData.customername}</li>
+                                                                </ul>
+                                                            )}
+                                                            {estimateData?.customeremail && <p>{estimateData.customeremail}</p>}
                                                         </div>
                                                     </div>
 
@@ -840,96 +834,96 @@ export default function Editestimate() {
                                                 <div className="box1 rounded adminborder p-4 m-2">
                                                     {/* Table Header */}
                                                     <div className="table-responsive">
-                                                    <table className="table table-bordered table-responsive text-center">
-                                                        <thead className="table-light">
-                                                            <tr>
-                                                                <th>ITEM</th>
-                                                                <th>QUANTITY</th>
-                                                                <th>UNIT</th>
-                                                                <th>PRICE</th>
-                                                                <th>AMOUNT</th>
+                                                        <table className="table table-bordered table-responsive text-center">
+                                                            <thead className="table-light">
+                                                                <tr>
+                                                                    <th>ITEM</th>
+                                                                    <th>QUANTITY</th>
+                                                                    <th>UNIT</th>
+                                                                    <th>PRICE</th>
+                                                                    <th>AMOUNT</th>
 
 
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {estimateData.items &&
-                                                                estimateData.items.map((o) => (
-                                                                    <tr key={o.itemId}>
-                                                                        {/* ITEM */}
-                                                                        <td scope='col'>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {estimateData.items &&
+                                                                    estimateData.items.map((o) => (
+                                                                        <tr key={o.itemId}>
+                                                                            {/* ITEM */}
+                                                                            <td scope='col'>
 
-                                                                            <div className="mb-3 d-flex align-items-baseline justify-content-between">
-                                                                                <p>{o.itemname}</p>
-                                                                                <button type="button" className="btn btn-danger btn-sm me-2" onClick={() => handleDeleteClick(o.itemId)}>
-                                                                                    <i className="fas fa-trash"></i>
-                                                                                </button>
-                                                                            </div>
-                                                                            <div className="row">
-                                                                                <div className="col">
-                                                                                    <label htmlFor={`item-description-${o.itemId}`} className="form-label">Description</label>
-                                                                                    <CKEditor
-                                                                                        editor={ClassicEditor}
-                                                                                        data={o.description}
-                                                                                        onChange={(e, t) => {
-                                                                                            handleDescriptionChange(t, o.itemId);
-                                                                                        }}
-                                                                                    />
+                                                                                <div className="mb-3 d-flex align-items-baseline justify-content-between">
+                                                                                    <p>{o.itemname}</p>
+                                                                                    <button type="button" className="btn btn-danger btn-sm me-2" onClick={() => handleDeleteClick(o.itemId)}>
+                                                                                        <i className="fas fa-trash"></i>
+                                                                                    </button>
                                                                                 </div>
-                                                                            </div>
+                                                                                <div className="row">
+                                                                                    <div className="col">
+                                                                                        <label htmlFor={`item-description-${o.itemId}`} className="form-label">Description</label>
+                                                                                        <CKEditor
+                                                                                            editor={ClassicEditor}
+                                                                                            data={o.description}
+                                                                                            onChange={(e, t) => {
+                                                                                                handleDescriptionChange(t, o.itemId);
+                                                                                            }}
+                                                                                        />
+                                                                                    </div>
+                                                                                </div>
 
 
 
 
-                                                                            <br />
+                                                                                <br />
 
 
-                                                                        </td>
+                                                                            </td>
 
 
-                                                                        {/* QUANTITY */}
-                                                                        <td>
-                                                                            <input
-                                                                                type="number"
-                                                                                name="quantity"
-                                                                                className="form-control"
-                                                                                value={o.itemquantity}
-                                                                                onChange={(e) => handleQuantityChange(e, o.itemId)}
-                                                                                id={`quantity-${o.itemId}`}
-                                                                                required
-                                                                            />
-                                                                        </td>
+                                                                            {/* QUANTITY */}
+                                                                            <td>
+                                                                                <input
+                                                                                    type="number"
+                                                                                    name="quantity"
+                                                                                    className="form-control"
+                                                                                    value={o.itemquantity}
+                                                                                    onChange={(e) => handleQuantityChange(e, o.itemId)}
+                                                                                    id={`quantity-${o.itemId}`}
+                                                                                    required
+                                                                                />
+                                                                            </td>
 
-                                                                        {/* UNIT */}
-                                                                        <td>{o.unit || "-"}</td>
+                                                                            {/* UNIT */}
+                                                                            <td>{o.unit || "-"}</td>
 
-                                                                        {/* PRICE */}
-                                                                        <td>
-                                                                            <input
-                                                                                type="number"
-                                                                                name="price"
-                                                                                className="form-control"
-                                                                                value={o.price}
-                                                                                onChange={(e) => handlePriceChange(e, o.itemId)}
-                                                                                onBlur={(e) => handlePriceBlur(e, o.itemId)}
-                                                                                id={`price-${o.itemId}`}
-                                                                                required
-                                                                            />
-                                                                        </td>
+                                                                            {/* PRICE */}
+                                                                            <td>
+                                                                                <input
+                                                                                    type="number"
+                                                                                    name="price"
+                                                                                    className="form-control"
+                                                                                    value={o.price}
+                                                                                    onChange={(e) => handlePriceChange(e, o.itemId)}
+                                                                                    onBlur={(e) => handlePriceBlur(e, o.itemId)}
+                                                                                    id={`price-${o.itemId}`}
+                                                                                    required
+                                                                                />
+                                                                            </td>
 
-                                                                        {/* AMOUNT */}
-                                                                        <td>
-                                                                            <CurrencySign />
-                                                                            {o.amount}
-                                                                        </td>
-
-
+                                                                            {/* AMOUNT */}
+                                                                            <td>
+                                                                                <CurrencySign />
+                                                                                {o.amount}
+                                                                            </td>
 
 
-                                                                    </tr>
-                                                                ))}
-                                                        </tbody>
-                                                    </table>
+
+
+                                                                        </tr>
+                                                                    ))}
+                                                            </tbody>
+                                                        </table>
                                                     </div>
 
                                                     {/* Warning Message */}
@@ -991,7 +985,7 @@ export default function Editestimate() {
                                                 </div>
 
                                                 <div className='row'>
-                                                <label htmlFor="" className='fs-4 ms-2 mt-5'>Note</label>
+                                                    <label htmlFor="" className='fs-4 ms-2 mt-5'>Note</label>
                                                     <div className='box1 rounded adminborder m-2'>
                                                         <CKEditor
                                                             editor={ClassicEditor}

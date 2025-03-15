@@ -412,7 +412,11 @@ export default function Editinvoice() {
 
     const handleEditorChange = (event, editor) => {
         const data = editor.getData();
-        setInvoiceData({ ...invoiceData, information: data });
+        // Use the functional form of setestimateData to ensure you're working with the latest state
+        setInvoiceData((prevEstimateData) => ({
+            ...prevEstimateData, // Spread the previous state
+            information: data,   // Update only the `information` field
+        }));
     };
     const handledescChange = (event, editor) => {
         const data = editor.getData();

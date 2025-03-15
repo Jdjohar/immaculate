@@ -552,7 +552,7 @@ thead{
   }
 
   const handleEditContent = (estimateData) => {
-    setselectedinvoices(estimateData);
+    
     let estimateid = estimateData._id;
     console.log(estimateid);
     navigate('/userpanel/Editestimate', { state: { estimateid } });
