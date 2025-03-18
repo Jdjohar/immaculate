@@ -46,8 +46,232 @@ const getCurrencySign = (currencyType) => {
             return '₹';
     }
 };
+// Function to get financial year based on region
+function getFinancialYear(date) {
+    const invoiceDate = new Date(date);
+    const year = invoiceDate.getFullYear();
+    const month = invoiceDate.getMonth() + 1; // JS months are 0-indexed
 
+    if (month >= 4) {
+        return `${year}-${year + 1}`; // April to March (India, UK)
+    } else {
+        return `${year - 1}-${year}`; // Before April (Falls in previous FY)
+    }
+}
+// Get invoices grouped by financial year
+router.get('/invoices-by-financial-year', async (req, res) => {
+    try {
+        let authtoken = req.headers.authorization;
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        
+        const { userid } = req.query;
+        
+        if (!userid) {
+            return res.status(400).json({
+                success: false,
+                message: 'User ID is required'
+            });
+        }
 
+        // Aggregation pipeline to group invoices by financial year
+        const invoicesByYear = await Invoice.aggregate([
+            {
+                $match: { userid: userid }  // Filter by user
+            },
+            {
+                $group: {
+                    _id: "$financialYear",
+                    invoices: { $push: "$$ROOT" },
+                    totalAmount: { $sum: "$total" },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { "_id": -1 }  // Sort by financial year descending
+            }
+        ]);
+
+        // Alternative simpler version if you don't need all invoice details
+        /*
+        const invoicesByYear = await Invoice.aggregate([
+            { $match: { userid: userid } },
+            {
+                $group: {
+                    _id: "$financialYear",
+                    totalAmount: { $sum: "$total" },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { "_id": -1 } }
+        ]);
+        */
+
+        res.status(200).json({
+            success: true,
+            data: invoicesByYear,
+            message: 'Invoices retrieved successfully'
+        });
+
+    } catch (error) {
+        console.error(error);
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+        }
+        res.status(500).json({ 
+            success: false,
+            message: 'Internal server error' 
+        });
+    }
+});
+// Get all invoices grouped by financial year for a user
+router.get('/all-invoices-by-financial-year', async (req, res) => {
+    try {
+        let authtoken = req.headers.authorization;
+        const decodedToken = jwt.verify(authtoken, jwrsecret);
+        
+        const { userid } = req.query;
+        
+        if (!userid) {
+            return res.status(400).json({
+                success: false,
+                message: 'User ID is required'
+            });
+        }
+
+        // Aggregation pipeline to group all invoices by financial year
+        const invoicesByYear = await Invoice.aggregate([
+            {
+                $match: { userid: userid }  // Filter by user
+            },
+            {
+                $addFields: {
+                    financialYear: {
+                        $cond: {
+                            if: { $gte: [{ $month: "$date" }, 4] },  // Assuming FY starts April 1st
+                            then: { 
+                                $concat: [
+                                    { $toString: { $year: "$date" } },
+                                    "-",
+                                    { $toString: { $add: [{ $year: "$date" }, 1] } }
+                                ]
+                            },
+                            else: { 
+                                $concat: [
+                                    { $toString: { $subtract: [{ $year: "$date" }, 1] } },
+                                    "-",
+                                    { $toString: { $year: "$date" } }
+                                ]
+                            }
+                        }
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: "$financialYear",
+                    invoices: { 
+                        $push: {
+                            _id: "$_id",
+                            invoice_id: "$invoice_id",
+                            InvoiceNumber: "$InvoiceNumber",
+                            customername: "$customername",
+                            job: "$job",
+                            customeremail: "$customeremail",
+                            emailsent: "$emailsent",
+                            date: "$date",
+                            duedate: "$duedate",
+                            items: "$items",
+                            subtotal: "$subtotal",
+                            total: "$total",
+                            amountdue: "$amountdue",
+                            discountTotal: "$discountTotal",
+                            information: "$information",
+                            tax: "$tax",
+                            taxpercentage: "$taxpercentage",
+                            status: "$status",
+                            isAddSignature: "$isAddSignature",
+                            isCustomerSign: "$isCustomerSign",
+                            createdAt: "$createdAt"
+                        }
+                    },
+                    totalAmount: { $sum: "$total" },
+                    invoiceCount: { $sum: 1 },
+                    totalDue: { $sum: "$amountdue" },
+                    totalTax: { $sum: { $toDouble: "$tax" } }
+                }
+            },
+            {
+                $sort: { "_id": -1 }  // Sort by financial year descending
+            },
+            {
+                $project: {
+                    financialYear: "$_id",
+                    invoices: 1,
+                    totalAmount: 1,
+                    invoiceCount: 1,
+                    totalDue: 1,
+                    totalTax: 1
+                }
+            }
+        ]);
+
+        // If no invoices found, return empty array
+        if (!invoicesByYear.length) {
+            return res.status(200).json({
+                success: true,
+                data: [],
+                message: 'No invoices found for this user'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: invoicesByYear,
+            message: 'All invoices retrieved successfully'
+        });
+
+    } catch (error) {
+        console.error(error);
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ 
+                success: false,
+                message: 'Unauthorized: Invalid token' 
+            });
+        }
+        res.status(500).json({ 
+            success: false,
+            message: 'Internal server error',
+            error: error.message
+        });
+    }
+});
+// Update existing invoices with financial year (one-time script)
+router.post('/update-financial-years', async (req, res) => {
+    try {
+        const invoices = await Invoice.find();
+        
+        for (let invoice of invoices) {
+            if (invoice.date && !invoice.financialYear) {
+                const date = new Date(invoice.date);
+                const year = date.getFullYear();
+                const month = date.getMonth();
+                invoice.financialYear = month >= 3 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
+                await invoice.save();
+            }
+        }
+        
+        res.status(200).json({
+            success: true,
+            message: 'Financial years updated successfully'
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: 'Error updating financial years'
+        });
+    }
+});
 
 router.get('/check-signature/:ownerId', (req, res) => {
     const ownerId = req.params.ownerId;

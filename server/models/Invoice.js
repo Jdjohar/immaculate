@@ -10,6 +10,10 @@ const InvoiceSchema = new Schema({
     customername: {
         type: String,
     },
+    financialYear: {
+        type: String,  // Format: "2023-2024"
+        index: true    // Adding index for better query performance
+    },
     job: {
         type: String,
     },
@@ -85,8 +89,19 @@ const InvoiceSchema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now,
-    },
+    }
+    
 
+});
+InvoiceSchema.pre('save', function(next) {
+    if (this.date) {
+        const date = new Date(this.date);
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        // Assuming financial year starts April 1st (adjust as per your needs)
+        this.financialYear = month >= 3 ? `${year}-${year + 1}` : `${year - 1}-${year}`;
+    }
+    next();
 });
 
 module.exports = mongoose.model('Invoice',InvoiceSchema)

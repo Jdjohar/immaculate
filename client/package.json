@@ -14,6 +14,7 @@
     "@ckeditor/ckeditor5-react": "^8.0.0",
     "@davzon/react-country-state-city": "^1.0.10",
     "date-fns": "^3.6.0",
+    "file-saver": "^2.0.5",
     "html2pdf.js": "^0.10.2",
     "jwt-decode": "^4.0.0",
     "moment": "^2.30.1",
