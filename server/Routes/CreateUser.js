@@ -2518,6 +2518,8 @@ router.post('/converttoinvoice/:estimateid', async (req, res) => {
                 tax: estimate.tax,
                 taxpercentage: estimate.taxpercentage,
                 job: estimate.job,
+                isAddSignature: estimate. isAddSignature,
+                isCustomerSign: estimate. isCustomerSign,
                 
             });
 
@@ -4527,7 +4529,7 @@ router.get('/expense/', async (req, res) => {
     try {
         const { invoiceId } = req.params;
 
-        const expenses = await Expense.find();
+        const expenses = await Expense.find().sort({ createdAt: -1 });
         res.status(200).json(expenses);
     } catch (error) {
         res.status(500).json({ error: error.message });

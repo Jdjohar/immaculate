@@ -672,7 +672,8 @@ export default function ExpenseEntries() {
                                                                     <td>
                                                                         {entry.transactionType === "Credit"
                                                                             ? "Credit"
-                                                                            : getExpenseTypeName(entry.expenseType)}
+                                                                            : getExpenseTypeName(entry.expenseType)} <br />
+                                                                            Des: {entry.description}
                                                                     </td>
                                                                     <td
                                                                         style={{

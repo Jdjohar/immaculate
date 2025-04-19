@@ -2065,6 +2065,9 @@ thead{
                               <span class="f-w-600 mt-3"><CurrencySign />{roundOff(invoiceData.total - transactions.reduce((total, payment) => total + payment.paidamount, 0))}</span>
                             </div>
                           </div>
+{console.log(invoiceData,"invoiceData")}
+{console.log(ownerData,"ownerData")}
+{console.log(signatureData,"signatureData")}
 
                           {invoiceData.isAddSignature || invoiceData.isCustomerSign ?
                             <div className="invoice-body">
