@@ -66,7 +66,7 @@ export default function ExpenseEntries() {
             invoiceId: '',
         });
     };
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
 
     // Fetch all data (invoices, expense entries, types, and vendors) on component mount
     useEffect(() => {
