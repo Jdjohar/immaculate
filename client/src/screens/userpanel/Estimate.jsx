@@ -222,70 +222,45 @@ export default function Estimate() {
                         </tr>
                       </thead>
                       <tbody>
-                        {getCurrentPageEstimates().map((estimate, index) => (
-                          estimate.convertedToInvoice != true && (
-                            <tr key={index}>
-                              <td>
-                                <p className='my-0 fw-bold clrtrxtstatus'>{estimate.customername}</p>
-                                <p className='my-0'>{estimate.EstimateNumber}</p>
-                                <p className='my-0'>Job: {estimate.job}</p>
-                              </td>
-                              <td>
-                              {estimate.status === 'Saved' ? (
-                                <span className='saved p-2 rounded-pill'>
-                                  <i className="fa-solid fa-circle fs-12 me-2 grey-3"></i>
-                                  <span className='clrtrxtstatus fw-bold'>Saved</span>
-                                </span>
-                              ) : estimate.status === 'Send' ? (
-                                <span className='sent p-2 rounded-pill'>
-                                  <i className="fa-solid fa-circle fs-12 me-2 text-primary"></i>
-                                  <span className='clrtrxtstatus fw-bold'>Send</span>
-                                </span>
-                              ) : estimate.status === 'Paid' ? (
-                                <span className='paid p-2 rounded-pill'>
-                                  <i class="fa-solid fa-circle fs-12 me-2 "></i>
-                                  <span className='clrtrxtstatus fw-bold'>Paid</span>
-                                </span>
-                              ) : estimate.status === 'Partially Paid' ? (
-                                <span className='paid p-2 rounded-pill'>
-                                  <i class="fa-solid fa-circle fs-12 me-2"></i>
-                                  <span className='clrtrxtstatus fw-bold'>Partially Paid</span>
-                                </span>
-                              ) : (
-                                <>
-                                  <i className="fa-solid fa-circle fs-12 me-2 unknown"></i>
-                                  <span className='clrtrxtstatus fw-bold'>Unknown Status</span>
-                                </>
-                              )}
-                            </td>
-                              <td>
-                                <div className=''>
-                                  <div className='d-flex'>
-                                    <p className='issue px-1 my-1'>Issued</p>
-                                    <p className='datetext my-1'>{formatCustomDate(estimate.date)}</p>
-                                  </div>
-                                </div>
-                              </td>
-                              {/* <td className='text-center'>
-                              <p className='datetext'>{estimate.emailsent}</p>
-                            </td> */}
-
-                              <td className='text-center'>
-                                <a role='button' className='text-black text-center' onClick={() => handleViewClick(estimate)}>
-                                  <i className='fa-solid fa-eye'></i>
-                                </a>
-                              </td>
-                              <td className='text-center'>
-                                <a role='button' className='btn text-black text-center converbtn' onClick={() => handleConvertToInvoice(estimate._id)} >Convert</a>
-                              </td>
-                              <td><CurrencySign />{roundOff(estimate.total)}</td>
-                            </tr>
-                          )
-                        ))}
-                      
-                      </tbody>
-                    </table>
-                  </div>
+                       {getCurrentPageEstimates().map((estimate, index) => (
+                        <tr key={index}>
+                          <td>
+                            <p className='my-0 fw-bold clrtrxtstatus'>{estimate.customername}</p>
+                            <p className='my-0'>{estimate.EstimateNumber}</p>
+                            <p className='my-0'>Job: {estimate.job}</p>
+                          </td>
+                          <td>
+                            <span className={`p-2 rounded-pill ${estimate.status === 'Send' ? 'sent' : estimate.status === 'Paid' ? 'paid' : 'saved'}`}>
+                              <i className="fa-solid fa-circle fs-12 me-2"></i>
+                              <span className='clrtrxtstatus fw-bold'>{estimate.status || 'Unknown'}</span>
+                            </span>
+                          </td>
+                          <td>
+                            <div className='d-flex'>
+                              <p className='issue px-1 my-1'>Issued</p>
+                              <p className='datetext my-1'>{formatCustomDate(estimate.date)}</p>
+                            </div>
+                          </td>
+                          <td className='text-center'>
+                            <a role='button' className='text-black' onClick={() => handleViewClick(estimate)}>
+                              <i className='fa-solid fa-eye'></i>
+                            </a>
+                          </td>
+                          <td className='text-center'>
+                            {estimate.convertedToInvoice ? (
+                              <span className='badge bg-success'>Converted</span>
+                            ) : (
+                              <button className='btn converbtn' onClick={() => handleConvertToInvoice(estimate._id)}>
+                                Convert
+                              </button>
+                            )}
+                          </td>
+                          <td><CurrencySign />{roundOff(estimate.total)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
                   {/* Pagination buttons */}
                   <div className='row mt-3'>
                     <div className='col-12'>
