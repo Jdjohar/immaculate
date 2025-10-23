@@ -34,7 +34,7 @@ const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 const multer = require('multer');
 const path = require('path');
-
+const axios = require("axios");
 const getCurrencySign = (currencyType) => {
     switch (currencyType) {
         case 'AUD':
