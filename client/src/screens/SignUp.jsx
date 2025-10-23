@@ -83,7 +83,7 @@ export default function SignUp() {
         
         companyFormData.append('companyImage', imgurl);
         console.log("imgurl: ", companyFormData);
-        const response = await fetch("https://immaculate.onrender.com/api/createuser", {
+        const response = await fetch("http://localhost:3001/api/createuser", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

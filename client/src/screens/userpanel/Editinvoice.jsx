@@ -113,7 +113,7 @@ export default function Editinvoice() {
     const fetchSignatureStatus = async () => {
         try {
             const ownerId = localStorage.getItem('userid');
-            const response = await fetch(`https://immaculate.onrender.com/api/check-signature/${ownerId}`);
+            const response = await fetch(`http://localhost:3001/api/check-signature/${ownerId}`);
             const data = await response.json();
             // setHasSignature(data.hasSignature);
             setIsAddSignatureSwitchOn(data.hasSignature);
@@ -127,7 +127,7 @@ export default function Editinvoice() {
         if (event.target.checked) {
             try {
                 const ownerId = localStorage.getItem('userid');
-                const response = await fetch(`https://immaculate.onrender.com/api/check-signature/${ownerId}`);
+                const response = await fetch(`http://localhost:3001/api/check-signature/${ownerId}`);
                 const data = await response.json();
                 setHasSignature(data.hasSignature);
 
@@ -165,7 +165,7 @@ export default function Editinvoice() {
             const ownerId = localStorage.getItem('userid');
             const email = localStorage.getItem('userEmail');
             const companyname = localStorage.getItem('companyname');
-            await fetch('https://immaculate.onrender.com/api/ownersignature', {
+            await fetch('http://localhost:3001/api/ownersignature', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -190,7 +190,7 @@ export default function Editinvoice() {
     const fetchInvoiceData = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://immaculate.onrender.com/api/geteditinvoicedata/${invoiceid}`, {
+            const response = await fetch(`http://localhost:3001/api/geteditinvoicedata/${invoiceid}`, {
                 headers: {
                     'Authorization': authToken,
                 }
@@ -222,7 +222,7 @@ export default function Editinvoice() {
         try {
             const userid = localStorage.getItem("userid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://immaculate.onrender.com/api/customers/${userid}`, {
+            const response = await fetch(`http://localhost:3001/api/customers/${userid}`, {
                 headers: {
                     'Authorization': authToken,
                 }
@@ -272,7 +272,7 @@ export default function Editinvoice() {
         try {
             const userid = localStorage.getItem("userid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://immaculate.onrender.com/api/itemdata/${userid}`, {
+            const response = await fetch(`http://localhost:3001/api/itemdata/${userid}`, {
                 headers: {
                     'Authorization': authToken,
                 }
@@ -316,7 +316,7 @@ export default function Editinvoice() {
             };
 
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://immaculate.onrender.com/api/updateinvoicedata/${invoiceid}`, {
+            const response = await fetch(`http://localhost:3001/api/updateinvoicedata/${invoiceid}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -467,7 +467,7 @@ export default function Editinvoice() {
             }
 
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://immaculate.onrender.com/api/delinvoiceitem/${invoiceData._id}/${itemId}`, {
+            const response = await fetch(`http://localhost:3001/api/delinvoiceitem/${invoiceData._id}/${itemId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': authToken,

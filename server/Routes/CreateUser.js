@@ -980,9 +980,42 @@ router.post("/send-invoice-email", async (req, res) => {
         .json({ success: false, error: resp.data || "Unknown response from PHP" });
     }
   } catch (err) {
-    console.error("Error calling Hostinger sendemail:", err.message || err);
-    return res.status(500).json({ success: false, error: err.message || err });
+  // Detailed Axios / Network error logging
+  console.error("⚠️ Error calling Hostinger sendemail:");
+  
+  // General error message
+  console.error("Message:", err.message);
+  
+  // Axios error code (e.g., ECONNREFUSED, ETIMEDOUT)
+  if (err.code) console.error("Code:", err.code);
+
+  // Axios config info
+  if (err.config && err.config.url) {
+    console.error("Request URL:", err.config.url);
   }
+
+  // If we got an HTTP response back from Hostinger
+  if (err.response) {
+    console.error("Status:", err.response.status);
+    console.error("Status Text:", err.response.statusText);
+    console.error("Headers:", err.response.headers);
+    console.error("Response Data:", err.response.data);
+  } else {
+    // If no HTTP response (network / timeout / DNS issue)
+    console.error("No response received from Hostinger (network or timeout).");
+  }
+
+  // Return user-friendly info to client
+  return res.status(500).json({
+    success: false,
+    error: err.message || "Failed to contact Hostinger mailer",
+    details: {
+      code: err.code || null,
+      status: err.response ? err.response.status : null,
+      data: err.response ? err.response.data : null,
+    },
+  });
+}
 });
 
 // router.post('/send-deposit-email', async (req, res) => {
