@@ -10,6 +10,7 @@
   "author": "Jashan",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.12.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cron": "^3.1.7",
