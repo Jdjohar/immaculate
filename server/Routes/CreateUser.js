@@ -35,7 +35,6 @@ const nodemailer = require('nodemailer');
 const multer = require('multer');
 const path = require('path');
 const axios = require("axios");
-
 const getCurrencySign = (currencyType) => {
     switch (currencyType) {
         case 'AUD':
@@ -865,7 +864,6 @@ router.get('/currentMonthReceivedAmount2/:userid', async (req, res) => {
 //         res.status(500).json({ success: false, error: 'Failed to send email.' });
 //     }
 // });
-
 router.post("/send-invoice-email", async (req, res) => {
   try {
     const {
@@ -987,6 +985,105 @@ router.post("/send-invoice-email", async (req, res) => {
   }
 });
 
+// router.post('/send-deposit-email', async (req, res) => {
+//     const {
+//         to,
+//         bcc,
+//         content,
+//         companyName,
+//         pdfAttachment,
+//         customdate,
+//         duedate,
+//         depositamount,
+//         InvoiceNumber,
+//         currencyType,
+//     } = req.body;
+//     console.log(duedate, "");
+
+//     const transporter = nodemailer.createTransport({
+//         service: 'gmail',
+//         auth: {
+//             user: "Immacltd23@gmail.com",
+//             pass: "sqiwgztarywwjyhk"
+//         },
+//     });
+
+//     // const transporter = nodemailer.createTransport({
+//     //     host: 'smtp.hostinger.com', // Replace with your hosting provider's SMTP server
+//     //     port: 465, // Replace with the appropriate port
+//     //     secure: true, // true for 465, false for other ports
+//     //     auth: {
+//     //       user: 'Immacltd23@gmail.com',
+//     //       pass: 'sqiwgztarywwjyhk'
+//     //     }
+//     //   });
+
+//     const currencySign = getCurrencySign(currencyType);
+
+//     const mailOptions = {
+//         from: 'Immacltd23@gmail.com',
+//         to: to.join(', '),
+//         bcc: bcc.join(', '),
+//         subject: `Deposit Request from ${companyName}`,
+//         attachments: [
+//             {
+//                 filename: `Invoice #${InvoiceNumber}.pdf`,
+//                 content: pdfAttachment.split(';base64,')[1], // Extract base64 content
+//                 encoding: 'base64',
+//             }
+//         ],
+//         html: `<html>
+//         <body style="background-color:#c5c1c187; margin-top: 40px; padding:20px 0px;">
+//              <section style="font-family:sans-serif; width: 50%; margin: auto; background-color:#fff; padding: 15px 30px; margin-top: 40px;">
+//                 <div style="padding: 10px 0px;  text-align: center; font-weight: 500; color: #999999">
+//                     <p style="margin-bottom:0px">${customdate}</p>
+//                     <p style="margin-top: 0px;">Invoice #${InvoiceNumber}</p>
+//                 </div>
+//                 <div>
+//                     <h1 style="margin-bottom:0px; font-size: 35px; color:#222">Deposit Request from ${companyName}</h1>
+//                     <h1 style="margin: 0px; font-size: 35px; color:#222">${currencySign}${depositamount}</h1>
+//                     <p style="margin-top: 0px; color:#222">Due: ${duedate}</p>
+//                 </div>
+//                 <div style="background-color:#f5f4f4; padding: 1px 20px; margin: 30px 0px 10px;">
+//                     <p style="color:#222">${content}</p>
+//                 </div>
+//                 <div style="margin: 20px 0px 10px;">
+//                     <p style="color:#222">This email contains a unique link just for you. Please do not share this email or link or others will have access to your document.</p>
+//                 </div>
+//             </section>
+//             <section style="font-family:sans-serif; width: 50%; margin: auto; background-color:#f5f4f4; padding: 35px 30px; margin-bottom: 40px;">
+//                 <div>
+//                     <p style="font-size: 15px; color:#222">Make your invoice</p>
+//                     <h1 style="font-size: 35px; margin-bottom: 0; margin-top: 0; color:#222">INVOICE</h1>
+//                 </div>
+//                 <div>
+//                     <ul style="text-align: center;display: inline-flex;list-style:none;padding-left:0px">
+//                         <li>
+//                             <a href="">
+//                                 <img src="https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico" alt="facebook icon" style="margin: 0px 5px;">
+//                             </a>
+//                         </li>
+//                         <li>
+//                             <a href="">
+//                                 <img src="https://static.cdninstagram.com/rsrc.php/y4/r/QaBlI0OZiks.ico" alt="instagram icon" style="margin: 0px 5px;">
+//                             </a>
+//                         </li>
+//                     </ul>
+//                 </div>
+//             </section>
+//         </body>
+//             </html>`,
+//     };
+
+//     try {
+//         await transporter.sendMail(mailOptions);
+//         console.log('Email sent successfully!');
+//         res.status(200).json({ success: true });
+//     } catch (error) {
+//         console.error('Error sending email:', error);
+//         res.status(500).json({ success: false, error: 'Failed to send email.' });
+//     }
+// });
 
 // router.post('/send-deposit-email', async (req, res) => {
 //     const {
