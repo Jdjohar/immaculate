@@ -33,7 +33,7 @@ export default function Edititem() {
     const fetchitemData = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/getitems/${itemId}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/getitems/${itemId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
