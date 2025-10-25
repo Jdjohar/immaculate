@@ -36,7 +36,7 @@ export default function Invoice() {
     try {
       const userid = localStorage.getItem("userid");
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`http://localhost:3001/api/invoicedata/${userid}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/invoicedata/${userid}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -53,7 +53,7 @@ export default function Invoice() {
       if (Array.isArray(json)) {
         setInvoices(json);
         const transactionPromises = json.map(async (invoice) => {
-          const response = await fetch(`http://localhost:3001/api/gettransactiondata/${invoice._id}`, {
+          const response = await fetch(`https://immaculate.onrender.com/api/gettransactiondata/${invoice._id}`, {
             headers: {
               'Authorization': authToken,
             }
@@ -87,7 +87,7 @@ export default function Invoice() {
       console.log('Fetching FY data for user:', userid); // Debug log
       console.log('Auth token:', authToken); // Debug log
 
-      const response = await fetch(`http://localhost:3001/api/all-invoices-by-financial-year?userid=${userid}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/all-invoices-by-financial-year?userid=${userid}`, {
         headers: {
           'Authorization': authToken,
         }
