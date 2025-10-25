@@ -865,158 +865,168 @@ router.get('/currentMonthReceivedAmount2/:userid', async (req, res) => {
 //     }
 // });
 router.post("/send-invoice-email", async (req, res) => {
-  try {
-    const {
-      to,
-      bcc,
-      content,
-      companyName,
-      pdfAttachment,
-      customdate,
-      duedate,
-      InvoiceNumber,
-      invoiceId,
-      ownerId,
-      amountdue,
-      currencyType,
-      amountdue1,
-    } = req.body;
 
-    // SMTP credentials — stored in your Render environment
-    const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
-    const smtpPort = process.env.SMTP_PORT || 587;
-    const smtpUser = process.env.SMTP_USER || "Immacltd23@gmail.com";
-    const smtpPass = process.env.SMTP_PASS || "sqiwgztarywwjyhk";
-    const smtpCrypto = process.env.SMTP_CRYPTO || "tls";
-
-    // Hostinger endpoint
-    const phpEndpoint =
-      process.env.HOSTINGER_MAILER_URL ||
-      "https://jdwebservices.com/demo/smtp/sendemail.php";
-
-    // API key — must match the .smtp_api_key file on Hostinger
-    const apiKey =
-      process.env.HOSTINGER_API_KEY || "MY_SUPER_SECRET_EMAIL_KEY_92x8HD!";
-
-    // Build email HTML (you can replace this with your existing HTML)
-    const html = `
-      <html>
-        <body style="background-color:#c5c1c187; margin-top: 40px; padding:20px 0px;">
-             <section style="font-family:sans-serif; width: 50%; margin: auto; background-color:#fff; padding: 15px 30px; margin-top: 40px;">
-                <div style="padding: 10px 0px;  text-align: center; font-weight: 500; color: #999999">
-                    <p style="margin-bottom:0px">${customdate}</p>
-                    <p style="margin-top: 0px;">Invoice #${InvoiceNumber}</p>
-                </div>
-                <div>
-                    <h1 style="margin-bottom:0px; font-size: 35px; color:#222">Invoice from ${companyName}</h1>
-                    <h1 style="margin: 0px; font-size: 35px; color:#222">${currencyType}${amountdue1}</h1>
-                    <p style="margin-top: 0px; color:#222">Due: ${duedate}</p>
-                </div>
-                <div style="background-color:#f5f4f4; padding: 1px 20px; margin: 30px 0px 10px;">
-                    <p style="color:#222">${content}</p>
-                </div>
-                <div style="margin: 20px 0px 10px;">
-                    <p style="color:#222">This email contains a unique link just for you. Please do not share this email or link or others will have access to your document.</p>
-                    <a href="https://immaculate-beta.vercel.app/customersigninvoice?invoiceId=${invoiceId}" style="display:inline-block;padding:10px 20px;background-color:#4CAF50;color:#fff;text-decoration:none;border-radius:5px;">View this Invoice</a>
-                </div>
-            </section>
-            <section style="font-family:sans-serif; width: 50%; margin: auto; background-color:#f5f4f4; padding: 35px 30px; margin-bottom: 40px;">
-                <div>
-                    <p style="font-size: 15px; color:#222">Make your invoice</p>
-                    <h1 style="font-size: 35px; margin-bottom: 0; margin-top: 0; color:#222">INVOICE</h1>
-                </div>
-                <div>
-                    <ul style="text-align: center;display: inline-flex;list-style:none;padding-left:0px">
-                        <li>
-                            <a href="">
-                                <img src="https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico" alt="facebook icon" style="margin: 0px 5px;">
-                            </a>
-                        </li>
-                        <li>
-                            <a href="">
-                                <img src="https://static.cdninstagram.com/rsrc.php/y4/r/QaBlI0OZiks.ico" alt="instagram icon" style="margin: 0px 5px;">
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </section>
-        </body>
-            </html>
-    `;
-
-    const payload = {
-      smtpHost,
-      smtpPort,
-      smtpUser,
-      smtpPass,
-      smtpCrypto,
-      fromEmail: smtpUser,
-      fromName: companyName || "Your Company",
-      to,
-      bcc,
-      subject: `Invoice from ${companyName}`,
-      html,
-      attachments: [
-        {
-          filename: `Invoice #${InvoiceNumber}.pdf`,
-          contentBase64: pdfAttachment, // base64 data:application/pdf;base64,...
+    console.log(process.env.SMTP_HOST ,"process.env.SMTP_HOST");
+    console.log(process.env.SMTP_PORT ,"process.env.SMTP_PORT");
+    console.log(process.env.SMTP_USER ,"process.env.SMTP_USER");
+    console.log(process.env.SMTP_PASS ,"process.env.SMTP_PASS");
+    console.log(process.env.SMTP_CRYPTO ,"process.env.SMTP_CRYPTO");
+    
+    try {
+      const {
+        to,
+        bcc,
+        content,
+        companyName,
+        pdfAttachment,
+        customdate,
+        duedate,
+        InvoiceNumber,
+        invoiceId,
+        ownerId,
+        amountdue,
+        currencyType,
+        amountdue1,
+      } = req.body;
+//   user: "canadianscrewpiles@gmail.com",
+//             pass: "vhjcbemwmrynvmcr"
+      // SMTP credentials — stored in your Render environment
+      const smtpHost = process.env.SMTP_HOST;
+      const smtpPort = process.env.SMTP_PORT;
+      const smtpUser = process.env.SMTP_USER;
+      const smtpPass = process.env.SMTP_PASS;
+      const smtpCrypto = process.env.SMTP_CRYPTO;
+  
+      // Hostinger endpoint
+      const phpEndpoint =
+        process.env.HOSTINGER_MAILER_URL ||
+        "https://jdwebservices.com/demo/smtp/sendemail.php";
+  
+      // API key — must match the .smtp_api_key file on Hostinger
+      const apiKey =
+        process.env.HOSTINGER_API_KEY || "MY_SUPER_SECRET_EMAIL_KEY_92x8HD!";
+  
+      // Build email HTML (you can replace this with your existing HTML)
+      const html = `
+        <html>
+          <body style="background-color:#c5c1c187; margin-top: 40px; padding:20px 0px;">
+               <section style="font-family:sans-serif; width: 50%; margin: auto; background-color:#fff; padding: 15px 30px; margin-top: 40px;">
+                  <div style="padding: 10px 0px;  text-align: center; font-weight: 500; color: #999999">
+                      <p style="margin-bottom:0px">${customdate}</p>
+                      <p style="margin-top: 0px;">Invoice #${InvoiceNumber}</p>
+                  </div>
+                  <div>
+                      <h1 style="margin-bottom:0px; font-size: 35px; color:#222">Invoice from ${companyName}</h1>
+                      <h1 style="margin: 0px; font-size: 35px; color:#222">${currencyType}${amountdue1}</h1>
+                      <p style="margin-top: 0px; color:#222">Due: ${duedate}</p>
+                  </div>
+                  <div style="background-color:#f5f4f4; padding: 1px 20px; margin: 30px 0px 10px;">
+                      <p style="color:#222">${content}</p>
+                  </div>
+                  <div style="margin: 20px 0px 10px;">
+                      <p style="color:#222">This email contains a unique link just for you. Please do not share this email or link or others will have access to your document.</p>
+                      <a href="https://immaculate-beta.vercel.app/customersigninvoice?invoiceId=${invoiceId}" style="display:inline-block;padding:10px 20px;background-color:#4CAF50;color:#fff;text-decoration:none;border-radius:5px;">View this Invoice</a>
+                  </div>
+              </section>
+              <section style="font-family:sans-serif; width: 50%; margin: auto; background-color:#f5f4f4; padding: 35px 30px; margin-bottom: 40px;">
+                  <div>
+                      <p style="font-size: 15px; color:#222">Make your invoice</p>
+                      <h1 style="font-size: 35px; margin-bottom: 0; margin-top: 0; color:#222">INVOICE</h1>
+                  </div>
+                  <div>
+                      <ul style="text-align: center;display: inline-flex;list-style:none;padding-left:0px">
+                          <li>
+                              <a href="">
+                                  <img src="https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico" alt="facebook icon" style="margin: 0px 5px;">
+                              </a>
+                          </li>
+                          <li>
+                              <a href="">
+                                  <img src="https://static.cdninstagram.com/rsrc.php/y4/r/QaBlI0OZiks.ico" alt="instagram icon" style="margin: 0px 5px;">
+                              </a>
+                          </li>
+                      </ul>
+                  </div>
+              </section>
+          </body>
+              </html>
+      `;
+  
+      const payload = {
+        smtpHost,
+        smtpPort,
+        smtpUser,
+        smtpPass,
+        smtpCrypto,
+        fromEmail: smtpUser,
+        fromName: companyName || "Your Company",
+        to,
+        bcc,
+        subject: `Invoice from ${companyName}`,
+        html,
+        attachments: [
+          {
+            filename: `Invoice #${InvoiceNumber}.pdf`,
+            contentBase64: pdfAttachment, // base64 data:application/pdf;base64,...
+          },
+        ],
+      };
+  
+      const resp = await axios.post(phpEndpoint, payload, {
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": apiKey,
         },
-      ],
-    };
-
-    const resp = await axios.post(phpEndpoint, payload, {
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": apiKey,
-      },
-      timeout: 30000,
-    });
-
-    if (resp.data && resp.data.success) {
-      return res.status(200).json({ success: true });
-    } else {
-      return res
-        .status(500)
-        .json({ success: false, error: resp.data || "Unknown response from PHP" });
+        timeout: 30000,
+      });
+  
+      if (resp.data && resp.data.success) {
+        return res.status(200).json({ success: true });
+      } else {
+        return res
+          .status(500)
+          .json({ success: false, error: resp.data || "Unknown response from PHP" });
+      }
+    } catch (err) {
+    // Detailed Axios / Network error logging
+    console.error("⚠️ Error calling Hostinger sendemail:");
+    
+    // General error message
+    console.error("Message:", err.message);
+    
+    // Axios error code (e.g., ECONNREFUSED, ETIMEDOUT)
+    if (err.code) console.error("Code:", err.code);
+  
+    // Axios config info
+    if (err.config && err.config.url) {
+      console.error("Request URL:", err.config.url);
     }
-  } catch (err) {
-  // Detailed Axios / Network error logging
-  console.error("⚠️ Error calling Hostinger sendemail:");
   
-  // General error message
-  console.error("Message:", err.message);
+    // If we got an HTTP response back from Hostinger
+    if (err.response) {
+      console.error("Status:", err.response.status);
+      console.error("Status Text:", err.response.statusText);
+      console.error("Headers:", err.response.headers);
+      console.error("Response Data:", err.response.data);
+    } else {
+      // If no HTTP response (network / timeout / DNS issue)
+      console.error("No response received from Hostinger (network or timeout).");
+    }
   
-  // Axios error code (e.g., ECONNREFUSED, ETIMEDOUT)
-  if (err.code) console.error("Code:", err.code);
-
-  // Axios config info
-  if (err.config && err.config.url) {
-    console.error("Request URL:", err.config.url);
+    // Return user-friendly info to client
+    return res.status(500).json({
+      success: false,
+      error: err.message || "Failed to contact Hostinger mailer",
+      details: {
+        code: err.code || null,
+        status: err.response ? err.response.status : null,
+        data: err.response ? err.response.data : null,
+      },
+    });
   }
-
-  // If we got an HTTP response back from Hostinger
-  if (err.response) {
-    console.error("Status:", err.response.status);
-    console.error("Status Text:", err.response.statusText);
-    console.error("Headers:", err.response.headers);
-    console.error("Response Data:", err.response.data);
-  } else {
-    // If no HTTP response (network / timeout / DNS issue)
-    console.error("No response received from Hostinger (network or timeout).");
-  }
-
-  // Return user-friendly info to client
-  return res.status(500).json({
-    success: false,
-    error: err.message || "Failed to contact Hostinger mailer",
-    details: {
-      code: err.code || null,
-      status: err.response ? err.response.status : null,
-      data: err.response ? err.response.data : null,
-    },
   });
-}
-});
+
+
 
 // router.post('/send-deposit-email', async (req, res) => {
 //     const {
