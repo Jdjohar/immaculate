@@ -34,7 +34,7 @@ export default function Addteam() {
     e.preventDefault();
     let userid = localStorage.getItem('userid');
     const authToken = localStorage.getItem('authToken');
-    const response = await fetch('https://immaculate.onrender.com/api/addteammember', {
+    const response = await fetch('http://localhost:3001/api/addteammember', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

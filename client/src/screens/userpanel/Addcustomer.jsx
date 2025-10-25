@@ -49,7 +49,7 @@
       e.preventDefault();
       let userid = localStorage.getItem('userid');
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch('https://immaculate.onrender.com/api/addcustomer', {
+      const response = await fetch('http://localhost:3001/api/addcustomer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
