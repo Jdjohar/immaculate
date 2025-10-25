@@ -33,7 +33,7 @@ export default function Itemlist() {
         try {
             const userid =  localStorage.getItem("userid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/itemdata/${userid}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/itemdata/${userid}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -75,7 +75,7 @@ export default function Itemlist() {
     const handleDeleteClick = async (itemId) => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/delitem/${itemId}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/delitem/${itemId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': authToken,

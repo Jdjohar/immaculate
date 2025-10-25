@@ -30,7 +30,7 @@ export default function Editteam() {
     const fetchteamData = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/getteamdata/${teamid}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/getteamdata/${teamid}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -64,7 +64,7 @@ export default function Editteam() {
                 ...team
             };
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3001/api/updateteamdata/${teamid}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/updateteamdata/${teamid}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
