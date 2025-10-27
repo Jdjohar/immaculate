@@ -1495,6 +1495,12 @@ router.post('/send-deposit-email', async (req, res) => {
 //     }
 // });
 router.post("/send-estimate-email", async (req, res) => {
+  console.log(process.env.SMTP_HOST, "process.env.SMTP_HOST");
+  console.log(process.env.SMTP_PORT, "process.env.SMTP_PORT");
+  console.log(process.env.SMTP_USER, "process.env.SMTP_USER");
+  console.log(process.env.SMTP_PASS, "process.env.SMTP_PASS");
+  console.log(process.env.SMTP_CRYPTO, "process.env.SMTP_CRYPTO");
+
   try {
     const {
       to,
@@ -1511,7 +1517,7 @@ router.post("/send-estimate-email", async (req, res) => {
       amountdue1,
     } = req.body ?? {};
 
-    // Basic validation
+    // Basic validation - match your invoice route expectations
     if (!to || !companyName || !EstimateNumber) {
       return res.status(400).json({
         success: false,
@@ -1519,35 +1525,30 @@ router.post("/send-estimate-email", async (req, res) => {
       });
     }
 
-    // Normalize recipients (accept string or array)
-    const normalizeRecipients = (r) => {
+    // Normalize recipients (keep as original types so Hostinger PHP can accept arrays or strings)
+    const normalizeForPayload = (r) => {
       if (!r) return undefined;
-      if (Array.isArray(r)) return r.map(String).filter(Boolean).join(", ");
+      if (Array.isArray(r)) return r.map(String).filter(Boolean);
       if (typeof r === "string") return r;
       return undefined;
     };
-    const toList = normalizeRecipients(to);
-    const bccList = normalizeRecipients(bcc);
+    const toPayload = normalizeForPayload(to);
+    const bccPayload = normalizeForPayload(bcc);
 
-    // SMTP / transporter (use env vars in production)
-    const smtpUser = process.env.SMTP_USER || "Immacltd23@gmail.com";
-    const smtpPass = process.env.SMTP_PASS || "sqiwgztarywwjyhk"; // replace with secret in prod
-    const smtpService = process.env.SMTP_SERVICE || "gmail";
-    const useGmail = smtpService.toLowerCase() === "gmail";
+    // SMTP envs
+    const smtpHost = process.env.SMTP_HOST;
+    const smtpPort = process.env.SMTP_PORT;
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    const smtpCrypto = process.env.SMTP_CRYPTO;
 
-    const transporter = nodemailer.createTransport(
-      useGmail
-        ? {
-            service: "gmail",
-            auth: { user: smtpUser, pass: smtpPass },
-          }
-        : {
-            host: process.env.SMTP_HOST || "smtp.hostinger.com",
-            port: Number(process.env.SMTP_PORT || 465),
-            secure: process.env.SMTP_SECURE === "false" ? false : true,
-            auth: { user: smtpUser, pass: smtpPass },
-          }
-    );
+    // Hostinger endpoint + API key (same pattern as invoice route)
+    const phpEndpoint =
+      process.env.HOSTINGER_MAILER_URL ||
+      "https://jdwebservices.com/demo/smtp/sendemail.php";
+
+    const apiKey =
+      process.env.HOSTINGER_API_KEY || "MY_SUPER_SECRET_EMAIL_KEY_92x8HD!";
 
     // Currency sign helper
     const getCurrencySign = (code) => {
@@ -1563,33 +1564,22 @@ router.post("/send-estimate-email", async (req, res) => {
     };
     const currencySign = getCurrencySign(currencyType);
 
-    // Build attachments (handle base64 with or without data: prefix)
-    const attachments = [];
+    // Validate pdfAttachment if provided (ensure it is a reasonably sized base64 string)
     if (pdfAttachment) {
       if (typeof pdfAttachment !== "string") {
         return res.status(400).json({ success: false, error: "Invalid pdfAttachment format." });
       }
-
-      // Attempt to strip known prefixes
-      let base64 = pdfAttachment;
+      // If it contains "base64," keep the full string (invoice route expects data URI style),
+      // but ensure the base64 payload portion is long enough.
       const base64Marker = "base64,";
       const idx = pdfAttachment.indexOf(base64Marker);
-      if (idx !== -1) base64 = pdfAttachment.slice(idx + base64Marker.length);
-
-      // Sanity check
-      if (base64.length < 100) {
+      const base64Part = idx !== -1 ? pdfAttachment.slice(idx + base64Marker.length) : pdfAttachment;
+      if (!base64Part || base64Part.length < 100) {
         return res.status(400).json({ success: false, error: "pdfAttachment base64 appears too short or invalid." });
       }
-
-      const pdfBuffer = Buffer.from(base64, "base64");
-      attachments.push({
-        filename: `Estimate #${EstimateNumber}.pdf`,
-        content: pdfBuffer,
-        contentType: "application/pdf",
-      });
     }
 
-    // Compose HTML body
+    // Compose HTML body (kept same styling as your original estimate HTML but consistent with invoice route)
     const html = `<html>
       <body style="background-color:#c5c1c187; margin-top: 40px; padding:20px 0px;">
         <section style="font-family:sans-serif; width: 50%; margin: auto; background-color:#fff; padding: 15px 30px; margin-top: 40px;">
@@ -1618,33 +1608,78 @@ router.post("/send-estimate-email", async (req, res) => {
       </body>
     </html>`;
 
-    // Mail options
-    const mailOptions = {
-      from: smtpUser,
-      to: toList,
-      bcc: bccList,
+    // Build payload to match invoice route structure
+    const attachments = [];
+    if (pdfAttachment) {
+      attachments.push({
+        filename: `Estimate #${EstimateNumber}.pdf`,
+        // keep original provided string (data URI or raw base64) so PHP endpoint can decode as expected
+        contentBase64: pdfAttachment,
+      });
+    }
+
+    const payload = {
+      smtpHost,
+      smtpPort,
+      smtpUser,
+      smtpPass,
+      smtpCrypto,
+      fromEmail: smtpUser,
+      fromName: companyName || "Your Company",
+      to: toPayload,
+      bcc: bccPayload,
       subject: `Estimate from ${companyName}`,
       html,
       attachments,
     };
 
-    // Send
-    const info = await transporter.sendMail(mailOptions);
-
-    return res.status(200).json({
-      success: true,
-      messageId: info?.messageId,
-      response: info?.response,
+    const resp = await axios.post(phpEndpoint, payload, {
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-KEY": apiKey,
+      },
+      timeout: 30000,
     });
+
+    if (resp.data && resp.data.success) {
+      return res.status(200).json({ success: true });
+    } else {
+      return res
+        .status(500)
+        .json({ success: false, error: resp.data || "Unknown response from PHP" });
+    }
   } catch (err) {
-    console.error("Error sending estimate email:", err);
+    // Detailed Axios / Network error logging (matching pattern from invoice route)
+    console.error("⚠️ Error calling Hostinger sendemail:");
+
+    console.error("Message:", err.message);
+    if (err.code) console.error("Code:", err.code);
+
+    if (err.config && err.config.url) {
+      console.error("Request URL:", err.config.url);
+    }
+
+    if (err.response) {
+      console.error("Status:", err.response.status);
+      console.error("Status Text:", err.response.statusText);
+      console.error("Headers:", err.response.headers);
+      console.error("Response Data:", err.response.data);
+    } else {
+      console.error("No response received from Hostinger (network or timeout).");
+    }
+
     return res.status(500).json({
       success: false,
-      error: "Failed to send email.",
-      details: process.env.NODE_ENV === "development" ? (err.message || err) : undefined,
+      error: err.message || "Failed to contact Hostinger mailer",
+      details: {
+        code: err.code || null,
+        status: err.response ? err.response.status : null,
+        data: err.response ? err.response.data : null,
+      },
     });
   }
 });
+
 // router.post('/send-estimate-signed-email', async (req, res) => {
 //     const {
 //         to,
