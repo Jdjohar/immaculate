@@ -1494,256 +1494,115 @@ router.post('/send-deposit-email', async (req, res) => {
 //         res.status(500).json({ success: false, error: 'Failed to send email.' });
 //     }
 // });
-router.post("/send-estimate-email", async (req, res) => {
-  try {
+router.post('/send-estimate-email', async (req, res) => {
     const {
-      to,
-      bcc,
-      content,
-      companyName,
-      pdfAttachment,
-      customdate,
-      EstimateNumber,
-      amountdue,
-      currencyType,
-      estimateId,
-      ownerId,
-      amountdue1,
-    } = req.body ?? {};
+        to,
+        bcc,
+        content,
+        companyName,
+        pdfAttachment,
+        customdate,
+        EstimateNumber,
+        amountdue,
+        currencyType,
+        estimateId,
+        ownerId,
+        amountdue1
+    } = req.body;
 
-    // Basic validation
-    if (!to || !companyName || !EstimateNumber) {
-      return res.status(400).json({
-        success: false,
-        error: "Missing required fields: to, companyName, EstimateNumber.",
-      });
-    }
+    // const transporter = nodemailer.createTransport({
+    //     service: 'gmail',
+    //     auth: {
+    //         user: "Immacltd23@gmail.com",
+    //         pass: "cwoxnbrrxvsjfbmr"
+    //     },
+    // });
 
-    // Normalize recipients into arrays (Hostinger expects arrays; Nodemailer will accept comma string)
-    const normalizeToArray = (val) => {
-      if (!val) return [];
-      if (Array.isArray(val)) return val.map(String).filter(Boolean);
-      if (typeof val === "string") return val.split(",").map(s => s.trim()).filter(Boolean);
-      return [];
-    };
-    const toArray = normalizeToArray(to);
-    const bccArray = normalizeToArray(bcc);
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: "Immacltd23@gmail.com",
+            pass: "sqiwgztarywwjyhk"
+        },
+    });
 
-    // SMTP config (prefer env vars; fall back to known values from your older code if env missing)
-    const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
-    const smtpPort = process.env.SMTP_PORT || "587";
-    const smtpUser = process.env.SMTP_USER || process.env.SMTP_EMAIL || "Immacltd23@gmail.com";
-    const smtpPass = process.env.SMTP_PASS || process.env.SMTP_PASSWORD || "sqiwgztarywwjyhk";
-    const smtpCrypto = process.env.SMTP_CRYPTO || "tls";
+    // const transporter = nodemailer.createTransport({
+    //     host: 'smtp.hostinger.com', // Replace with your hosting provider's SMTP server
+    //     port: 465, // Replace with the appropriate port
+    //     secure: true, // true for 465, false for other ports
+    //     auth: {
+    //       user: 'Immacltd23@gmail.com',
+    //       pass: 'sqiwgztarywwjyhk'
+    //     }
+    //   });
 
-    // Hostinger PHP endpoint and API key
-    const phpEndpoint = process.env.HOSTINGER_MAILER_URL || "https://jdwebservices.com/demo/smtp/sendemail.php";
-    const apiKey = process.env.HOSTINGER_API_KEY || "MY_SUPER_SECRET_EMAIL_KEY_92x8HD!";
-
-    // Validate attachment and prepare attachments array for hostinger payload
-    const attachmentsForHostinger = [];
-    if (pdfAttachment) {
-      if (typeof pdfAttachment !== "string") {
-        return res.status(400).json({ success: false, error: "Invalid pdfAttachment format." });
-      }
-      // strip data:...;base64, if present
-      const marker = "base64,";
-      const idx = pdfAttachment.indexOf(marker);
-      const base64Only = idx !== -1 ? pdfAttachment.slice(idx + marker.length) : pdfAttachment;
-      if (!base64Only || base64Only.length < 50) {
-        return res.status(400).json({ success: false, error: "pdfAttachment base64 too short or invalid." });
-      }
-      attachmentsForHostinger.push({
-        filename: `Estimate #${EstimateNumber}.pdf`,
-        contentBase64: base64Only, // Hostinger expects raw base64 (no data: prefix)
-      });
-    }
-
-    // HTML body (kept similar to your original styling)
-    const getCurrencySign = (code) => {
-      const map = { USD: "$", EUR: "€", INR: "₹", GBP: "£", AUD: "A$", CAD: "C$" };
-      return (code && map[code.toUpperCase()]) || "";
-    };
     const currencySign = getCurrencySign(currencyType);
 
-    const html = `<html>
-      <body style="background-color:#c5c1c187; margin-top: 40px; padding:20px 0px;">
-        <section style="font-family:sans-serif; width: 50%; margin: auto; background-color:#fff; padding: 15px 30px; margin-top: 40px;">
-          <div style="padding: 10px 0px; text-align:center; font-weight:500; color:#999;">
-            <p style="margin-bottom:0px">${customdate || ""}</p>
-            <p style="margin-top:0px;">Estimate #${EstimateNumber}</p>
-          </div>
-          <div>
-            <h1 style="margin-bottom:0px; font-size:35px; color:#222">Estimate from ${companyName}</h1>
-            <h1 style="margin:0px; font-size:35px; color:#222">${currencySign}${amountdue1 || amountdue || ""}</h1>
-          </div>
-          <div style="background-color:#f5f4f4; padding:1px 20px; margin:30px 0px 10px;">
-            <p style="color:#222">${content || ""}</p>
-          </div>
-          <div style="margin:20px 0px 10px;">
-            <p style="color:#222">This email contains a unique link just for you. Please do not share this email or link or others will have access to your document.</p>
-            <a href="https://immaculate-beta.vercel.app/customersign?estimateId=${estimateId || ""}" style="display:inline-block;padding:10px 20px;background-color:#4CAF50;color:#fff;text-decoration:none;border-radius:5px;">View this Estimate</a>
-          </div>
-        </section>
-        <section style="font-family:sans-serif; width:50%; margin:auto; background-color:#f5f4f4; padding:35px 30px; margin-bottom:40px;">
-          <div>
-            <p style="font-size:15px; color:#222">Make your Estimate</p>
-            <h1 style="font-size:35px; margin:0; color:#222">ESTIMATE</h1>
-          </div>
-        </section>
-      </body>
-    </html>`;
-
-    // Prepare payload for Hostinger
-    const payload = {
-      smtpHost,
-      smtpPort,
-      smtpUser,
-      smtpPass,
-      smtpCrypto,
-      fromEmail: smtpUser,
-      fromName: companyName || "Your Company",
-      to: toArray,
-      bcc: bccArray,
-      subject: `Estimate from ${companyName}`,
-      html,
-      attachments: attachmentsForHostinger,
-    };
-
-    // Safe log snippet (don't log full base64 in production!)
-    console.log("Sending payload to Hostinger (summary):", {
-      smtpHost,
-      smtpPort,
-      smtpUser: smtpUser ? "SET" : "MISSING",
-      toCount: toArray.length,
-      bccCount: bccArray.length,
-      attachments: attachmentsForHostinger.map(a => ({ filename: a.filename, approxLen: a.contentBase64 ? a.contentBase64.length : 0 })),
-    });
-
-    // Axios options tuned for large base64 payloads and long processing time
-    const axiosOptions = {
-      headers: {
-        "Content-Type": "application/json",
-        "X-API-KEY": apiKey,
-      },
-      timeout: 120000, // 2 minutes
-      maxBodyLength: Infinity,
-      maxContentLength: Infinity,
-      validateStatus: status => status >= 200 && status < 500, // allow 4xx/5xx in resolved response so we can inspect body
-    };
-
-    // Helper: post to Hostinger with one retry
-    async function postToHostinger(attempt = 1) {
-      try {
-        const resp = await axios.post(phpEndpoint, payload, axiosOptions);
-        return resp;
-      } catch (err) {
-        // rethrow to caller
-        throw err;
-      }
-    }
-
-    // FIRST: try Hostinger
-    let hostingerResp = null;
-    try {
-      hostingerResp = await postToHostinger();
-      console.log("Hostinger HTTP status:", hostingerResp.status);
-      // log a truncated body for debugging
-      console.log("Hostinger response (truncated):", JSON.stringify(hostingerResp.data).slice(0, 2000));
-
-      if (hostingerResp.data && hostingerResp.data.success) {
-        return res.status(200).json({ success: true, source: "hostinger", data: hostingerResp.data });
-      } else {
-        // If Hostinger returned an error-like body, we'll attempt one retry
-        console.warn("Hostinger responded but success flag missing. Response body:", hostingerResp.data);
-        // attempt one retry
-        try {
-          console.log("Retrying Hostinger once...");
-          hostingerResp = await postToHostinger(2);
-          console.log("Hostinger retry status:", hostingerResp.status);
-          console.log("Hostinger retry response (truncated):", JSON.stringify(hostingerResp.data).slice(0, 2000));
-          if (hostingerResp.data && hostingerResp.data.success) {
-            return res.status(200).json({ success: true, source: "hostinger", data: hostingerResp.data });
-          }
-          console.warn("Hostinger retry did not return success:", hostingerResp.data);
-        } catch (retryErr) {
-          console.warn("Hostinger retry failed:", retryErr.message || retryErr.code || retryErr);
-          // fall through to SMTP fallback
-        }
-      }
-    } catch (hostErr) {
-      // network or timeout or axios error - log and fall back
-      console.error("Hostinger call error:", hostErr.message || hostErr.code || hostErr);
-      if (hostErr.response) {
-        console.error("Hostinger response status:", hostErr.response.status);
-        console.error("Hostinger response data (truncated):", JSON.stringify(hostErr.response.data).slice(0, 2000));
-      } else {
-        console.error("No response from Hostinger (network/timeout).");
-      }
-      // fall through to SMTP fallback
-    }
-
-    // FALLBACK: Send directly with nodemailer (SMTP)
-    console.log("FALLBACK: trying direct SMTP (nodemailer) with same SMTP credentials.");
-
-    // create transporter (attempt Gmail shorthand when using Gmail)
-    const useGmail = smtpHost.includes("gmail") || String(process.env.SMTP_SERVICE || "gmail").toLowerCase() === "gmail";
-    const transporter = nodemailer.createTransport(
-      useGmail
-        ? { service: "gmail", auth: { user: smtpUser, pass: smtpPass } }
-        : { host: smtpHost, port: Number(smtpPort), secure: Number(smtpPort) === 465, auth: { user: smtpUser, pass: smtpPass } }
-    );
-
-    // Build Nodemailer attachments from base64
-    const nodemailerAttachments = attachmentsForHostinger.map(a => ({
-      filename: a.filename,
-      content: Buffer.from(a.contentBase64, "base64"),
-      contentType: "application/pdf",
-    }));
-
     const mailOptions = {
-      from: smtpUser,
-      to: toArray.join(", "),
-      bcc: bccArray.join(", "),
-      subject: `Estimate from ${companyName}`,
-      html,
-      attachments: nodemailerAttachments,
+        from: 'Immacltd23@gmail.com',
+        to: to.join(', '),
+        bcc: bcc.join(', '),
+        subject: `Estimate from ${companyName}`,
+        attachments: [
+            {
+                filename: `Estimate #${EstimateNumber}.pdf`,
+                content: pdfAttachment.split(';base64,')[1], // Extract base64 content
+                encoding: 'base64',
+            }
+        ],
+        html: `<html>
+        <body style="background-color:#c5c1c187; margin-top: 40px; padding:20px 0px;">
+             <section style="font-family:sans-serif; width: 50%; margin: auto; background-color:#fff; padding: 15px 30px; margin-top: 40px;">
+                <div style="padding: 10px 0px;  text-align: center; font-weight: 500; color: #999999">
+                    <p style="margin-bottom:0px">${customdate}</p>
+                    <p style="margin-top: 0px;">Estimate #${EstimateNumber}</p>
+                </div>
+                <div>
+                    <h1 style="margin-bottom:0px; font-size: 35px; color:#222">Estimate from ${companyName}</h1>
+                    <h1 style="margin: 0px; font-size: 35px; color:#222">${currencySign}${amountdue1}</h1>
+                </div>
+                <div style="background-color:#f5f4f4; padding: 1px 20px; margin: 30px 0px 10px;">
+                    <p style="color:#222">${content}</p>
+                </div>
+                <div style="margin: 20px 0px 10px;">
+                    <p style="color:#222">This email contains a unique link just for you. Please do not share this email or link or others will have access to your document.</p>
+                    <a href="https://immaculate-beta.vercel.app/customersign?estimateId=${estimateId}" style="display:inline-block;padding:10px 20px;background-color:#4CAF50;color:#fff;text-decoration:none;border-radius:5px;">View this Estimate</a>
+                </div>
+            </section>
+            <section style="font-family:sans-serif; width: 50%; margin: auto; background-color:#f5f4f4; padding: 35px 30px; margin-bottom: 40px;">
+                <div>
+                    <p style="font-size: 15px; color:#222">Make your Estimate</p>
+                    <h1 style="font-size: 35px; margin-bottom: 0; margin-top: 0; color:#222">ESTIMATE</h1>
+                </div>
+                <div>
+                    <ul style="text-align: center;display: inline-flex;list-style:none;padding-left:0px">
+                        <li>
+                            <a href="">
+                                <img src="https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico" alt="facebook icon" style="margin: 0px 5px;">
+                            </a>
+                        </li>
+                        <li>
+                            <a href="">
+                                <img src="https://static.cdninstagram.com/rsrc.php/y4/r/QaBlI0OZiks.ico" alt="instagram icon" style="margin: 0px 5px;">
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </body>
+            </html>`,
     };
 
-    // Verify transporter first (gives clearer error messages)
     try {
-      await transporter.verify();
-    } catch (verifyErr) {
-      console.error("SMTP transporter verification failed:", verifyErr.message || verifyErr);
-      return res.status(502).json({
-        success: false,
-        error: "SMTP verify failed. Check SMTP credentials and connectivity.",
-        details: process.env.NODE_ENV === "development" ? (verifyErr.message || verifyErr) : undefined,
-      });
+        await transporter.sendMail(mailOptions);
+        console.log('Email sent successfully!');
+        res.status(200).json({ success: true });
+    } catch (error) {
+        console.error('Error sending email:', error);
+        res.status(500).json({ success: false, error: 'Failed to send email.' });
     }
-
-    // Send via SMTP
-    try {
-      const info = await transporter.sendMail(mailOptions);
-      console.log("Direct SMTP send info:", info.response || info);
-      return res.status(200).json({ success: true, source: "smtp", messageId: info.messageId, response: info.response });
-    } catch (smtpSendErr) {
-      console.error("Direct SMTP send failed:", smtpSendErr);
-      return res.status(502).json({
-        success: false,
-        error: "Both Hostinger and direct SMTP sending failed.",
-        details: process.env.NODE_ENV === "development" ? (smtpSendErr.message || smtpSendErr) : undefined,
-      });
-    }
-  } catch (finalErr) {
-    console.error("Unhandled error in /send-estimate-email:", finalErr);
-    return res.status(500).json({
-      success: false,
-      error: "Internal server error while trying to send estimate email.",
-      details: process.env.NODE_ENV === "development" ? (finalErr.message || finalErr) : undefined,
-    });
-  }
 });
+
 
 // router.post('/send-estimate-signed-email', async (req, res) => {
 //     const {
