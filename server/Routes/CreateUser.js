@@ -1511,7 +1511,7 @@ router.post("/send-estimate-email", async (req, res) => {
       amountdue1,
     } = req.body ?? {};
 
-    // basic validation
+    // Basic validation
     if (!to || !companyName || !EstimateNumber) {
       return res.status(400).json({
         success: false,
@@ -1519,61 +1519,47 @@ router.post("/send-estimate-email", async (req, res) => {
       });
     }
 
-    // normalize recipients into arrays (Hostinger PHP usually expects arrays)
+    // Normalize recipients into arrays (Hostinger expects arrays; Nodemailer will accept comma string)
     const normalizeToArray = (val) => {
       if (!val) return [];
       if (Array.isArray(val)) return val.map(String).filter(Boolean);
-      if (typeof val === "string") {
-        // comma separated string -> array
-        return val.split(",").map(s => s.trim()).filter(Boolean);
-      }
+      if (typeof val === "string") return val.split(",").map(s => s.trim()).filter(Boolean);
       return [];
     };
     const toArray = normalizeToArray(to);
     const bccArray = normalizeToArray(bcc);
 
-    // SMTP envs (forwarded to Hostinger PHP)
-    const smtpHost = process.env.SMTP_HOST;
-    const smtpPort = process.env.SMTP_PORT;
-    const smtpUser = process.env.SMTP_USER;
-    const smtpPass = process.env.SMTP_PASS;
-    const smtpCrypto = process.env.SMTP_CRYPTO;
+    // SMTP config (prefer env vars; fall back to known values from your older code if env missing)
+    const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com";
+    const smtpPort = process.env.SMTP_PORT || "587";
+    const smtpUser = process.env.SMTP_USER || process.env.SMTP_EMAIL || "Immacltd23@gmail.com";
+    const smtpPass = process.env.SMTP_PASS || process.env.SMTP_PASSWORD || "sqiwgztarywwjyhk";
+    const smtpCrypto = process.env.SMTP_CRYPTO || "tls";
 
-    // Hostinger endpoint + API key
-    const phpEndpoint =
-      process.env.HOSTINGER_MAILER_URL ||
-      "https://jdwebservices.com/demo/smtp/sendemail.php";
-    const apiKey =
-      process.env.HOSTINGER_API_KEY || "MY_SUPER_SECRET_EMAIL_KEY_92x8HD!";
+    // Hostinger PHP endpoint and API key
+    const phpEndpoint = process.env.HOSTINGER_MAILER_URL || "https://jdwebservices.com/demo/smtp/sendemail.php";
+    const apiKey = process.env.HOSTINGER_API_KEY || "MY_SUPER_SECRET_EMAIL_KEY_92x8HD!";
 
-    // validate pdfAttachment if provided and strip data URI prefix if present
-    const attachments = [];
+    // Validate attachment and prepare attachments array for hostinger payload
+    const attachmentsForHostinger = [];
     if (pdfAttachment) {
       if (typeof pdfAttachment !== "string") {
         return res.status(400).json({ success: false, error: "Invalid pdfAttachment format." });
       }
-
-      // strip the data:<mime>;base64, prefix if present
+      // strip data:...;base64, if present
       const marker = "base64,";
       const idx = pdfAttachment.indexOf(marker);
-      let base64Only = pdfAttachment;
-      if (idx !== -1) {
-        base64Only = pdfAttachment.slice(idx + marker.length);
+      const base64Only = idx !== -1 ? pdfAttachment.slice(idx + marker.length) : pdfAttachment;
+      if (!base64Only || base64Only.length < 50) {
+        return res.status(400).json({ success: false, error: "pdfAttachment base64 too short or invalid." });
       }
-
-      // sanity check base64 length
-      if (!base64Only || base64Only.length < 100) {
-        return res.status(400).json({ success: false, error: "pdfAttachment base64 appears too short or invalid." });
-      }
-
-      attachments.push({
+      attachmentsForHostinger.push({
         filename: `Estimate #${EstimateNumber}.pdf`,
-        // IMPORTANT: send *only* the base64 string (no data: prefix)
-        contentBase64: base64Only,
+        contentBase64: base64Only, // Hostinger expects raw base64 (no data: prefix)
       });
     }
 
-    // html body (kept similar to your original)
+    // HTML body (kept similar to your original styling)
     const getCurrencySign = (code) => {
       const map = { USD: "$", EUR: "€", INR: "₹", GBP: "£", AUD: "A$", CAD: "C$" };
       return (code && map[code.toUpperCase()]) || "";
@@ -1599,10 +1585,16 @@ router.post("/send-estimate-email", async (req, res) => {
             <a href="https://immaculate-beta.vercel.app/customersign?estimateId=${estimateId || ""}" style="display:inline-block;padding:10px 20px;background-color:#4CAF50;color:#fff;text-decoration:none;border-radius:5px;">View this Estimate</a>
           </div>
         </section>
+        <section style="font-family:sans-serif; width:50%; margin:auto; background-color:#f5f4f4; padding:35px 30px; margin-bottom:40px;">
+          <div>
+            <p style="font-size:15px; color:#222">Make your Estimate</p>
+            <h1 style="font-size:35px; margin:0; color:#222">ESTIMATE</h1>
+          </div>
+        </section>
       </body>
     </html>`;
 
-    // assemble payload - ensure to & bcc are arrays
+    // Prepare payload for Hostinger
     const payload = {
       smtpHost,
       smtpPort,
@@ -1615,45 +1607,140 @@ router.post("/send-estimate-email", async (req, res) => {
       bcc: bccArray,
       subject: `Estimate from ${companyName}`,
       html,
-      attachments,
+      attachments: attachmentsForHostinger,
     };
 
-    // Debug: log payload *without* heavy base64 content (do not log full attachment in production)
-    const safePayloadLog = { ...payload, attachments: attachments.map(a => ({ filename: a.filename, contentBase64: a.contentBase64 ? `${a.contentBase64.slice(0,50)}...` : null })) };
-    console.log("Sending payload to Hostinger mailer:", JSON.stringify(safePayloadLog, null, 2));
+    // Safe log snippet (don't log full base64 in production!)
+    console.log("Sending payload to Hostinger (summary):", {
+      smtpHost,
+      smtpPort,
+      smtpUser: smtpUser ? "SET" : "MISSING",
+      toCount: toArray.length,
+      bccCount: bccArray.length,
+      attachments: attachmentsForHostinger.map(a => ({ filename: a.filename, approxLen: a.contentBase64 ? a.contentBase64.length : 0 })),
+    });
 
-    const resp = await axios.post(phpEndpoint, payload, {
+    // Axios options tuned for large base64 payloads and long processing time
+    const axiosOptions = {
       headers: {
         "Content-Type": "application/json",
         "X-API-KEY": apiKey,
       },
-      timeout: 60000, // allow more time if attachment is large
-    });
+      timeout: 120000, // 2 minutes
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity,
+      validateStatus: status => status >= 200 && status < 500, // allow 4xx/5xx in resolved response so we can inspect body
+    };
 
-    // Log complete response for debugging
-    console.log("Hostinger response status:", resp.status);
-    console.log("Hostinger response data:", JSON.stringify(resp.data, null, 2));
+    // Helper: post to Hostinger with one retry
+    async function postToHostinger(attempt = 1) {
+      try {
+        const resp = await axios.post(phpEndpoint, payload, axiosOptions);
+        return resp;
+      } catch (err) {
+        // rethrow to caller
+        throw err;
+      }
+    }
 
-    if (resp.data && resp.data.success) {
-      return res.status(200).json({ success: true, data: resp.data });
-    } else {
-      // surface PHP response error message if present
-      const remoteError = resp.data || resp.statusText || "Unknown response from PHP";
-      return res.status(502).json({ success: false, error: remoteError });
+    // FIRST: try Hostinger
+    let hostingerResp = null;
+    try {
+      hostingerResp = await postToHostinger();
+      console.log("Hostinger HTTP status:", hostingerResp.status);
+      // log a truncated body for debugging
+      console.log("Hostinger response (truncated):", JSON.stringify(hostingerResp.data).slice(0, 2000));
+
+      if (hostingerResp.data && hostingerResp.data.success) {
+        return res.status(200).json({ success: true, source: "hostinger", data: hostingerResp.data });
+      } else {
+        // If Hostinger returned an error-like body, we'll attempt one retry
+        console.warn("Hostinger responded but success flag missing. Response body:", hostingerResp.data);
+        // attempt one retry
+        try {
+          console.log("Retrying Hostinger once...");
+          hostingerResp = await postToHostinger(2);
+          console.log("Hostinger retry status:", hostingerResp.status);
+          console.log("Hostinger retry response (truncated):", JSON.stringify(hostingerResp.data).slice(0, 2000));
+          if (hostingerResp.data && hostingerResp.data.success) {
+            return res.status(200).json({ success: true, source: "hostinger", data: hostingerResp.data });
+          }
+          console.warn("Hostinger retry did not return success:", hostingerResp.data);
+        } catch (retryErr) {
+          console.warn("Hostinger retry failed:", retryErr.message || retryErr.code || retryErr);
+          // fall through to SMTP fallback
+        }
+      }
+    } catch (hostErr) {
+      // network or timeout or axios error - log and fall back
+      console.error("Hostinger call error:", hostErr.message || hostErr.code || hostErr);
+      if (hostErr.response) {
+        console.error("Hostinger response status:", hostErr.response.status);
+        console.error("Hostinger response data (truncated):", JSON.stringify(hostErr.response.data).slice(0, 2000));
+      } else {
+        console.error("No response from Hostinger (network/timeout).");
+      }
+      // fall through to SMTP fallback
     }
-  } catch (err) {
-    console.error("Error calling Hostinger sendemail:");
-    console.error("Message:", err.message);
-    if (err.response) {
-      console.error("Status:", err.response.status);
-      console.error("Response Data:", JSON.stringify(err.response.data, null, 2));
-    } else {
-      console.error("No response from Hostinger (network/timeout).");
+
+    // FALLBACK: Send directly with nodemailer (SMTP)
+    console.log("FALLBACK: trying direct SMTP (nodemailer) with same SMTP credentials.");
+
+    // create transporter (attempt Gmail shorthand when using Gmail)
+    const useGmail = smtpHost.includes("gmail") || String(process.env.SMTP_SERVICE || "gmail").toLowerCase() === "gmail";
+    const transporter = nodemailer.createTransport(
+      useGmail
+        ? { service: "gmail", auth: { user: smtpUser, pass: smtpPass } }
+        : { host: smtpHost, port: Number(smtpPort), secure: Number(smtpPort) === 465, auth: { user: smtpUser, pass: smtpPass } }
+    );
+
+    // Build Nodemailer attachments from base64
+    const nodemailerAttachments = attachmentsForHostinger.map(a => ({
+      filename: a.filename,
+      content: Buffer.from(a.contentBase64, "base64"),
+      contentType: "application/pdf",
+    }));
+
+    const mailOptions = {
+      from: smtpUser,
+      to: toArray.join(", "),
+      bcc: bccArray.join(", "),
+      subject: `Estimate from ${companyName}`,
+      html,
+      attachments: nodemailerAttachments,
+    };
+
+    // Verify transporter first (gives clearer error messages)
+    try {
+      await transporter.verify();
+    } catch (verifyErr) {
+      console.error("SMTP transporter verification failed:", verifyErr.message || verifyErr);
+      return res.status(502).json({
+        success: false,
+        error: "SMTP verify failed. Check SMTP credentials and connectivity.",
+        details: process.env.NODE_ENV === "development" ? (verifyErr.message || verifyErr) : undefined,
+      });
     }
+
+    // Send via SMTP
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log("Direct SMTP send info:", info.response || info);
+      return res.status(200).json({ success: true, source: "smtp", messageId: info.messageId, response: info.response });
+    } catch (smtpSendErr) {
+      console.error("Direct SMTP send failed:", smtpSendErr);
+      return res.status(502).json({
+        success: false,
+        error: "Both Hostinger and direct SMTP sending failed.",
+        details: process.env.NODE_ENV === "development" ? (smtpSendErr.message || smtpSendErr) : undefined,
+      });
+    }
+  } catch (finalErr) {
+    console.error("Unhandled error in /send-estimate-email:", finalErr);
     return res.status(500).json({
       success: false,
-      error: err.message || "Failed to contact Hostinger mailer",
-      details: err.response ? err.response.data : null,
+      error: "Internal server error while trying to send estimate email.",
+      details: process.env.NODE_ENV === "development" ? (finalErr.message || finalErr) : undefined,
     });
   }
 });
