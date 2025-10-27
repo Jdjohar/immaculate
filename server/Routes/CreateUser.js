@@ -1495,12 +1495,6 @@ router.post('/send-deposit-email', async (req, res) => {
 //     }
 // });
 router.post("/send-estimate-email", async (req, res) => {
-  console.log(process.env.SMTP_HOST, "process.env.SMTP_HOST");
-  console.log(process.env.SMTP_PORT, "process.env.SMTP_PORT");
-  console.log(process.env.SMTP_USER, "process.env.SMTP_USER");
-  console.log(process.env.SMTP_PASS, "process.env.SMTP_PASS");
-  console.log(process.env.SMTP_CRYPTO, "process.env.SMTP_CRYPTO");
-
   try {
     const {
       to,
@@ -1517,7 +1511,7 @@ router.post("/send-estimate-email", async (req, res) => {
       amountdue1,
     } = req.body ?? {};
 
-    // Basic validation - match your invoice route expectations
+    // basic validation
     if (!to || !companyName || !EstimateNumber) {
       return res.status(400).json({
         success: false,
@@ -1525,61 +1519,67 @@ router.post("/send-estimate-email", async (req, res) => {
       });
     }
 
-    // Normalize recipients (keep as original types so Hostinger PHP can accept arrays or strings)
-    const normalizeForPayload = (r) => {
-      if (!r) return undefined;
-      if (Array.isArray(r)) return r.map(String).filter(Boolean);
-      if (typeof r === "string") return r;
-      return undefined;
+    // normalize recipients into arrays (Hostinger PHP usually expects arrays)
+    const normalizeToArray = (val) => {
+      if (!val) return [];
+      if (Array.isArray(val)) return val.map(String).filter(Boolean);
+      if (typeof val === "string") {
+        // comma separated string -> array
+        return val.split(",").map(s => s.trim()).filter(Boolean);
+      }
+      return [];
     };
-    const toPayload = normalizeForPayload(to);
-    const bccPayload = normalizeForPayload(bcc);
+    const toArray = normalizeToArray(to);
+    const bccArray = normalizeToArray(bcc);
 
-    // SMTP envs
+    // SMTP envs (forwarded to Hostinger PHP)
     const smtpHost = process.env.SMTP_HOST;
     const smtpPort = process.env.SMTP_PORT;
     const smtpUser = process.env.SMTP_USER;
     const smtpPass = process.env.SMTP_PASS;
     const smtpCrypto = process.env.SMTP_CRYPTO;
 
-    // Hostinger endpoint + API key (same pattern as invoice route)
+    // Hostinger endpoint + API key
     const phpEndpoint =
       process.env.HOSTINGER_MAILER_URL ||
       "https://jdwebservices.com/demo/smtp/sendemail.php";
-
     const apiKey =
       process.env.HOSTINGER_API_KEY || "MY_SUPER_SECRET_EMAIL_KEY_92x8HD!";
 
-    // Currency sign helper
-    const getCurrencySign = (code) => {
-      const map = {
-        USD: "$",
-        EUR: "€",
-        INR: "₹",
-        GBP: "£",
-        AUD: "A$",
-        CAD: "C$",
-      };
-      return (code && map[code.toUpperCase()]) || "";
-    };
-    const currencySign = getCurrencySign(currencyType);
-
-    // Validate pdfAttachment if provided (ensure it is a reasonably sized base64 string)
+    // validate pdfAttachment if provided and strip data URI prefix if present
+    const attachments = [];
     if (pdfAttachment) {
       if (typeof pdfAttachment !== "string") {
         return res.status(400).json({ success: false, error: "Invalid pdfAttachment format." });
       }
-      // If it contains "base64," keep the full string (invoice route expects data URI style),
-      // but ensure the base64 payload portion is long enough.
-      const base64Marker = "base64,";
-      const idx = pdfAttachment.indexOf(base64Marker);
-      const base64Part = idx !== -1 ? pdfAttachment.slice(idx + base64Marker.length) : pdfAttachment;
-      if (!base64Part || base64Part.length < 100) {
+
+      // strip the data:<mime>;base64, prefix if present
+      const marker = "base64,";
+      const idx = pdfAttachment.indexOf(marker);
+      let base64Only = pdfAttachment;
+      if (idx !== -1) {
+        base64Only = pdfAttachment.slice(idx + marker.length);
+      }
+
+      // sanity check base64 length
+      if (!base64Only || base64Only.length < 100) {
         return res.status(400).json({ success: false, error: "pdfAttachment base64 appears too short or invalid." });
       }
+
+      attachments.push({
+        filename: `Estimate #${EstimateNumber}.pdf`,
+        // IMPORTANT: send *only* the base64 string (no data: prefix)
+        contentBase64: base64Only,
+      });
     }
 
-    // Compose HTML body (kept same styling as your original estimate HTML but consistent with invoice route)
+    // html body (kept similar to your original)
+    const getCurrencySign = (code) => {
+      const map = { USD: "$", EUR: "€", INR: "₹", GBP: "£", AUD: "A$", CAD: "C$" };
+      return (code && map[code.toUpperCase()]) || "";
+    };
+    const currencySign = getCurrencySign(currencyType);
+
     const html = `<html>
       <body style="background-color:#c5c1c187; margin-top: 40px; padding:20px 0px;">
         <section style="font-family:sans-serif; width: 50%; margin: auto; background-color:#fff; padding: 15px 30px; margin-top: 40px;">
@@ -1599,25 +1599,10 @@ router.post("/send-estimate-email", async (req, res) => {
             <a href="https://immaculate-beta.vercel.app/customersign?estimateId=${estimateId || ""}" style="display:inline-block;padding:10px 20px;background-color:#4CAF50;color:#fff;text-decoration:none;border-radius:5px;">View this Estimate</a>
           </div>
         </section>
-        <section style="font-family:sans-serif; width:50%; margin:auto; background-color:#f5f4f4; padding:35px 30px; margin-bottom:40px;">
-          <div>
-            <p style="font-size:15px; color:#222">Make your Estimate</p>
-            <h1 style="font-size:35px; margin:0; color:#222">ESTIMATE</h1>
-          </div>
-        </section>
       </body>
     </html>`;
 
-    // Build payload to match invoice route structure
-    const attachments = [];
-    if (pdfAttachment) {
-      attachments.push({
-        filename: `Estimate #${EstimateNumber}.pdf`,
-        // keep original provided string (data URI or raw base64) so PHP endpoint can decode as expected
-        contentBase64: pdfAttachment,
-      });
-    }
-
+    // assemble payload - ensure to & bcc are arrays
     const payload = {
       smtpHost,
       smtpPort,
@@ -1626,56 +1611,49 @@ router.post("/send-estimate-email", async (req, res) => {
       smtpCrypto,
       fromEmail: smtpUser,
       fromName: companyName || "Your Company",
-      to: toPayload,
-      bcc: bccPayload,
+      to: toArray,
+      bcc: bccArray,
       subject: `Estimate from ${companyName}`,
       html,
       attachments,
     };
+
+    // Debug: log payload *without* heavy base64 content (do not log full attachment in production)
+    const safePayloadLog = { ...payload, attachments: attachments.map(a => ({ filename: a.filename, contentBase64: a.contentBase64 ? `${a.contentBase64.slice(0,50)}...` : null })) };
+    console.log("Sending payload to Hostinger mailer:", JSON.stringify(safePayloadLog, null, 2));
 
     const resp = await axios.post(phpEndpoint, payload, {
       headers: {
         "Content-Type": "application/json",
         "X-API-KEY": apiKey,
       },
-      timeout: 30000,
+      timeout: 60000, // allow more time if attachment is large
     });
 
+    // Log complete response for debugging
+    console.log("Hostinger response status:", resp.status);
+    console.log("Hostinger response data:", JSON.stringify(resp.data, null, 2));
+
     if (resp.data && resp.data.success) {
-      return res.status(200).json({ success: true });
+      return res.status(200).json({ success: true, data: resp.data });
     } else {
-      return res
-        .status(500)
-        .json({ success: false, error: resp.data || "Unknown response from PHP" });
+      // surface PHP response error message if present
+      const remoteError = resp.data || resp.statusText || "Unknown response from PHP";
+      return res.status(502).json({ success: false, error: remoteError });
     }
   } catch (err) {
-    // Detailed Axios / Network error logging (matching pattern from invoice route)
-    console.error("⚠️ Error calling Hostinger sendemail:");
-
+    console.error("Error calling Hostinger sendemail:");
     console.error("Message:", err.message);
-    if (err.code) console.error("Code:", err.code);
-
-    if (err.config && err.config.url) {
-      console.error("Request URL:", err.config.url);
-    }
-
     if (err.response) {
       console.error("Status:", err.response.status);
-      console.error("Status Text:", err.response.statusText);
-      console.error("Headers:", err.response.headers);
-      console.error("Response Data:", err.response.data);
+      console.error("Response Data:", JSON.stringify(err.response.data, null, 2));
     } else {
-      console.error("No response received from Hostinger (network or timeout).");
+      console.error("No response from Hostinger (network/timeout).");
     }
-
     return res.status(500).json({
       success: false,
       error: err.message || "Failed to contact Hostinger mailer",
-      details: {
-        code: err.code || null,
-        status: err.response ? err.response.status : null,
-        data: err.response ? err.response.data : null,
-      },
+      details: err.response ? err.response.data : null,
     });
   }
 });
