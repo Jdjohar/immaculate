@@ -14,7 +14,7 @@ export default function ExpenseType() {
     const [alertMessage, setAlertMessage] = useState('');
     const [alertmessageShow, setAlertmessageShow] = useState('');
 
-    const apiURL = 'https://immaculate.onrender.com/api/expensetype';
+    const apiURL = 'https://immaculate-qlaf.vercel.app/api/expensetype';
 
     // Fetch all expense types on component mount
     useEffect(() => {

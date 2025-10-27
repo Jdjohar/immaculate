@@ -1494,8 +1494,7 @@ router.post('/send-deposit-email', async (req, res) => {
 //         res.status(500).json({ success: false, error: 'Failed to send email.' });
 //     }
 // });
-router.post("/send-estimate-email", async (req, res) => {
-  try {
+router.post('/send-estimate-email', async (req, res) => {
     const {
       to,
       bcc,
@@ -1509,142 +1508,196 @@ router.post("/send-estimate-email", async (req, res) => {
       estimateId,
       ownerId,
       amountdue1,
-    } = req.body ?? {};
-
-    // Basic validation
-    if (!to || !companyName || !EstimateNumber) {
+    } = req.body;
+  
+    // Basic required checks
+    if (!to || !pdfAttachment || !EstimateNumber) {
       return res.status(400).json({
         success: false,
-        error: "Missing required fields: to, companyName, EstimateNumber.",
+        error: 'Missing required fields: to, pdfAttachment, or EstimateNumber.',
       });
     }
-
-    // Normalize recipients (accept string or array)
-    const normalizeRecipients = (r) => {
-      if (!r) return undefined;
-      if (Array.isArray(r)) return r.map(String).filter(Boolean).join(", ");
-      if (typeof r === "string") return r;
-      return undefined;
-    };
-    const toList = normalizeRecipients(to);
-    const bccList = normalizeRecipients(bcc);
-
-    // SMTP / transporter (use env vars in production)
-    const smtpUser = process.env.SMTP_USER || "Immacltd23@gmail.com";
-    const smtpPass = process.env.SMTP_PASS || "sqiwgztarywwjyhk"; // replace with secret in prod
-    const smtpService = process.env.SMTP_SERVICE || "gmail";
-    const useGmail = smtpService.toLowerCase() === "gmail";
-
-    const transporter = nodemailer.createTransport(
-      useGmail
-        ? {
-            service: "gmail",
-            auth: { user: smtpUser, pass: smtpPass },
-          }
-        : {
-            host: process.env.SMTP_HOST || "smtp.hostinger.com",
-            port: Number(process.env.SMTP_PORT || 465),
-            secure: process.env.SMTP_SECURE === "false" ? false : true,
-            auth: { user: smtpUser, pass: smtpPass },
-          }
-    );
-
-    // Currency sign helper
-    const getCurrencySign = (code) => {
-      const map = {
-        USD: "$",
-        EUR: "€",
-        INR: "₹",
-        GBP: "£",
-        AUD: "A$",
-        CAD: "C$",
-      };
-      return (code && map[code.toUpperCase()]) || "";
-    };
+  
+    // Normalize recipients (allow array or string)
+    const toStr = Array.isArray(to) ? to.join(', ') : String(to || '');
+    const bccStr = Array.isArray(bcc) ? bcc.join(', ') : (bcc ? String(bcc) : undefined);
+  
+    // Normalize base64 attachment (strip data:...;base64, if present)
+    const base64Match = typeof pdfAttachment === 'string' && pdfAttachment.match(/base64,(.*)$/);
+    const attachmentBase64 = base64Match ? base64Match[1] : pdfAttachment;
+  
+    // Env-driven config
+    const smtpHost = process.env.SMTP_HOST;
+    const smtpPort = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined;
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    const smtpCrypto = (process.env.SMTP_CRYPTO || 'tls').toLowerCase(); // 'tls'|'ssl' etc.
+  
+    const phpEndpoint = process.env.HOSTINGER_MAILER_URL; // optional
+    const apiKey = process.env.HOSTINGER_API_KEY;
+  
+    const filename = `Estimate-${EstimateNumber}.pdf`;
+    const subject = `Estimate from ${companyName || 'Your Company'}`;
+  
     const currencySign = getCurrencySign(currencyType);
-
-    // Build attachments (handle base64 with or without data: prefix)
-    const attachments = [];
-    if (pdfAttachment) {
-      if (typeof pdfAttachment !== "string") {
-        return res.status(400).json({ success: false, error: "Invalid pdfAttachment format." });
+    const html = `
+      <html>
+      <body style="background-color:#c5c1c187; margin-top: 40px; padding:20px 0px;">
+           <section style="font-family:sans-serif; width: 50%; margin: auto; background-color:#fff; padding: 15px 30px; margin-top: 40px;">
+              <div style="padding: 10px 0px;  text-align: center; font-weight: 500; color: #999999">
+                  <p style="margin-bottom:0px">${customdate || ''}</p>
+                  <p style="margin-top: 0px;">Estimate #${EstimateNumber}</p>
+              </div>
+              <div>
+                  <h1 style="margin-bottom:0px; font-size: 35px; color:#222">Estimate from ${companyName}</h1>
+                  <h1 style="margin: 0px; font-size: 35px; color:#222">${currencySign}${amountdue1 || amountdue || ''}</h1>
+              </div>
+              <div style="background-color:#f5f4f4; padding: 1px 20px; margin: 30px 0px 10px;">
+                  <p style="color:#222">${content || ''}</p>
+              </div>
+              <div style="margin: 20px 0px 10px;">
+                  <p style="color:#222">This email contains a unique link just for you. Please do not share this email or link or others will have access to your document.</p>
+                  <a href="https://cspiles.vercel.app/customersign?estimateId=${estimateId}" style="display:inline-block;padding:10px 20px;background-color:#4CAF50;color:#fff;text-decoration:none;border-radius:5px;">View this Estimate</a>
+              </div>
+          </section>
+          <section style="font-family:sans-serif; width: 50%; margin: auto; background-color:#f5f4f4; padding: 35px 30px; margin-bottom: 40px;">
+              <div>
+                  <p style="font-size: 15px; color:#222">Make your Estimate</p>
+                  <h1 style="font-size: 35px; margin-bottom: 0; margin-top: 0; color:#222">ESTIMATE</h1>
+              </div>
+              <div>
+                  <ul style="text-align: center;display: inline-flex;list-style:none;padding-left:0px">
+                      <li>
+                          <a href="">
+                              <img src="https://static.xx.fbcdn.net/rsrc.php/yb/r/hLRJ1GG_y0J.ico" alt="facebook icon" style="margin: 0px 5px;">
+                          </a>
+                      </li>
+                      <li>
+                          <a href="">
+                              <img src="https://static.cdninstagram.com/rsrc.php/y4/r/QaBlI0OZiks.ico" alt="instagram icon" style="margin: 0px 5px;">
+                          </a>
+                      </li>
+                  </ul>
+              </div>
+          </section>
+      </body>
+      </html>`;
+  
+    // If a Hostinger PHP endpoint is configured, prefer sending via that endpoint
+    if (phpEndpoint && apiKey) {
+      try {
+        const payload = {
+          smtpHost,
+          smtpPort,
+          smtpUser,
+          smtpPass,
+          smtpCrypto,
+          fromEmail: smtpUser || (process.env.FROM_EMAIL || ''),
+          fromName: companyName || 'Your Company',
+          to: toStr,
+          bcc: bccStr,
+          subject,
+          html,
+          attachments: [
+            {
+              filename,
+              contentBase64: attachmentBase64,
+              contentType: 'application/pdf',
+            },
+          ],
+        };
+  
+        const resp = await axios.post(phpEndpoint, payload, {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-KEY': apiKey,
+          },
+          timeout: Number(process.env.EMAIL_REQUEST_TIMEOUT_MS || 30000),
+        });
+  
+        if (resp.data && resp.data.success) {
+          return res.status(200).json({ success: true, data: resp.data });
+        }
+  
+        console.error('Hostinger response:', resp.data);
+        return res.status(502).json({
+          success: false,
+          error: resp.data || 'Unknown response from Hostinger mail endpoint',
+        });
+      } catch (err) {
+        console.error('⚠️ Error calling Hostinger sendemail:');
+        console.error('Message:', err.message);
+        if (err.code) console.error('Code:', err.code);
+        if (err.config && err.config.url) console.error('Request URL:', err.config.url);
+        if (err.response) {
+          console.error('Status:', err.response.status);
+          console.error('Status Text:', err.response.statusText);
+          console.error('Headers:', err.response.headers);
+          console.error('Response Data:', err.response.data);
+        } else {
+          console.error('No response received from Hostinger (network or timeout).');
+        }
+  
+        return res.status(500).json({
+          success: false,
+          error: err.message || 'Failed to contact Hostinger mailer',
+          details: {
+            code: err.code || null,
+            status: err.response ? err.response.status : null,
+            data: err.response ? err.response.data : null,
+          },
+        });
       }
-
-      // Attempt to strip known prefixes
-      let base64 = pdfAttachment;
-      const base64Marker = "base64,";
-      const idx = pdfAttachment.indexOf(base64Marker);
-      if (idx !== -1) base64 = pdfAttachment.slice(idx + base64Marker.length);
-
-      // Sanity check
-      if (base64.length < 100) {
-        return res.status(400).json({ success: false, error: "pdfAttachment base64 appears too short or invalid." });
-      }
-
-      const pdfBuffer = Buffer.from(base64, "base64");
-      attachments.push({
-        filename: `Estimate #${EstimateNumber}.pdf`,
-        content: pdfBuffer,
-        contentType: "application/pdf",
+    }
+  
+    // Fallback to direct SMTP via nodemailer
+    if (!smtpUser || !smtpPass || !smtpHost) {
+      console.error('Missing SMTP config in environment variables for direct SMTP send.');
+      return res.status(500).json({
+        success: false,
+        error: 'Server SMTP configuration incomplete (SMTP_HOST, SMTP_USER, SMTP_PASS required).',
       });
     }
+  
+    try {
+      const secure = smtpCrypto === 'ssl' || Number(smtpPort) === 465;
+      const transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort || (secure ? 465 : 587),
+        secure,
+        auth: {
+          user: smtpUser,
+          pass: smtpPass,
+        },
+      });
+  
+      const mailOptions = {
+        from: process.env.FROM_EMAIL || smtpUser,
+        to: toStr,
+        bcc: bccStr,
+        subject,
+        html,
+        attachments: [
+          {
+            filename,
+            content: Buffer.from(attachmentBase64, 'base64'),
+            contentType: 'application/pdf',
+          },
+        ],
+      };
+  
+      const info = await transporter.sendMail(mailOptions);
+      console.log('Email sent via SMTP:', info && (info.messageId || info.accepted));
+      return res.status(200).json({ success: true, info });
+    } catch (err) {
+      console.error('Error sending email via SMTP:');
+      console.error('Message:', err.message);
+      if (err.code) console.error('Code:', err.code);
+      if (err.response) console.error('Response:', err.response);
+      return res.status(500).json({ success: false, error: err.message || 'Failed to send email via SMTP' });
+    }
+  });
 
-    // Compose HTML body
-    const html = `<html>
-      <body style="background-color:#c5c1c187; margin-top: 40px; padding:20px 0px;">
-        <section style="font-family:sans-serif; width: 50%; margin: auto; background-color:#fff; padding: 15px 30px; margin-top: 40px;">
-          <div style="padding: 10px 0px; text-align:center; font-weight:500; color:#999;">
-            <p style="margin-bottom:0px">${customdate || ""}</p>
-            <p style="margin-top:0px;">Estimate #${EstimateNumber}</p>
-          </div>
-          <div>
-            <h1 style="margin-bottom:0px; font-size:35px; color:#222">Estimate from ${companyName}</h1>
-            <h1 style="margin:0px; font-size:35px; color:#222">${currencySign}${amountdue1 || amountdue || ""}</h1>
-          </div>
-          <div style="background-color:#f5f4f4; padding:1px 20px; margin:30px 0px 10px;">
-            <p style="color:#222">${content || ""}</p>
-          </div>
-          <div style="margin:20px 0px 10px;">
-            <p style="color:#222">This email contains a unique link just for you. Please do not share this email or link or others will have access to your document.</p>
-            <a href="https://immaculate-beta.vercel.app/customersign?estimateId=${estimateId || ""}" style="display:inline-block;padding:10px 20px;background-color:#4CAF50;color:#fff;text-decoration:none;border-radius:5px;">View this Estimate</a>
-          </div>
-        </section>
-        <section style="font-family:sans-serif; width:50%; margin:auto; background-color:#f5f4f4; padding:35px 30px; margin-bottom:40px;">
-          <div>
-            <p style="font-size:15px; color:#222">Make your Estimate</p>
-            <h1 style="font-size:35px; margin:0; color:#222">ESTIMATE</h1>
-          </div>
-        </section>
-      </body>
-    </html>`;
-
-    // Mail options
-    const mailOptions = {
-      from: smtpUser,
-      to: toList,
-      bcc: bccList,
-      subject: `Estimate from ${companyName}`,
-      html,
-      attachments,
-    };
-
-    // Send
-    const info = await transporter.sendMail(mailOptions);
-
-    return res.status(200).json({
-      success: true,
-      messageId: info?.messageId,
-      response: info?.response,
-    });
-  } catch (err) {
-    console.error("Error sending estimate email:", err);
-    return res.status(500).json({
-      success: false,
-      error: "Failed to send email.",
-      details: process.env.NODE_ENV === "development" ? (err.message || err) : undefined,
-    });
-  }
-});
 // router.post('/send-estimate-signed-email', async (req, res) => {
 //     const {
 //         to,

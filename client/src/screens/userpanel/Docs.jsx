@@ -30,7 +30,7 @@ export default function AddDocument() {
   const fetchUploadedDocs = async () => {
     const authToken = localStorage.getItem('authToken');
     try {
-      const response = await fetch('https://immaculate.onrender.com/api/docs', {
+      const response = await fetch('https://immaculate-qlaf.vercel.app/api/docs', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ export default function AddDocument() {
       return;
     }
 
-    const response = await fetch('https://immaculate.onrender.com/api/docs', {
+    const response = await fetch('https://immaculate-qlaf.vercel.app/api/docs', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

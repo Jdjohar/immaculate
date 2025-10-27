@@ -37,7 +37,7 @@ export default function Dashboard() {
       let isTeamMember = localStorage.getItem('isTeamMember');
       const authToken = localStorage.getItem('authToken');
 
-      const response = await fetch('https://immaculate.onrender.com/api/clockin', {
+      const response = await fetch('https://immaculate-qlaf.vercel.app/api/clockin', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ export default function Dashboard() {
       let userEmail = localStorage.getItem('userEmail');
       let isTeamMember = localStorage.getItem('isTeamMember');
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch('https://immaculate.onrender.com/api/clockout', {
+      const response = await fetch('https://immaculate-qlaf.vercel.app/api/clockout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -176,7 +176,7 @@ export default function Dashboard() {
     try {
       const userid = localStorage.getItem('userid');
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://immaculate.onrender.com/api/userEntries/${userid}`, {
+      const response = await fetch(`https://immaculate-qlaf.vercel.app/api/userEntries/${userid}`, {
         headers: {
           'Authorization': authToken,
         }

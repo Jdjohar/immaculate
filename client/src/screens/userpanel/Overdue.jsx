@@ -28,7 +28,7 @@ const Overdue = () => {
     try {
       const userid = localStorage.getItem("userid");
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://immaculate.onrender.com/api/overdueInvoices/${userid}`, {
+      const response = await fetch(`https://immaculate-qlaf.vercel.app/api/overdueInvoices/${userid}`, {
         headers: {
           'Authorization': authToken,
         }
