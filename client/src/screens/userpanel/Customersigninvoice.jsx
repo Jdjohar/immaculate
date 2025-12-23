@@ -449,7 +449,7 @@ thead{
     try {
       // const userid = localStorage.getItem("userid");
       // const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://immaculate-qlaf.vercel.app/api/getemailinvoiceData/${invoiceId}`, {
+      const response = await fetch(`hhttps://immaculate.onrender.com/api/getemailinvoiceData/${invoiceId}`, {
         // headers: {
         //   'Authorization': authToken,
         // }
@@ -494,7 +494,7 @@ thead{
       const userId = invoiceData.userid;  // localStorage.getItem("userid");
       // const userid =   localStorage.getItem("userid");
       // const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://immaculate-qlaf.vercel.app/api/getemailsignupdata/${userId}`, {
+      const response = await fetch(`hhttps://immaculate.onrender.com/api/getemailsignupdata/${userId}`, {
         // headers: {
         //   'Authorization': authToken,
         // }
@@ -523,7 +523,7 @@ thead{
     try {
       // const userid = localStorage.getItem("userid");
       // const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://immaculate-qlaf.vercel.app/api/getemailtransactiondata/${invoiceId}`, {
+      const response = await fetch(`hhttps://immaculate.onrender.com/api/getemailtransactiondata/${invoiceId}`, {
         // headers: {
         //   'Authorization': authToken,
         // }
@@ -560,7 +560,7 @@ thead{
       const ownerId = invoiceData.userid;
       // const ownerId = localStorage.getItem('userid');
       // const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://immaculate-qlaf.vercel.app/api/getemailownerdata/${ownerId}`, {
+      const response = await fetch(`hhttps://immaculate.onrender.com/api/getemailownerdata/${ownerId}`, {
         // headers: {
         //   'Authorization': authToken,
         // }
@@ -589,7 +589,7 @@ thead{
     }
 
     try {
-      const response = await fetch(`https://immaculate-qlaf.vercel.app/api/checkcustomersignatureusinginvoice/${encodeURIComponent(invoiceIdpass)}`);
+      const response = await fetch(`hhttps://immaculate.onrender.com/api/checkcustomersignatureusinginvoice/${encodeURIComponent(invoiceIdpass)}`);
       const json = await response.json();
       console.log('Customer signature response:', json);
       console.log('Customer signature response:', response.ok);
@@ -609,12 +609,12 @@ thead{
 
     try {
       // Check if customer signature already exists
-      const checkResponse = await fetch(`https://immaculate-qlaf.vercel.app/api/checkcustomersignatureusinginvoice/${encodeURIComponent(invoiceData._id)}`);
+      const checkResponse = await fetch(`hhttps://immaculate.onrender.com/api/checkcustomersignatureusinginvoice/${encodeURIComponent(invoiceData._id)}`);
       const checkJson = await checkResponse.json();
 
       if (checkJson.hasSignature) {
         // Update the existing customer signature
-        const updateResponse = await fetch(`https://immaculate-qlaf.vercel.app/api/updatecustomersigninv/${encodeURIComponent(invoiceData._id)}`, {
+        const updateResponse = await fetch(`hhttps://immaculate.onrender.com/api/updatecustomersigninv/${encodeURIComponent(invoiceData._id)}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -650,12 +650,12 @@ thead{
 
     try {
       // Check if customer signature already exists
-      const checkResponse = await fetch(`https://immaculate-qlaf.vercel.app/api/checkcustomersignatureusinginvoice/${encodeURIComponent(invoiceData._id)}`);
+      const checkResponse = await fetch(`hhttps://immaculate.onrender.com/api/checkcustomersignatureusinginvoice/${encodeURIComponent(invoiceData._id)}`);
       const checkJson = await checkResponse.json();
 
       // if (checkJson.ok) {
       // Update the existing customer signature
-      const updateResponse = await fetch(`https://immaculate-qlaf.vercel.app/api/updatecustomersigninv/${encodeURIComponent(invoiceData._id)}`, {
+      const updateResponse = await fetch(`hhttps://immaculate.onrender.com/api/updatecustomersigninv/${encodeURIComponent(invoiceData._id)}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -731,7 +731,7 @@ thead{
   //     const authToken = localStorage.getItem('authToken');
 
   //     try {
-  //         const response = await fetch('https://immaculate-qlaf.vercel.app/api/customersignature', {
+  //         const response = await fetch('hhttps://immaculate.onrender.com/api/customersignature', {
   //             method: 'POST',
   //             headers: {
   //                 'Content-Type': 'application/json',
@@ -784,7 +784,7 @@ thead{
       }
 
       // Send email request to backend
-      const emailResponse = await fetch('https://immaculate-qlaf.vercel.app/api/send-Invoice-signed-email', {
+      const emailResponse = await fetch('hhttps://immaculate.onrender.com/api/send-Invoice-signed-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -804,7 +804,7 @@ thead{
       }
 
       console.log('Email sent successfully');// Update customer signature
-      const updateResponse = await fetch(`https://immaculate-qlaf.vercel.app/api/updatecustomersigninv/${encodeURIComponent(invoiceData._id)}`, {
+      const updateResponse = await fetch(`hhttps://immaculate.onrender.com/api/updatecustomersigninv/${encodeURIComponent(invoiceData._id)}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -843,7 +843,7 @@ thead{
   //     }
 
   //     // Send email request to backend
-  //     const response = await fetch('https://immaculate-qlaf.vercel.app/api/send-Invoice-signed-email', {
+  //     const response = await fetch('hhttps://immaculate.onrender.com/api/send-Invoice-signed-email', {
   //       method: 'POST',
   //       headers: {
   //         'Content-Type': 'application/json',

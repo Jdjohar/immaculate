@@ -27,7 +27,7 @@ export default function Teamhistory() {
         try {
             const teamid = localStorage.getItem('userid');
             const authToken = localStorage.getItem('authToken');
-          const response = await fetch(`https://immaculate-qlaf.vercel.app/api/userEntries/${teamid}`, {
+          const response = await fetch(`hhttps://immaculate.onrender.com/api/userEntries/${teamid}`, {
             headers: {
               'Authorization': authToken,
             }

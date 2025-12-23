@@ -83,7 +83,7 @@ export default function SignUp() {
         
         companyFormData.append('companyImage', imgurl);
         console.log("imgurl: ", companyFormData);
-        const response = await fetch("https://immaculate-qlaf.vercel.app/api/createuser", {
+        const response = await fetch("hhttps://immaculate.onrender.com/api/createuser", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

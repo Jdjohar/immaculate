@@ -71,7 +71,7 @@ export default function Dashboard() {
     try {
       const authToken = localStorage.getItem('authToken');
       const userid = localStorage.getItem("userid");
-      const response = await fetch(`https://immaculate-qlaf.vercel.app/api/getsignupdata/${userid}`, {
+      const response = await fetch(`hhttps://immaculate.onrender.com/api/getsignupdata/${userid}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -95,7 +95,7 @@ export default function Dashboard() {
     try {
       const userid = localStorage.getItem("userid");
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://immaculate-qlaf.vercel.app/api/invoicedata/${userid}`, {
+      const response = await fetch(`hhttps://immaculate.onrender.com/api/invoicedata/${userid}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -123,7 +123,7 @@ export default function Dashboard() {
     try {
       const userid = localStorage.getItem("userid");
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://immaculate-qlaf.vercel.app/api/currentMonthReceivedAmount/${userid}`, {
+      const response = await fetch(`hhttps://immaculate.onrender.com/api/currentMonthReceivedAmount/${userid}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -149,7 +149,7 @@ export default function Dashboard() {
     try {
       const authToken = localStorage.getItem('authToken');
       const userId = localStorage.getItem('userid');
-      const response = await fetch(`https://immaculate-qlaf.vercel.app/api/totalPaymentReceived/${userId}`, {
+      const response = await fetch(`hhttps://immaculate.onrender.com/api/totalPaymentReceived/${userId}`, {
         headers: {
           Authorization: authToken,
         },
@@ -173,7 +173,7 @@ export default function Dashboard() {
     // ... (unchanged)
     try {
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://immaculate-qlaf.vercel.app/api/expense`, {
+      const response = await fetch(`hhttps://immaculate.onrender.com/api/expense`, {
         headers: {
           Authorization: authToken,
         },
@@ -199,7 +199,7 @@ export default function Dashboard() {
     try {
       const authToken = localStorage.getItem('authToken');
       const userid = localStorage.getItem('userid');
-      const response = await fetch(`https://immaculate-qlaf.vercel.app/api/overdueInvoices/${userid}`, {
+      const response = await fetch(`hhttps://immaculate.onrender.com/api/overdueInvoices/${userid}`, {
         headers: { 'Authorization': authToken },
       });
       if (response.status === 401) {
@@ -221,7 +221,7 @@ export default function Dashboard() {
     try {
       const userid = localStorage.getItem("userid");
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`https://immaculate-qlaf.vercel.app/api/all-invoices-by-financial-year?userid=${userid}`, {
+      const response = await fetch(`hhttps://immaculate.onrender.com/api/all-invoices-by-financial-year?userid=${userid}`, {
         headers: {
           'Authorization': authToken,
         }

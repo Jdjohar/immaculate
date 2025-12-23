@@ -49,7 +49,7 @@
       e.preventDefault();
       let userid = localStorage.getItem('userid');
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch('https://immaculate-qlaf.vercel.app/api/addcustomer', {
+      const response = await fetch('hhttps://immaculate.onrender.com/api/addcustomer', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

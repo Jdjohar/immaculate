@@ -121,7 +121,7 @@ export default function Editestimate() {
     const fetchSignatureStatus = async () => {
         try {
             const ownerId = localStorage.getItem('userid');
-            const response = await fetch(`https://immaculate-qlaf.vercel.app/api/check-signature/${ownerId}`);
+            const response = await fetch(`hhttps://immaculate.onrender.com/api/check-signature/${ownerId}`);
             const data = await response.json();
             console.log(data, "data");
 
@@ -136,7 +136,7 @@ export default function Editestimate() {
         if (event.target.checked) {
             try {
                 const ownerId = localStorage.getItem('userid');
-                const response = await fetch(`https://immaculate-qlaf.vercel.app/api/check-signature/${ownerId}`);
+                const response = await fetch(`hhttps://immaculate.onrender.com/api/check-signature/${ownerId}`);
                 const data = await response.json();
                 setHasSignature(data.hasSignature);
 
@@ -174,7 +174,7 @@ export default function Editestimate() {
             const ownerId = localStorage.getItem('userid');
             const email = localStorage.getItem('userEmail');
             const companyname = localStorage.getItem('companyname');
-            await fetch('https://immaculate-qlaf.vercel.app/api/ownersignature', {
+            await fetch('hhttps://immaculate.onrender.com/api/ownersignature', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -195,7 +195,7 @@ export default function Editestimate() {
     const fetchdata = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://immaculate-qlaf.vercel.app/api/geteditestimateData/${estimateid}`, {
+            const response = await fetch(`hhttps://immaculate.onrender.com/api/geteditestimateData/${estimateid}`, {
                 headers: {
                     'Authorization': authToken,
                 }
@@ -239,7 +239,7 @@ export default function Editestimate() {
         try {
             const userid = localStorage.getItem("userid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://immaculate-qlaf.vercel.app/api/customers/${userid}`, {
+            const response = await fetch(`hhttps://immaculate.onrender.com/api/customers/${userid}`, {
                 headers: {
                     'Authorization': authToken,
                 }
@@ -270,7 +270,7 @@ export default function Editestimate() {
         try {
             const userid = localStorage.getItem("userid");
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://immaculate-qlaf.vercel.app/api/itemdata/${userid}`, {
+            const response = await fetch(`hhttps://immaculate.onrender.com/api/itemdata/${userid}`, {
                 headers: {
                     'Authorization': authToken,
                 }
@@ -311,7 +311,7 @@ export default function Editestimate() {
             };
             const authToken = localStorage.getItem('authToken');
 
-            const response = await fetch(`https://immaculate-qlaf.vercel.app/api/updateestimateData/${estimateid}`, {
+            const response = await fetch(`hhttps://immaculate.onrender.com/api/updateestimateData/${estimateid}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -441,7 +441,7 @@ export default function Editestimate() {
             }
 
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`https://immaculate-qlaf.vercel.app/api/delestimateitem/${estimateData._id}/${itemId}`, {
+            const response = await fetch(`hhttps://immaculate.onrender.com/api/delestimateitem/${estimateData._id}/${itemId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': authToken,
