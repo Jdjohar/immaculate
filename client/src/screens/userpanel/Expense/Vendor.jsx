@@ -18,7 +18,7 @@ export default function Vendor() {
     const [alertMessage, setAlertMessage] = useState('');
     const [alertMessageShow, setAlertMessageShow] = useState(false);
 
-    const apiURL = 'hhttps://immaculate.onrender.com/api/vendor';
+    const apiURL = 'https://immaculate.onrender.com/api/vendor';
 
     // Fetch all vendors on component mount
     useEffect(() => {

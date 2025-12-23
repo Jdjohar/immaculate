@@ -39,7 +39,7 @@ export default function Editcustomer() {
     const fetchCustomerData = async () => {
         try {
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`hhttps://immaculate.onrender.com/api/getcustomers/${customerId}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/getcustomers/${customerId}`, {
                 headers: {
                   'Authorization': authToken,
                 }
@@ -75,7 +75,7 @@ export default function Editcustomer() {
                 ...customer
             };
             const authToken = localStorage.getItem('authToken');
-            const response = await fetch(`hhttps://immaculate.onrender.com/api/updatecostomerdata/${customerId}`, {
+            const response = await fetch(`https://immaculate.onrender.com/api/updatecostomerdata/${customerId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

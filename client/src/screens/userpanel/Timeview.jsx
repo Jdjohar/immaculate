@@ -32,7 +32,7 @@ export default function Timeview() {
   const fetchAllEntries = async () => {
     try {
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`hhttps://immaculate.onrender.com/api/userEntries/${teamid}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/userEntries/${teamid}`, {
         headers: {
           'Authorization': authToken,
         }
@@ -68,7 +68,7 @@ export default function Timeview() {
     setIsDeleting(true); // Disable the button while processing
 
     try {
-      const response = await fetch(`hhttps://immaculate.onrender.com/api/userEntries/${entryId}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/userEntries/${entryId}`, {
         method: "DELETE",
       });
 
@@ -140,7 +140,7 @@ export default function Timeview() {
 
     try {
       const authToken = localStorage.getItem('authToken');
-      const response = await fetch(`hhttps://immaculate.onrender.com/api/userEntries/${entryId}`, {
+      const response = await fetch(`https://immaculate.onrender.com/api/userEntries/${entryId}`, {
         method: "PUT",
         headers: {
           'Authorization': authToken,
