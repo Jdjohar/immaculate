@@ -787,14 +787,14 @@ router.post('/send-invoice-email', async (req, res) => {
     //     secure: true, // true for 465, false for other ports
     //     auth: {
     //       user: 'Immacltd23@gmail.com',
-    //       pass: 'sqiwgztarywwjyhk'
+    //       pass: 'jswqttycqfjbgyej'
     //     }
     //   });
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
             user: "Immacltd23@gmail.com",
-            pass: "sqiwgztarywwjyhk"
+            pass: "jswqttycqfjbgyej"
         },
     });
 
@@ -1048,7 +1048,7 @@ router.post('/send-invoice-email', async (req, res) => {
 //         service: 'gmail',
 //         auth: {
 //             user: "Immacltd23@gmail.com",
-//             pass: "sqiwgztarywwjyhk"
+//             pass: "jswqttycqfjbgyej"
 //         },
 //     });
 
@@ -1058,7 +1058,7 @@ router.post('/send-invoice-email', async (req, res) => {
 //     //     secure: true, // true for 465, false for other ports
 //     //     auth: {
 //     //       user: 'Immacltd23@gmail.com',
-//     //       pass: 'sqiwgztarywwjyhk'
+//     //       pass: 'jswqttycqfjbgyej'
 //     //     }
 //     //   });
 
@@ -1148,7 +1148,7 @@ router.post('/send-invoice-email', async (req, res) => {
 //         service: 'gmail',
 //         auth: {
 //             user: "Immacltd23@gmail.com",
-//             pass: "sqiwgztarywwjyhk"
+//             pass: "jswqttycqfjbgyej"
 //         },
 //     });
 
@@ -1158,7 +1158,7 @@ router.post('/send-invoice-email', async (req, res) => {
 //     //     secure: true, // true for 465, false for other ports
 //     //     auth: {
 //     //       user: 'Immacltd23@gmail.com',
-//     //       pass: 'sqiwgztarywwjyhk'
+//     //       pass: 'jswqttycqfjbgyej'
 //     //     }
 //     //   });
 
@@ -1263,7 +1263,7 @@ router.post('/send-deposit-email', async (req, res) => {
 
     // ---- SMTP transporter (use env vars in production) ----
     const smtpUser = process.env.SMTP_USER || "Immacltd23@gmail.com";
-    const smtpPass = process.env.SMTP_PASS || "sqiwgztarywwjyhk"; // replace with env secret in prod
+    const smtpPass = process.env.SMTP_PASS || "jswqttycqfjbgyej"; // replace with env secret in prod
     const useGmail = (process.env.SMTP_SERVICE || "gmail") === "gmail";
 
     // If you want to use Hostinger or custom SMTP, set env vars appropriately.
@@ -1414,7 +1414,7 @@ router.post('/send-deposit-email', async (req, res) => {
 //         service: 'gmail',
 //         auth: {
 //             user: "Immacltd23@gmail.com",
-//             pass: "sqiwgztarywwjyhk"
+//             pass: "jswqttycqfjbgyej"
 //         },
 //     });
 
@@ -1424,7 +1424,7 @@ router.post('/send-deposit-email', async (req, res) => {
 //     //     secure: true, // true for 465, false for other ports
 //     //     auth: {
 //     //       user: 'Immacltd23@gmail.com',
-//     //       pass: 'sqiwgztarywwjyhk'
+//     //       pass: 'jswqttycqfjbgyej'
 //     //     }
 //     //   });
 
@@ -1522,7 +1522,7 @@ router.post('/send-estimate-email', async (req, res) => {
         service: 'gmail',
         auth: {
             user: "Immacltd23@gmail.com",
-            pass: "sqiwgztarywwjyhk"
+            pass: "jswqttycqfjbgyej"
         },
     });
 
@@ -1532,7 +1532,7 @@ router.post('/send-estimate-email', async (req, res) => {
     //     secure: true, // true for 465, false for other ports
     //     auth: {
     //       user: 'Immacltd23@gmail.com',
-    //       pass: 'sqiwgztarywwjyhk'
+    //       pass: 'jswqttycqfjbgyej'
     //     }
     //   });
 
@@ -1625,7 +1625,7 @@ router.post('/send-estimate-email', async (req, res) => {
 //         service: 'gmail',
 //         auth: {
 //             user: "Immacltd23@gmail.com",
-//             pass: "sqiwgztarywwjyhk"
+//             pass: "jswqttycqfjbgyej"
 //         },
 //     });
 
@@ -1708,7 +1708,7 @@ router.post("/send-estimate-signed-email", async (req, res) => {
 
     // --- SMTP Transporter ---
     const smtpUser = process.env.SMTP_USER || "Immacltd23@gmail.com";
-    const smtpPass = process.env.SMTP_PASS || "sqiwgztarywwjyhk"; // use env in prod
+    const smtpPass = process.env.SMTP_PASS || "jswqttycqfjbgyej"; // use env in prod
     const smtpService = process.env.SMTP_SERVICE || "gmail";
     const useGmail = smtpService.toLowerCase() === "gmail";
 
@@ -1818,7 +1818,7 @@ router.post("/send-estimate-signed-email", async (req, res) => {
 //         service: 'gmail',
 //         auth: {
 //             user: "Immacltd23@gmail.com",
-//             pass: "sqiwgztarywwjyhk"
+//             pass: "jswqttycqfjbgyej"
 //         },
 //     });
 
@@ -1901,7 +1901,7 @@ router.post("/send-Invoice-signed-email", async (req, res) => {
 
     // SMTP transporter (use env vars in production)
     const smtpUser = process.env.SMTP_USER || "Immacltd23@gmail.com";
-    const smtpPass = process.env.SMTP_PASS || "sqiwgztarywwjyhk"; // replace with env secret in production
+    const smtpPass = process.env.SMTP_PASS || "jswqttycqfjbgyej"; // replace with env secret in production
     const smtpService = (process.env.SMTP_SERVICE || "gmail").toLowerCase();
     const useGmail = smtpService === "gmail";
 
@@ -2222,7 +2222,7 @@ router.post('/login', [
 //         service: 'gmail',
 //         auth: {
 //             user: "Immacltd23@gmail.com",
-//             pass: "sqiwgztarywwjyhk"
+//             pass: "jswqttycqfjbgyej"
 //         },
 //     });
 //     // const transporter = nodemailer.createTransport({
@@ -2231,7 +2231,7 @@ router.post('/login', [
 //     //     secure: true, // true for 465, false for other ports
 //     //     auth: {
 //     //       user: 'Immacltd23@gmail.com',
-//     //       pass: 'sqiwgztarywwjyhk'
+//     //       pass: 'jswqttycqfjbgyej'
 //     //     }
 //     //   });
 
@@ -2266,7 +2266,7 @@ async function sendWelcomeEmail(userEmail, name, isFirstTimeLogin) {
 
     // --- SMTP Configuration ---
     const smtpUser = process.env.SMTP_USER || "Immacltd23@gmail.com";
-    const smtpPass = process.env.SMTP_PASS || "sqiwgztarywwjyhk"; // ⚠️ Replace with env secret in production
+    const smtpPass = process.env.SMTP_PASS || "jswqttycqfjbgyej"; // ⚠️ Replace with env secret in production
     const smtpService = (process.env.SMTP_SERVICE || "gmail").toLowerCase();
     const useGmail = smtpService === "gmail";
 
@@ -2366,7 +2366,7 @@ async function sendWelcomeEmail(userEmail, name, isFirstTimeLogin) {
 //             service: 'gmail',
 //             auth: {
 //                 user: "Immacltd23@gmail.com",
-//                 pass: "sqiwgztarywwjyhk"
+//                 pass: "jswqttycqfjbgyej"
 //             },
 //         });
 //         // const transporter = nodemailer.createTransport({
@@ -2375,7 +2375,7 @@ async function sendWelcomeEmail(userEmail, name, isFirstTimeLogin) {
 //         //     secure: true, // true for 465, false for other ports
 //         //     auth: {
 //         //       user: 'Immacltd23@gmail.com',
-//         //       pass: 'sqiwgztarywwjyhk'
+//         //       pass: 'jswqttycqfjbgyej'
 //         //     }
 //         //   });
 
@@ -2424,7 +2424,7 @@ router.post("/forgot-password", async (req, res) => {
 
     // SMTP / transporter (use env vars in production)
     const smtpUser = process.env.SMTP_USER || "Immacltd23@gmail.com";
-    const smtpPass = process.env.SMTP_PASS || "sqiwgztarywwjyhk"; // replace in prod
+    const smtpPass = process.env.SMTP_PASS || "jswqttycqfjbgyej"; // replace in prod
     const smtpService = (process.env.SMTP_SERVICE || "gmail").toLowerCase();
     const useGmail = smtpService === "gmail";
 
@@ -4542,7 +4542,7 @@ async function getCompanyName(userId) {
 //         service: 'gmail',
 //         auth: {
 //             user: "Immacltd23@gmail.com",
-//             pass: "sqiwgztarywwjyhk"
+//             pass: "jswqttycqfjbgyej"
 //         },
 //     });
 //     // const transporter = nodemailer.createTransport({
@@ -4551,7 +4551,7 @@ async function getCompanyName(userId) {
 //     //     secure: true, // true for 465, false for other ports
 //     //     auth: {
 //     //       user: 'Immacltd23@gmail.com',
-//     //       pass: 'sqiwgztarywwjyhk'
+//     //       pass: 'jswqttycqfjbgyej'
 //     //     }
 //     //   });
 
@@ -4584,7 +4584,7 @@ async function sendTeamWelcomeEmail(userEmail, name, isFirstTimeLogin, companyNa
 
     // --- SMTP CONFIGURATION ---
     const smtpUser = process.env.SMTP_USER || "Immacltd23@gmail.com";
-    const smtpPass = process.env.SMTP_PASS || "sqiwgztarywwjyhk"; // ⚠️ Replace with env var in prod
+    const smtpPass = process.env.SMTP_PASS || "jswqttycqfjbgyej"; // ⚠️ Replace with env var in prod
     const smtpService = (process.env.SMTP_SERVICE || "gmail").toLowerCase();
     const useGmail = smtpService === "gmail";
 
