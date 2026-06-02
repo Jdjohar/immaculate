@@ -781,27 +781,29 @@ router.post('/send-invoice-email', async (req, res) => {
         currencyType,
         amountdue1
     } = req.body;
-    // const transporter = nodemailer.createTransport({
-    //     host: 'smtp.hostinger.com', // Replace with your hosting provider's SMTP server
-    //     port: 465, // Replace with the appropriate port
-    //     secure: true, // true for 465, false for other ports
-    //     auth: {
-    //       user: 'Immacltd23@gmail.com',
-    //       pass: 'hulocvtjdutgnysr'
-    //     }
-    //   });
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: "Immacltd23@gmail.com",
-            pass: "hulocvtjdutgnysr"
-        },
-    });
+    const smtpUser = process.env.SMTP_USER || "Immacltd23@gmail.com";
+    const smtpPass = process.env.SMTP_PASS || "hulocvtjdutgnysr";
+    const smtpService = process.env.SMTP_SERVICE || "gmail";
+    const useGmail = smtpService.toLowerCase() === "gmail";
+
+    const transporter = nodemailer.createTransport(
+        useGmail
+            ? {
+                service: "gmail",
+                auth: { user: smtpUser, pass: smtpPass },
+            }
+            : {
+                host: process.env.SMTP_HOST || "smtp.hostinger.com",
+                port: Number(process.env.SMTP_PORT || 465),
+                secure: process.env.SMTP_SECURE === "false" ? false : true,
+                auth: { user: smtpUser, pass: smtpPass },
+            }
+    );
 
     const currencySign = getCurrencySign(currencyType);
 
     const mailOptions = {
-        from: 'Immacltd23@gmail.com',
+        from: smtpUser,
         to: to.join(', '),
         bcc: bcc.join(', '),
         subject: `Invoice from ${companyName}`,
@@ -1510,36 +1512,29 @@ router.post('/send-estimate-email', async (req, res) => {
         amountdue1
     } = req.body;
 
-    // const transporter = nodemailer.createTransport({
-    //     service: 'gmail',
-    //     auth: {
-    //         user: "Immacltd23@gmail.com",
-    //         pass: "cwoxnbrrxvsjfbmr"
-    //     },
-    // });
+    const smtpUser = process.env.SMTP_USER || "Immacltd23@gmail.com";
+    const smtpPass = process.env.SMTP_PASS || "hulocvtjdutgnysr";
+    const smtpService = process.env.SMTP_SERVICE || "gmail";
+    const useGmail = smtpService.toLowerCase() === "gmail";
 
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: "Immacltd23@gmail.com",
-            pass: "hulocvtjdutgnysr"
-        },
-    });
-
-    // const transporter = nodemailer.createTransport({
-    //     host: 'smtp.hostinger.com', // Replace with your hosting provider's SMTP server
-    //     port: 465, // Replace with the appropriate port
-    //     secure: true, // true for 465, false for other ports
-    //     auth: {
-    //       user: 'Immacltd23@gmail.com',
-    //       pass: 'hulocvtjdutgnysr'
-    //     }
-    //   });
+    const transporter = nodemailer.createTransport(
+        useGmail
+            ? {
+                service: "gmail",
+                auth: { user: smtpUser, pass: smtpPass },
+            }
+            : {
+                host: process.env.SMTP_HOST || "smtp.hostinger.com",
+                port: Number(process.env.SMTP_PORT || 465),
+                secure: process.env.SMTP_SECURE === "false" ? false : true,
+                auth: { user: smtpUser, pass: smtpPass },
+            }
+    );
 
     const currencySign = getCurrencySign(currencyType);
 
     const mailOptions = {
-        from: 'Immacltd23@gmail.com',
+        from: smtpUser,
         to: to.join(', '),
         bcc: bcc.join(', '),
         subject: `Estimate from ${companyName}`,
