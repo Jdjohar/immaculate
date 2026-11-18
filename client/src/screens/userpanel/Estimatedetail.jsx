@@ -69,6 +69,25 @@ export default function Estimatedetail() {
     }
   };
 
+  const getFormattedInformation = (info) => {
+    if (!info) {
+      return '<p><b>Terms:</b></p><p>Quotes are valid for 30 days from the date of quotation prepared.</p><p>1 year of workmanship warranty</p><p>Basic Selection</p><p>(Extra charges may apply on upgrades)</p>';
+    }
+    if (!info.toLowerCase().includes('workmanship warranty')) {
+      if (info.includes('Quotes are valid for 30 days from the date of quotation prepared.</p>')) {
+        return info.replace(
+          'Quotes are valid for 30 days from the date of quotation prepared.</p>',
+          'Quotes are valid for 30 days from the date of quotation prepared.</p><p>1 year of workmanship warranty</p>'
+        );
+      } else if (info.toLowerCase().includes('terms:')) {
+        return info.replace(/(terms:?<\/[^>]+>)/i, '$1<p>1 year of workmanship warranty</p>');
+      } else {
+        return info + '<p>1 year of workmanship warranty</p>';
+      }
+    }
+    return info;
+  };
+
   useEffect(() => {
 
     console.log("estimateid ===========", estimateid);
@@ -1443,7 +1462,7 @@ thead{
                           {estimateData.information ? (
                             <div className="estimate-pdf-notes-col">
                               <div className="estimate-pdf-notes-title">Project Specifications & Terms</div>
-                              <div className="estimate-pdf-notes-content" dangerouslySetInnerHTML={{ __html: estimateData.information }} />
+                              <div className="estimate-pdf-notes-content" dangerouslySetInnerHTML={{ __html: getFormattedInformation(estimateData.information) }} />
                             </div>
                           ) : null}
                           <div className="estimate-pdf-trust-col">
@@ -1757,7 +1776,7 @@ thead{
                             <div className='mt-1'>
                               <div className='row'>
                                 <div className='col'>
-                                  <div className='information-content' dangerouslySetInnerHTML={{ __html: estimateData.information }} />
+                                  <div className='information-content' dangerouslySetInnerHTML={{ __html: getFormattedInformation(estimateData.information) }} />
 
                                 </div>
                                 <div className='col'>

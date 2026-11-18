@@ -107,6 +107,7 @@ export default function Createestimate() {
         <br>
         <p><b>Terms:</b></p>
         <p>Quotes are valid for 30 days from the date of quotation prepared.</p>
+        <p>1 year of workmanship warranty</p>
         <p>Basic Selection</p>
         <p>(Extra charges may apply on upgrades)</p>
         
