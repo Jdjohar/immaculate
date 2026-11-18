@@ -50,6 +50,25 @@ export default function Estimatedetail() {
     return Math.round(value * 100) / 100;
   };
 
+  const formatCurrency = (amount) => {
+    if (amount === undefined || amount === null || amount === '' || isNaN(amount)) return '0.00';
+    return Number(amount).toLocaleString('en-CA', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  };
+
+  const parseLocationName = (val) => {
+    if (!val) return '';
+    if (typeof val === 'object' && val.name) return val.name;
+    try {
+      const parsed = JSON.parse(val);
+      return parsed?.name || val;
+    } catch (e) {
+      return val;
+    }
+  };
+
   useEffect(() => {
 
     console.log("estimateid ===========", estimateid);
@@ -759,17 +778,23 @@ thead{
   const convertToPdf = () => {
     const content = document.getElementById('invoiceContent').innerHTML;
     const opt = {
-      filename: `${estimateData.EstimateNumber}.pdf`,
-      html2canvas: { scale: 3, useCORS: true },
-      enableLinks: true,
+      filename: `${estimateData.EstimateNumber || 'Estimate'}.pdf`,
+      margin: [8, 8, 8, 8],
       image: { type: 'jpeg', quality: 0.98 },
-      margin: 0.2,
+      enableLinks: true,
+      html2canvas: {
+        scale: 2.5,
+        useCORS: true,
+        letterRendering: true,
+        scrollY: 0,
+        logging: false
+      },
       jsPDF: {
-        unit: 'in',
-        format: 'A4',
+        unit: 'mm',
+        format: 'a4',
         orientation: 'portrait'
       },
-      userUnit: 450 / 210
+      pagebreak: { mode: ['css', 'legacy'] }
     };
     html2pdf().from(content).set(opt).save();
   };
@@ -778,11 +803,23 @@ thead{
     return new Promise((resolve, reject) => {
       const content = document.getElementById('invoiceContent').innerHTML;
       const opt = {
-        margin: 0.2,
-        filename: 'myfile.pdf',
-        html2canvas: { scale: 3, useCORS: true }, // Increase scale for better resolution
-        jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' },
-        userUnit: 450 / 210
+        filename: `${estimateData.EstimateNumber || 'Estimate'}.pdf`,
+        margin: [8, 8, 8, 8],
+        image: { type: 'jpeg', quality: 0.98 },
+        enableLinks: true,
+        html2canvas: {
+          scale: 2.5,
+          useCORS: true,
+          letterRendering: true,
+          scrollY: 0,
+          logging: false
+        },
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait'
+        },
+        pagebreak: { mode: ['css', 'legacy'] }
       };
 
       html2pdf().from(content).set(opt).toPdf().get('pdf').then(function (pdf) {
@@ -890,194 +927,583 @@ thead{
 
                     )}
 
-                    <div class="page" style={{display:'none'}} id='invoiceContent'>
-                      <div class="header ps pb-0" >
-                        {signupdata.companyImageUrl !== "" ?
-                          <img src={signupdata.companyImageUrl} style={{ height: '85px' }} className='logoimage' alt="" /> :
-                          <p className='h4 fw-bold'>{signupdata.companyname}</p>
+                    <div style={{ display: 'none' }} id='invoiceContent'>
+                      <style>{`
+                        .estimate-pdf-wrap {
+                          width: 100%;
+                          max-width: 800px;
+                          margin: 0 auto;
+                          padding: 24px 28px;
+                          background: #ffffff;
+                          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+                          font-size: 12px;
+                          line-height: 1.45;
+                          color: #1e293b;
+                          box-sizing: border-box;
                         }
-                        <div class="company-info fs12">
-                          <h1 className='m-0 ' style={{ fontSize: '26px' }}>Estimate</h1>
-                          <p className='m-0'><strong>{signupdata.companyname}</strong></p>
-                          <p className='m-0'>{signupdata.address}</p>
-                          {signupdata.city ? JSON.parse(signupdata.city).name + ',' : ' '}
-                          {signupdata.state ? JSON.parse(signupdata.state).name : ' '}
-                          <div className=''>{signupdata.state ? JSON.parse(signupdata.country).name : ' '}</div>
-                          <div ><a className='text-decoration-none' href={`mailto:${signupdata.email}`}>{signupdata.email}</a></div>
-                          <div ><a className='text-decoration-none' href='https://www.instagram.com/immaculate.homes'>https://www.instagram.com/immaculate.homes</a></div>
-                          <div ><a className='text-decoration-none' href={`${signupdata.website}`}>{signupdata.website}</a></div>
-                          {/* <div>
-                            {signupdata.gstNumber == ''
-                              ?
-                              ""
-                              :
-                              `${signupdata.TaxName} ${signupdata.gstNumber}`
-                            }
-                          </div> */}
-                          {/* <p className='m-0'>GST 774737217RT0001</p> */}
-                        </div>
-                      </div>
+                        .estimate-pdf-header {
+                          display: flex;
+                          justify-content: space-between;
+                          align-items: flex-start;
+                          padding-bottom: 18px;
+                          border-bottom: 2px solid #e2e8f0;
+                          margin-bottom: 16px;
+                        }
+                        .estimate-pdf-brand {
+                          display: flex;
+                          flex-direction: column;
+                          gap: 5px;
+                          max-width: 58%;
+                        }
+                        .estimate-pdf-logo {
+                          height: 65px;
+                          width: auto;
+                          object-fit: contain;
+                          align-self: flex-start;
+                          margin-bottom: 4px;
+                        }
+                        .estimate-pdf-company-name {
+                          font-size: 15px;
+                          font-weight: 700;
+                          color: #0f172a;
+                          letter-spacing: -0.2px;
+                        }
+                        .estimate-pdf-company-info {
+                          font-size: 11px;
+                          color: #475569;
+                          line-height: 1.4;
+                        }
+                        .estimate-pdf-company-info a {
+                          color: #475569;
+                          text-decoration: none;
+                        }
+                        .estimate-pdf-meta {
+                          text-align: right;
+                          display: flex;
+                          flex-direction: column;
+                          align-items: flex-end;
+                          gap: 4px;
+                          max-width: 40%;
+                        }
+                        .estimate-pdf-title {
+                          font-size: 26px;
+                          font-weight: 800;
+                          color: #166534;
+                          letter-spacing: 1px;
+                          text-transform: uppercase;
+                          line-height: 1.1;
+                          margin-bottom: 4px;
+                        }
+                        .estimate-pdf-badge {
+                          display: inline-block;
+                          background: #f0fdf4;
+                          color: #166534;
+                          border: 1px solid #bbf7d0;
+                          padding: 3px 10px;
+                          border-radius: 4px;
+                          font-weight: 700;
+                          font-size: 12px;
+                        }
+                        .estimate-pdf-meta-text {
+                          font-size: 11.5px;
+                          color: #64748b;
+                          margin-top: 2px;
+                        }
+                        .estimate-pdf-meta-text strong {
+                          color: #334155;
+                        }
+                        .estimate-pdf-details-card {
+                          display: flex;
+                          justify-content: space-between;
+                          background: #f8fafc;
+                          border: 1px solid #e2e8f0;
+                          border-left: 4px solid #166534;
+                          border-radius: 6px;
+                          padding: 12px 16px;
+                          margin-bottom: 20px;
+                          page-break-inside: avoid;
+                          break-inside: avoid;
+                        }
+                        .estimate-pdf-col {
+                          width: 48%;
+                        }
+                        .estimate-pdf-section-label {
+                          font-size: 10px;
+                          font-weight: 700;
+                          color: #166534;
+                          text-transform: uppercase;
+                          letter-spacing: 0.6px;
+                          margin-bottom: 4px;
+                        }
+                        .estimate-pdf-client-name {
+                          font-size: 14px;
+                          font-weight: 700;
+                          color: #0f172a;
+                          margin-bottom: 2px;
+                        }
+                        .estimate-pdf-client-meta {
+                          font-size: 11px;
+                          color: #475569;
+                          line-height: 1.35;
+                        }
+                        .estimate-pdf-job-name {
+                          font-size: 13px;
+                          font-weight: 600;
+                          color: #0f172a;
+                          margin-bottom: 2px;
+                        }
+                        .estimate-pdf-table-container {
+                          margin-bottom: 18px;
+                          page-break-inside: auto;
+                          break-inside: auto;
+                        }
+                        .estimate-pdf-table {
+                          width: 100%;
+                          border-collapse: collapse;
+                          page-break-inside: auto;
+                          break-inside: auto;
+                        }
+                        .estimate-pdf-table thead {
+                          display: table-header-group;
+                        }
+                        .estimate-pdf-table th {
+                          background: #166534;
+                          color: #ffffff;
+                          font-size: 10.5px;
+                          font-weight: 700;
+                          text-transform: uppercase;
+                          letter-spacing: 0.5px;
+                          padding: 9px 12px;
+                          border: none;
+                        }
+                        .estimate-pdf-table th:first-child {
+                          border-top-left-radius: 4px;
+                        }
+                        .estimate-pdf-table th:last-child {
+                          border-top-right-radius: 4px;
+                        }
+                        .estimate-pdf-table tbody {
+                          page-break-inside: auto;
+                          break-inside: auto;
+                        }
+                        .estimate-pdf-table-row {
+                          page-break-inside: avoid !important;
+                          break-inside: avoid !important;
+                          border-bottom: 1px solid #e2e8f0;
+                        }
+                        .estimate-pdf-table-row:nth-child(even) {
+                          background-color: #fafbfb;
+                        }
+                        .estimate-pdf-table td {
+                          padding: 10px 12px;
+                          vertical-align: top !important;
+                          font-size: 11.5px;
+                          color: #334155;
+                        }
+                        .estimate-pdf-item-title {
+                          font-size: 13px;
+                          font-weight: 700;
+                          color: #0f172a;
+                          margin-bottom: 4px;
+                          display: block;
+                        }
+                        .estimate-pdf-item-desc {
+                          font-size: 11px;
+                          color: #475569;
+                          line-height: 1.45;
+                        }
+                        .estimate-pdf-item-desc p {
+                          margin: 0 0 2px 0;
+                        }
+                        .estimate-pdf-rate {
+                          font-weight: 500;
+                          color: #1e293b;
+                          white-space: nowrap;
+                        }
+                        .estimate-pdf-amount {
+                          font-weight: 700;
+                          color: #0f172a;
+                          white-space: nowrap;
+                        }
+                        .estimate-pdf-summary-wrap {
+                          display: flex;
+                          justify-content: flex-end;
+                          margin-bottom: 20px;
+                          page-break-inside: avoid;
+                          break-inside: avoid;
+                        }
+                        .estimate-pdf-summary-card {
+                          width: 320px;
+                          background: #f8fafc;
+                          border: 1px solid #e2e8f0;
+                          border-radius: 6px;
+                          padding: 12px 14px;
+                        }
+                        .estimate-pdf-summary-line {
+                          display: flex;
+                          justify-content: space-between;
+                          align-items: center;
+                          padding: 4px 0;
+                          font-size: 11.5px;
+                          color: #475569;
+                        }
+                        .estimate-pdf-summary-line strong {
+                          color: #0f172a;
+                          font-weight: 600;
+                        }
+                        .estimate-pdf-total-banner {
+                          display: flex;
+                          justify-content: space-between;
+                          align-items: center;
+                          background: #166534;
+                          color: #ffffff;
+                          padding: 8px 12px;
+                          border-radius: 4px;
+                          margin-top: 8px;
+                        }
+                        .estimate-pdf-total-label {
+                          font-size: 12px;
+                          font-weight: 700;
+                          letter-spacing: 0.5px;
+                          text-transform: uppercase;
+                        }
+                        .estimate-pdf-total-val {
+                          font-size: 16px;
+                          font-weight: 800;
+                          letter-spacing: -0.2px;
+                        }
+                        .estimate-pdf-info-wrap {
+                          display: flex;
+                          justify-content: space-between;
+                          gap: 16px;
+                          margin-bottom: 20px;
+                          page-break-inside: avoid;
+                          break-inside: avoid;
+                        }
+                        .estimate-pdf-notes-col {
+                          flex: 1;
+                          background: #f8fafc;
+                          border: 1px solid #e2e8f0;
+                          border-radius: 6px;
+                          padding: 12px 14px;
+                        }
+                        .estimate-pdf-notes-title {
+                          font-size: 11px;
+                          font-weight: 700;
+                          color: #166534;
+                          text-transform: uppercase;
+                          letter-spacing: 0.5px;
+                          margin-bottom: 6px;
+                        }
+                        .estimate-pdf-notes-content {
+                          font-size: 11px;
+                          color: #334155;
+                          line-height: 1.45;
+                        }
+                        .estimate-pdf-notes-content p {
+                          margin: 0 0 3px 0;
+                        }
+                        .estimate-pdf-trust-col {
+                          width: 250px;
+                          display: flex;
+                          flex-direction: column;
+                          align-items: center;
+                          justify-content: center;
+                          background: #f8fafc;
+                          border: 1px solid #e2e8f0;
+                          border-radius: 6px;
+                          padding: 12px;
+                          text-align: center;
+                        }
+                        .estimate-pdf-trust-title {
+                          font-size: 10px;
+                          font-weight: 700;
+                          color: #166534;
+                          text-transform: uppercase;
+                          letter-spacing: 0.5px;
+                          margin-bottom: 8px;
+                        }
+                        .estimate-pdf-trust-img {
+                          max-height: 48px;
+                          width: auto;
+                          object-fit: contain;
+                          margin-bottom: 6px;
+                        }
+                        .estimate-pdf-trust-desc {
+                          font-size: 9.5px;
+                          color: #64748b;
+                          line-height: 1.3;
+                        }
+                        .estimate-pdf-signature-wrap {
+                          border: 1px solid #e2e8f0;
+                          border-radius: 6px;
+                          background: #ffffff;
+                          padding: 14px 16px;
+                          margin-bottom: 16px;
+                          page-break-inside: avoid !important;
+                          break-inside: avoid !important;
+                        }
+                        .estimate-pdf-agreement-text {
+                          font-size: 10.5px;
+                          color: #64748b;
+                          font-style: italic;
+                          margin-bottom: 14px;
+                          line-height: 1.35;
+                          padding-bottom: 10px;
+                          border-bottom: 1px dashed #e2e8f0;
+                        }
+                        .estimate-pdf-signatures-row {
+                          display: flex;
+                          justify-content: space-between;
+                          gap: 30px;
+                        }
+                        .estimate-pdf-sig-box {
+                          flex: 1;
+                        }
+                        .estimate-pdf-sig-label {
+                          font-size: 10.5px;
+                          font-weight: 700;
+                          color: #166534;
+                          text-transform: uppercase;
+                          letter-spacing: 0.5px;
+                          margin-bottom: 4px;
+                        }
+                        .estimate-pdf-sig-party {
+                          font-size: 12px;
+                          font-weight: 700;
+                          color: #0f172a;
+                          margin-bottom: 4px;
+                        }
+                        .estimate-pdf-sig-img-wrap {
+                          height: 46px;
+                          display: flex;
+                          align-items: flex-end;
+                          margin-bottom: 4px;
+                        }
+                        .estimate-pdf-sig-img {
+                          max-height: 44px;
+                          max-width: 170px;
+                          object-fit: contain;
+                        }
+                        .estimate-pdf-sig-placeholder {
+                          font-size: 11px;
+                          color: #94a3b8;
+                          font-style: italic;
+                        }
+                        .estimate-pdf-sig-line {
+                          height: 1px;
+                          background-color: #94a3b8;
+                          width: 100%;
+                          margin: 4px 0 6px 0;
+                        }
+                        .estimate-pdf-sig-meta {
+                          font-size: 10px;
+                          color: #64748b;
+                        }
+                        .estimate-pdf-footer {
+                          text-align: center;
+                          padding-top: 12px;
+                          border-top: 1px solid #e2e8f0;
+                          font-size: 9.5px;
+                          color: #94a3b8;
+                          page-break-inside: avoid;
+                          break-inside: avoid;
+                        }
+                      `}</style>
 
-                      <div class="invoice-details fs12 ps py-2 bg-light no-split">
-                        <div>
-                          <p className='m-0 text-green'><strong>Prepared For</strong></p>
-                          <p className='m-0'> {estimateData.customername}</p>
-                          <p className='m-0'>{estimateData.customeremail}</p>
-                          <p className='m-0'>{estimateData.customerphone || ''}</p>
-                        </div>
-                        <div>
-                          <p className='m-0 text-green'><strong>Estimate #:</strong> {estimateData.EstimateNumber}</p>
-                          <p className='m-0 text-green'><strong>Date:</strong> {formatCustomDate(estimateData.date)}</p>
-
-
-                          {
-                            estimateData.job == "" || estimateData.job == null
-                              ?
-                              ""
-                              :
-                              <p className='m-0'><strong className='text-green'>Job:</strong> {estimateData.job}</p>
-                          }
-                        </div>
-                      </div>
-                      <div className='ps pb-0'>
-
-
-                        <table className='fs12'>
-                          <thead className='border-bottom'>
-                            <tr>
-                              <th width="40%" className='text-green text-left'>Item</th>
-                              <th className='text-green  d-md-table-cell' width="15%">Quantity</th>
-                              <th className='text-green  d-md-table-cell' width="15%" >Unit</th>
-                              <th className='text-green  d-md-table-cell' width="15%">Price</th>
-                              <th className='text-green d-md-table-cell' width="15%" style={{ textAlign: 'right' }}>Amount</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {console.log(items, "items")}
-                            {items.map((item) => (
-                              <tr className='border-bottom' key={item._id}>
-                                <td className='  d-md-table-cell' width="15%">
-                                  <div>
-                                    <span><strong>{item.itemname}</strong></span>
-                                    <div dangerouslySetInnerHTML={{ __html: item.description }} />
-                                    {/* <div>{item.description.replace(/<\/?[^>]+(>|$)/g, '')}</div> */}
-                                  </div>
-                                </td>
-                                <td className='e d-md-table-cell' width="15%">{item.itemquantity}</td>
-                                <td className=' d-md-table-cell' width="15%">{item.unit}</td>
-                                <td className=' d-md-table-cell' width="15%">{roundOff(item.price)}</td>
-                                <td className=' d-md-table-cell text-end' width="15%">{roundOff(item.amount)}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                      <div class="totals ps no-split">
-                        <table className='fs12'>
-                          <tr>
-                            <td className='text-end'>Subtotal:</td>
-                            <td style={{ textAlign: 'right' }}><CurrencySign />{roundOff(estimateData.subtotal)}</td>
-                          </tr>
-
-                          {
-                            estimateData.discountTotal > 0
-                              ?
-                              <tr>
-                                <td className='text-end' width="22%">Discount</td>
-                                <td className='text-end' width="22%"><CurrencySign />{roundOff(estimateData.discountTotal)}</td>
-                              </tr>
-                              :
-                              null
-                          }
-
-                          {
-                            signupdata.taxPercentage == 0
-                              ?
-                              <tr></tr>
-                              :
-                              <tr>
-                                <td className='text-end' width="22%">
-                                  {signupdata.TaxName} ({signupdata.taxPercentage}%)
-
-                                </td>
-                                <td className='text-end' width="22%"><CurrencySign />{roundOff(estimateData.tax)}</td>
-                              </tr>
-                          }
-
-
-                          <tr>
-                            <td className='text-end'>Total</td>
-                            <td style={{ textAlign: 'right' }}><CurrencySign />{roundOff(estimateData.total)}</td>
-                          </tr>
-
-                          {transactions.map((transaction) => (
-                            <tr key={transaction._id}>
-                              <td className='text-md-end' width="100%">{transaction.method == "deposit" ? "Deposit" : "Paid"} on {formatCustomDate(transaction.paiddate)}</td>
-                              <td className='text-end' width="100%" style={{ borderBottom: '1px solid #ddd' }}><CurrencySign />{transaction.paidamount}</td>
-                            </tr>
-                          ))}
-                        </table>
-
-
-                      </div>
-
-
-
-                      <div className='ps text-right' >
-                        <p className='text-end'> <span className='p-3 text-green' style={{ background: '#f0f3f4' }} >Estimate Total: <strong><CurrencySign />{roundOff(estimateData.total - transactions.reduce((total, payment) => total + payment.paidamount, 0))}</strong></span></p>
-                      </div>
-
-                      <div className='invoice-body invoice-body-text'>
-                        <div className='mt-1'>
-                          <div className='row'>
-                            <div className='col'>
-                              <div className='information-content' dangerouslySetInnerHTML={{ __html: estimateData.information }} />
-
-                            </div>
-                            <div className='col'>
-                              <img src={sign} className='w-100' />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-
-                      {estimateData.isAddSignature || estimateData.isCustomerSign ?
-                        <div className="invoice-body no-split">
-                          <p>By signing this document, the customer agrees to the services and conditions described in this document.</p>
-                          <div className="row">
-                            {console.log(ownerData, "ownerData")
-                            }
-                            {ownerData && estimateData.isAddSignature && (
-                              <div className="col-6">
-                                <div className="my-2">
-                                  <div>
-                                    <p className='text-center fw-bold '>{ownerData.companyname}</p>
-                                    <img src={ownerData.data} alt="Saved Signature" style={{ width: "100%" }} /><hr />
-                                    <p className='text-center'>{formatCustomDate(estimateData.createdAt)}</p>
-                                  </div>
-                                </div>
-                              </div>
+                      <div className="estimate-pdf-wrap">
+                        {/* Header */}
+                        <div className="estimate-pdf-header">
+                          <div className="estimate-pdf-brand">
+                            {signupdata.companyImageUrl && signupdata.companyImageUrl !== "" ? (
+                              <img src={signupdata.companyImageUrl} className="estimate-pdf-logo" alt="Company Logo" />
+                            ) : (
+                              <p className="estimate-pdf-company-name m-0">{signupdata.companyname}</p>
                             )}
-                            <div className="col-6">
-                              <div className="my-2">
-                                <div>
-                                  <p className='text-center fw-bold'>{estimateData.customername}</p>
-                                  {signatureData != null ?
-                                    signatureData.customersign == '' ? ('') :
-                                      (<div className="signature-section">
-                                        <img src={`${signatureData.customersign}`} alt="Customer Signature" style={{ width: "100%" }} /><hr />
-                                        <p className='text-center'>{formatCustomDate(signatureData.createdAt)}</p>
-                                      </div>) : ''}
-
-                                </div>
+                            <div className="estimate-pdf-company-name">{signupdata.companyname}</div>
+                            <div className="estimate-pdf-company-info">
+                              {signupdata.address ? <div>{signupdata.address}</div> : null}
+                              <div>
+                                {[parseLocationName(signupdata.city), parseLocationName(signupdata.state), parseLocationName(signupdata.country)].filter(Boolean).join(', ')}
                               </div>
+                              {signupdata.email ? <div>Email: {signupdata.email}</div> : null}
+                              <div>Instagram: @immaculate.homes</div>
+                              {signupdata.website ? <div>Web: {signupdata.website}</div> : null}
+                              {signupdata.gstNumber ? <div>{signupdata.TaxName || 'GST'} #: {signupdata.gstNumber}</div> : null}
                             </div>
                           </div>
 
-                        </div> : ''
-                      }
+                          <div className="estimate-pdf-meta">
+                            <div className="estimate-pdf-title">Estimate</div>
+                            <div className="estimate-pdf-badge">Estimate #: {estimateData.EstimateNumber}</div>
+                            <div className="estimate-pdf-meta-text"><strong>Date:</strong> {formatCustomDate(estimateData.date)}</div>
+                            {estimateData.duedate ? (
+                              <div className="estimate-pdf-meta-text"><strong>Valid Until:</strong> {formatCustomDate(estimateData.duedate)}</div>
+                            ) : (
+                              <div className="estimate-pdf-meta-text"><strong>Valid Until:</strong> 30 Days from date</div>
+                            )}
+                          </div>
+                        </div>
 
+                        {/* Prepared For & Job Location */}
+                        <div className="estimate-pdf-details-card">
+                          <div className="estimate-pdf-col">
+                            <div className="estimate-pdf-section-label">Prepared For</div>
+                            <div className="estimate-pdf-client-name">{estimateData.customername}</div>
+                            {estimateData.customeremail ? <div className="estimate-pdf-client-meta">{estimateData.customeremail}</div> : null}
+                            {estimateData.customerphone ? <div className="estimate-pdf-client-meta">{estimateData.customerphone}</div> : null}
+                          </div>
+                          <div className="estimate-pdf-col" style={{ textAlign: 'right' }}>
+                            <div className="estimate-pdf-section-label">Project / Job Location</div>
+                            <div className="estimate-pdf-job-name">{estimateData.job || 'Project Site'}</div>
+                            <div className="estimate-pdf-client-meta">
+                              {[parseLocationName(signupdata.city), parseLocationName(signupdata.state)].filter(Boolean).join(', ')}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Line Items Table */}
+                        <div className="estimate-pdf-table-container">
+                          <table className="estimate-pdf-table">
+                            <thead>
+                              <tr>
+                                <th style={{ width: '52%', textAlign: 'left' }}>Scope of Work / Item</th>
+                                <th style={{ width: '10%', textAlign: 'center' }}>Qty</th>
+                                <th style={{ width: '10%', textAlign: 'center' }}>Unit</th>
+                                <th style={{ width: '14%', textAlign: 'right' }}>Price</th>
+                                <th style={{ width: '14%', textAlign: 'right' }}>Amount</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {items.map((item) => (
+                                <tr className="estimate-pdf-table-row" key={item._id}>
+                                  <td>
+                                    <span className="estimate-pdf-item-title">{item.itemname}</span>
+                                    <div className="estimate-pdf-item-desc" dangerouslySetInnerHTML={{ __html: item.description }} />
+                                  </td>
+                                  <td style={{ textAlign: 'center', fontWeight: 500 }}>{item.itemquantity}</td>
+                                  <td style={{ textAlign: 'center', fontWeight: 500 }}>{item.unit}</td>
+                                  <td style={{ textAlign: 'right' }} className="estimate-pdf-rate">
+                                    <CurrencySign />{formatCurrency(item.price)}
+                                  </td>
+                                  <td style={{ textAlign: 'right' }} className="estimate-pdf-amount">
+                                    <CurrencySign />{formatCurrency(item.amount)}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {/* Financial Summary */}
+                        <div className="estimate-pdf-summary-wrap">
+                          <div className="estimate-pdf-summary-card">
+                            <div className="estimate-pdf-summary-line">
+                              <span>Subtotal:</span>
+                              <strong><CurrencySign />{formatCurrency(estimateData.subtotal)}</strong>
+                            </div>
+
+                            {estimateData.discountTotal > 0 ? (
+                              <div className="estimate-pdf-summary-line">
+                                <span>Discount:</span>
+                                <strong>-<CurrencySign />{formatCurrency(estimateData.discountTotal)}</strong>
+                              </div>
+                            ) : null}
+
+                            {signupdata.taxPercentage > 0 ? (
+                              <div className="estimate-pdf-summary-line">
+                                <span>{signupdata.TaxName || 'GST'} ({signupdata.taxPercentage}%):</span>
+                                <strong><CurrencySign />{formatCurrency(estimateData.tax)}</strong>
+                              </div>
+                            ) : null}
+
+                            <div className="estimate-pdf-summary-line" style={{ borderTop: '1px solid #e2e8f0', paddingTop: '6px', marginTop: '4px' }}>
+                              <span>Total:</span>
+                              <strong><CurrencySign />{formatCurrency(estimateData.total)}</strong>
+                            </div>
+
+                            {transactions && transactions.length > 0 ? transactions.map((t) => (
+                              <div className="estimate-pdf-summary-line" key={t._id}>
+                                <span>{t.method === 'deposit' ? 'Deposit' : 'Paid'} on {formatCustomDate(t.paiddate)}:</span>
+                                <strong>-<CurrencySign />{formatCurrency(t.paidamount)}</strong>
+                              </div>
+                            )) : null}
+
+                            <div className="estimate-pdf-total-banner">
+                              <span className="estimate-pdf-total-label">Estimate Total</span>
+                              <span className="estimate-pdf-total-val">
+                                <CurrencySign />{formatCurrency(estimateData.total - transactions.reduce((total, payment) => total + (Number(payment.paidamount) || 0), 0))}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Notes & Trust Badges */}
+                        <div className="estimate-pdf-info-wrap">
+                          {estimateData.information ? (
+                            <div className="estimate-pdf-notes-col">
+                              <div className="estimate-pdf-notes-title">Project Specifications & Terms</div>
+                              <div className="estimate-pdf-notes-content" dangerouslySetInnerHTML={{ __html: estimateData.information }} />
+                            </div>
+                          ) : null}
+                          <div className="estimate-pdf-trust-col">
+                            <div className="estimate-pdf-trust-title">Licensed & Insured Contractor</div>
+                            <img src={sign} className="estimate-pdf-trust-img" alt="WCB Alberta & Fully Insured" />
+                            <div className="estimate-pdf-trust-desc">Alberta WCB Covered • Fully Insured • Commercial & Residential Specialists</div>
+                          </div>
+                        </div>
+
+                        {/* Signatures */}
+                        {estimateData.isAddSignature || estimateData.isCustomerSign ? (
+                          <div className="estimate-pdf-signature-wrap">
+                            <div className="estimate-pdf-agreement-text">
+                              By signing this document, the customer agrees to the services, specifications, and terms described in this estimate.
+                            </div>
+                            <div className="estimate-pdf-signatures-row">
+                              {ownerData && estimateData.isAddSignature ? (
+                                <div className="estimate-pdf-sig-box">
+                                  <div className="estimate-pdf-sig-label">Authorized Signature</div>
+                                  <div className="estimate-pdf-sig-party">{ownerData.companyname || signupdata.companyname}</div>
+                                  <div className="estimate-pdf-sig-img-wrap">
+                                    {ownerData.data ? (
+                                      <img src={ownerData.data} alt="Authorized Signature" className="estimate-pdf-sig-img" />
+                                    ) : (
+                                      <div style={{ height: '40px' }}></div>
+                                    )}
+                                  </div>
+                                  <div className="estimate-pdf-sig-line"></div>
+                                  <div className="estimate-pdf-sig-meta">
+                                    Date: {formatCustomDate(estimateData.createdAt || estimateData.date)}
+                                  </div>
+                                </div>
+                              ) : null}
+
+                              {estimateData.isCustomerSign ? (
+                                <div className="estimate-pdf-sig-box">
+                                  <div className="estimate-pdf-sig-label">Customer Acceptance</div>
+                                  <div className="estimate-pdf-sig-party">{estimateData.customername}</div>
+                                  <div className="estimate-pdf-sig-img-wrap">
+                                    {signatureData && signatureData.customersign ? (
+                                      <img src={`${signatureData.customersign}`} alt="Customer Signature" className="estimate-pdf-sig-img" />
+                                    ) : (
+                                      <span className="estimate-pdf-sig-placeholder">[ Sign Here to Accept ]</span>
+                                    )}
+                                  </div>
+                                  <div className="estimate-pdf-sig-line"></div>
+                                  <div className="estimate-pdf-sig-meta">
+                                    Date: {signatureData && signatureData.createdAt ? formatCustomDate(signatureData.createdAt) : '________________________'}
+                                  </div>
+                                </div>
+                              ) : null}
+                            </div>
+                          </div>
+                        ) : null}
+
+                        {/* Footer */}
+                        <div className="estimate-pdf-footer">
+                          {signupdata.companyname || 'Immaculate Homes Ltd'} • Calgary, Alberta • {signupdata.email || 'immacltd23@gmail.com'} • {signupdata.website || 'www.immaculatehomes.ca'} • "We build homes TRUST"
+                        </div>
+                      </div>
                     </div>
 
                     <div className="row">

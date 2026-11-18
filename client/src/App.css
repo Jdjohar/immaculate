@@ -96,19 +96,27 @@ th {
 }
 
 .page {
-  page-break-after: always;
-  page-break-inside: avoid;
+  page-break-inside: auto;
+  break-inside: auto;
 }
-.page, .invoice-body {
-  page-break-inside: avoid;
+.invoice-body {
+  page-break-inside: auto;
+  break-inside: auto;
 }
 
-table, tr, td {
+table {
+  page-break-inside: auto;
+  break-inside: auto;
+}
+
+tr {
   page-break-inside: avoid;
+  break-inside: avoid;
 }
 
 .no-split {
   page-break-inside: avoid;
+  break-inside: avoid;
 }
 .App-link {
   color: #61dafb;
