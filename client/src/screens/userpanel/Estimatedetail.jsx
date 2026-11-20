@@ -69,23 +69,55 @@ export default function Estimatedetail() {
     }
   };
 
+  const formatDescriptionCompact = (desc) => {
+    if (!desc) return '';
+    let clean = desc
+      .replace(/<\/(p|li|div)>/gi, '\n')
+      .replace(/<(br|br\s*\/)>/gi, '\n')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+
+    let points = clean
+      .split('\n')
+      .map(p => p.trim())
+      .filter(p => p.length > 0)
+      .map(p => p.replace(/^[-•*–—\s]+/, '').replace(/[,;]+$/, '').trim())
+      .filter(p => p.length > 0);
+
+    if (points.length <= 1) {
+      return clean.trim();
+    }
+
+    return points.join(' <span class="estimate-pdf-point-bullet">•</span> ');
+  };
+
   const getFormattedInformation = (info) => {
     if (!info) {
-      return '<p><b>Terms:</b></p><p>Quotes are valid for 30 days from the date of quotation prepared.</p><p>1 year of workmanship warranty</p><p>Basic Selection</p><p>(Extra charges may apply on upgrades)</p>';
+      return '<p><b>Terms:</b></p><p>Quotes are valid for 30 days from the date of quotation prepared.</p><p><strong>1 year of workmanship warranty</strong></p><p>Basic Selection</p><p>(Extra charges may apply on upgrades)</p>';
     }
-    if (!info.toLowerCase().includes('workmanship warranty')) {
-      if (info.includes('Quotes are valid for 30 days from the date of quotation prepared.</p>')) {
-        return info.replace(
+    let formatted = info;
+    if (!formatted.toLowerCase().includes('workmanship warranty')) {
+      if (formatted.includes('Quotes are valid for 30 days from the date of quotation prepared.</p>')) {
+        formatted = formatted.replace(
           'Quotes are valid for 30 days from the date of quotation prepared.</p>',
-          'Quotes are valid for 30 days from the date of quotation prepared.</p><p>1 year of workmanship warranty</p>'
+          'Quotes are valid for 30 days from the date of quotation prepared.</p><p><strong>1 year of workmanship warranty</strong></p>'
         );
-      } else if (info.toLowerCase().includes('terms:')) {
-        return info.replace(/(terms:?<\/[^>]+>)/i, '$1<p>1 year of workmanship warranty</p>');
+      } else if (formatted.toLowerCase().includes('terms:')) {
+        formatted = formatted.replace(/(terms:?<\/[^>]+>)/i, '$1<p><strong>1 year of workmanship warranty</strong></p>');
       } else {
-        return info + '<p>1 year of workmanship warranty</p>';
+        formatted = formatted + '<p><strong>1 year of workmanship warranty</strong></p>';
+      }
+    } else {
+      if (!formatted.includes('<strong>1 year of workmanship warranty</strong>') && !formatted.includes('<b>1 year of workmanship warranty</b>')) {
+        formatted = formatted.replace(/1 year of workmanship warranty/gi, '<strong>1 year of workmanship warranty</strong>');
       }
     }
-    return info;
+    return formatted;
   };
 
   useEffect(() => {
@@ -949,48 +981,49 @@ thead{
                     <div style={{ display: 'none' }} id='invoiceContent'>
                       <style>{`
                         .estimate-pdf-wrap {
-                          width: 100%;
-                          max-width: 800px;
+                          width: 100% !important;
+                          max-width: 100% !important;
                           margin: 0 auto;
-                          padding: 24px 28px;
+                          padding: 12px 16px;
                           background: #ffffff;
                           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-                          font-size: 12px;
-                          line-height: 1.45;
+                          font-size: 11px;
+                          line-height: 1.35;
                           color: #1e293b;
-                          box-sizing: border-box;
+                          box-sizing: border-box !important;
                         }
                         .estimate-pdf-header {
                           display: flex;
                           justify-content: space-between;
                           align-items: flex-start;
-                          padding-bottom: 18px;
+                          padding-bottom: 10px;
                           border-bottom: 2px solid #e2e8f0;
-                          margin-bottom: 16px;
+                          margin-bottom: 10px;
+                          width: 100%;
                         }
                         .estimate-pdf-brand {
                           display: flex;
                           flex-direction: column;
-                          gap: 5px;
-                          max-width: 58%;
+                          gap: 2px;
+                          width: 58%;
                         }
                         .estimate-pdf-logo {
-                          height: 65px;
+                          height: 48px;
                           width: auto;
                           object-fit: contain;
                           align-self: flex-start;
-                          margin-bottom: 4px;
+                          margin-bottom: 2px;
                         }
                         .estimate-pdf-company-name {
-                          font-size: 15px;
+                          font-size: 13px;
                           font-weight: 700;
                           color: #0f172a;
                           letter-spacing: -0.2px;
                         }
                         .estimate-pdf-company-info {
-                          font-size: 11px;
+                          font-size: 10px;
                           color: #475569;
-                          line-height: 1.4;
+                          line-height: 1.3;
                         }
                         .estimate-pdf-company-info a {
                           color: #475569;
@@ -1001,32 +1034,31 @@ thead{
                           display: flex;
                           flex-direction: column;
                           align-items: flex-end;
-                          gap: 4px;
-                          max-width: 40%;
+                          gap: 2px;
+                          width: 40%;
                         }
                         .estimate-pdf-title {
-                          font-size: 26px;
+                          font-size: 22px;
                           font-weight: 800;
                           color: #166534;
-                          letter-spacing: 1px;
+                          letter-spacing: 0.8px;
                           text-transform: uppercase;
                           line-height: 1.1;
-                          margin-bottom: 4px;
+                          margin-bottom: 2px;
                         }
                         .estimate-pdf-badge {
                           display: inline-block;
                           background: #f0fdf4;
                           color: #166534;
                           border: 1px solid #bbf7d0;
-                          padding: 3px 10px;
+                          padding: 2px 7px;
                           border-radius: 4px;
                           font-weight: 700;
-                          font-size: 12px;
+                          font-size: 10.5px;
                         }
                         .estimate-pdf-meta-text {
-                          font-size: 11.5px;
+                          font-size: 10.5px;
                           color: #64748b;
-                          margin-top: 2px;
                         }
                         .estimate-pdf-meta-text strong {
                           color: #334155;
@@ -1036,10 +1068,11 @@ thead{
                           justify-content: space-between;
                           background: #f8fafc;
                           border: 1px solid #e2e8f0;
-                          border-left: 4px solid #166534;
-                          border-radius: 6px;
-                          padding: 12px 16px;
-                          margin-bottom: 20px;
+                          border-left: 3.5px solid #166534;
+                          border-radius: 4px;
+                          padding: 8px 12px;
+                          margin-bottom: 10px;
+                          width: 100%;
                           page-break-inside: avoid;
                           break-inside: avoid;
                         }
@@ -1047,37 +1080,37 @@ thead{
                           width: 48%;
                         }
                         .estimate-pdf-section-label {
-                          font-size: 10px;
+                          font-size: 9px;
                           font-weight: 700;
                           color: #166534;
                           text-transform: uppercase;
-                          letter-spacing: 0.6px;
-                          margin-bottom: 4px;
+                          letter-spacing: 0.5px;
+                          margin-bottom: 2px;
                         }
                         .estimate-pdf-client-name {
-                          font-size: 14px;
+                          font-size: 12.5px;
                           font-weight: 700;
                           color: #0f172a;
-                          margin-bottom: 2px;
                         }
                         .estimate-pdf-client-meta {
-                          font-size: 11px;
+                          font-size: 10px;
                           color: #475569;
-                          line-height: 1.35;
+                          line-height: 1.3;
                         }
                         .estimate-pdf-job-name {
-                          font-size: 13px;
+                          font-size: 11.5px;
                           font-weight: 600;
                           color: #0f172a;
-                          margin-bottom: 2px;
                         }
                         .estimate-pdf-table-container {
-                          margin-bottom: 18px;
+                          margin-bottom: 10px;
+                          width: 100%;
                           page-break-inside: auto;
                           break-inside: auto;
                         }
                         .estimate-pdf-table {
-                          width: 100%;
+                          width: 100% !important;
+                          table-layout: fixed !important;
                           border-collapse: collapse;
                           page-break-inside: auto;
                           break-inside: auto;
@@ -1088,11 +1121,11 @@ thead{
                         .estimate-pdf-table th {
                           background: #166534;
                           color: #ffffff;
-                          font-size: 10.5px;
+                          font-size: 9.5px;
                           font-weight: 700;
                           text-transform: uppercase;
                           letter-spacing: 0.5px;
-                          padding: 9px 12px;
+                          padding: 6px 8px;
                           border: none;
                         }
                         .estimate-pdf-table th:first-child {
@@ -1111,28 +1144,36 @@ thead{
                           border-bottom: 1px solid #e2e8f0;
                         }
                         .estimate-pdf-table-row:nth-child(even) {
-                          background-color: #fafbfb;
+                          background-color: #fbfcfc;
                         }
                         .estimate-pdf-table td {
-                          padding: 10px 12px;
+                          padding: 6px 8px;
                           vertical-align: top !important;
-                          font-size: 11.5px;
+                          font-size: 10.5px;
                           color: #334155;
+                          word-wrap: break-word;
+                          overflow-wrap: break-word;
                         }
                         .estimate-pdf-item-title {
-                          font-size: 13px;
+                          font-size: 11.5px;
                           font-weight: 700;
                           color: #0f172a;
-                          margin-bottom: 4px;
                           display: block;
+                          margin-bottom: 2px;
                         }
                         .estimate-pdf-item-desc {
-                          font-size: 11px;
+                          font-size: 10px;
                           color: #475569;
-                          line-height: 1.45;
+                          line-height: 1.35;
                         }
                         .estimate-pdf-item-desc p {
                           margin: 0 0 2px 0;
+                        }
+                        .estimate-pdf-point-bullet {
+                          color: #166534;
+                          font-weight: bold;
+                          margin: 0 4px;
+                          font-size: 11px;
                         }
                         .estimate-pdf-rate {
                           font-weight: 500;
@@ -1147,23 +1188,24 @@ thead{
                         .estimate-pdf-summary-wrap {
                           display: flex;
                           justify-content: flex-end;
-                          margin-bottom: 20px;
+                          margin-bottom: 10px;
+                          width: 100%;
                           page-break-inside: avoid;
                           break-inside: avoid;
                         }
                         .estimate-pdf-summary-card {
-                          width: 320px;
+                          width: 250px;
                           background: #f8fafc;
                           border: 1px solid #e2e8f0;
-                          border-radius: 6px;
-                          padding: 12px 14px;
+                          border-radius: 4px;
+                          padding: 6px 10px;
                         }
                         .estimate-pdf-summary-line {
                           display: flex;
                           justify-content: space-between;
                           align-items: center;
-                          padding: 4px 0;
-                          font-size: 11.5px;
+                          padding: 2px 0;
+                          font-size: 10.5px;
                           color: #475569;
                         }
                         .estimate-pdf-summary-line strong {
@@ -1176,26 +1218,26 @@ thead{
                           align-items: center;
                           background: #166534;
                           color: #ffffff;
-                          padding: 8px 12px;
-                          border-radius: 4px;
-                          margin-top: 8px;
+                          padding: 5px 8px;
+                          border-radius: 3px;
+                          margin-top: 4px;
                         }
                         .estimate-pdf-total-label {
-                          font-size: 12px;
+                          font-size: 10.5px;
                           font-weight: 700;
                           letter-spacing: 0.5px;
                           text-transform: uppercase;
                         }
                         .estimate-pdf-total-val {
-                          font-size: 16px;
+                          font-size: 14px;
                           font-weight: 800;
-                          letter-spacing: -0.2px;
                         }
                         .estimate-pdf-info-wrap {
                           display: flex;
                           justify-content: space-between;
-                          gap: 16px;
-                          margin-bottom: 20px;
+                          gap: 10px;
+                          margin-bottom: 10px;
+                          width: 100%;
                           page-break-inside: avoid;
                           break-inside: avoid;
                         }
@@ -1203,109 +1245,111 @@ thead{
                           flex: 1;
                           background: #f8fafc;
                           border: 1px solid #e2e8f0;
-                          border-radius: 6px;
-                          padding: 12px 14px;
+                          border-radius: 4px;
+                          padding: 6px 10px;
                         }
                         .estimate-pdf-notes-title {
-                          font-size: 11px;
+                          font-size: 9.5px;
                           font-weight: 700;
                           color: #166534;
                           text-transform: uppercase;
                           letter-spacing: 0.5px;
-                          margin-bottom: 6px;
+                          margin-bottom: 3px;
                         }
                         .estimate-pdf-notes-content {
-                          font-size: 11px;
+                          font-size: 9.5px;
                           color: #334155;
-                          line-height: 1.45;
+                          line-height: 1.35;
                         }
                         .estimate-pdf-notes-content p {
-                          margin: 0 0 3px 0;
+                          margin: 0 0 2px 0;
                         }
                         .estimate-pdf-trust-col {
-                          width: 250px;
+                          width: 190px;
                           display: flex;
                           flex-direction: column;
                           align-items: center;
                           justify-content: center;
                           background: #f8fafc;
                           border: 1px solid #e2e8f0;
-                          border-radius: 6px;
-                          padding: 12px;
+                          border-radius: 4px;
+                          padding: 6px;
                           text-align: center;
                         }
                         .estimate-pdf-trust-title {
-                          font-size: 10px;
+                          font-size: 9px;
                           font-weight: 700;
                           color: #166534;
                           text-transform: uppercase;
                           letter-spacing: 0.5px;
-                          margin-bottom: 8px;
+                          margin-bottom: 4px;
                         }
                         .estimate-pdf-trust-img {
-                          max-height: 48px;
+                          max-height: 38px;
                           width: auto;
                           object-fit: contain;
-                          margin-bottom: 6px;
+                          margin-bottom: 3px;
                         }
                         .estimate-pdf-trust-desc {
-                          font-size: 9.5px;
+                          font-size: 8.5px;
                           color: #64748b;
-                          line-height: 1.3;
+                          line-height: 1.2;
                         }
                         .estimate-pdf-signature-wrap {
                           border: 1px solid #e2e8f0;
-                          border-radius: 6px;
+                          border-radius: 4px;
                           background: #ffffff;
-                          padding: 14px 16px;
-                          margin-bottom: 16px;
+                          padding: 8px 12px;
+                          margin-bottom: 8px;
+                          width: 100%;
                           page-break-inside: avoid !important;
                           break-inside: avoid !important;
                         }
                         .estimate-pdf-agreement-text {
-                          font-size: 10.5px;
+                          font-size: 9px;
                           color: #64748b;
                           font-style: italic;
-                          margin-bottom: 14px;
-                          line-height: 1.35;
-                          padding-bottom: 10px;
+                          margin-bottom: 6px;
+                          line-height: 1.25;
+                          padding-bottom: 4px;
                           border-bottom: 1px dashed #e2e8f0;
                         }
                         .estimate-pdf-signatures-row {
                           display: flex;
                           justify-content: space-between;
-                          gap: 30px;
+                          gap: 20px;
+                          width: 100%;
                         }
                         .estimate-pdf-sig-box {
                           flex: 1;
                         }
                         .estimate-pdf-sig-label {
-                          font-size: 10.5px;
+                          font-size: 9px;
                           font-weight: 700;
                           color: #166534;
                           text-transform: uppercase;
                           letter-spacing: 0.5px;
-                          margin-bottom: 4px;
+                          margin-bottom: 2px;
                         }
                         .estimate-pdf-sig-party {
-                          font-size: 12px;
+                          font-size: 10.5px;
                           font-weight: 700;
                           color: #0f172a;
-                          margin-bottom: 4px;
+                          margin-bottom: 2px;
                         }
                         .estimate-pdf-sig-img-wrap {
-                          height: 46px;
+                          height: 34px;
                           display: flex;
                           align-items: flex-end;
-                          margin-bottom: 4px;
+                          margin-bottom: 2px;
                         }
                         .estimate-pdf-sig-img {
-                          max-height: 44px;
-                          max-width: 170px;
+                          max-height: 32px;
+                          max-width: 140px;
                           object-fit: contain;
                         }
                         .estimate-pdf-sig-placeholder {
-                          font-size: 11px;
+                          font-size: 9.5px;
                           color: #94a3b8;
                           font-style: italic;
                         }
@@ -1313,18 +1357,19 @@ thead{
                           height: 1px;
                           background-color: #94a3b8;
                           width: 100%;
-                          margin: 4px 0 6px 0;
+                          margin: 2px 0 3px 0;
                         }
                         .estimate-pdf-sig-meta {
-                          font-size: 10px;
+                          font-size: 9px;
                           color: #64748b;
                         }
                         .estimate-pdf-footer {
                           text-align: center;
-                          padding-top: 12px;
+                          padding-top: 6px;
                           border-top: 1px solid #e2e8f0;
-                          font-size: 9.5px;
+                          font-size: 8.5px;
                           color: #94a3b8;
+                          width: 100%;
                           page-break-inside: avoid;
                           break-inside: avoid;
                         }
@@ -1386,11 +1431,11 @@ thead{
                           <table className="estimate-pdf-table">
                             <thead>
                               <tr>
-                                <th style={{ width: '52%', textAlign: 'left' }}>Scope of Work / Item</th>
+                                <th style={{ width: '50%', textAlign: 'left' }}>Scope of Work / Item</th>
                                 <th style={{ width: '10%', textAlign: 'center' }}>Qty</th>
                                 <th style={{ width: '10%', textAlign: 'center' }}>Unit</th>
-                                <th style={{ width: '14%', textAlign: 'right' }}>Price</th>
-                                <th style={{ width: '14%', textAlign: 'right' }}>Amount</th>
+                                <th style={{ width: '15%', textAlign: 'right' }}>Price</th>
+                                <th style={{ width: '15%', textAlign: 'right' }}>Amount</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -1398,7 +1443,7 @@ thead{
                                 <tr className="estimate-pdf-table-row" key={item._id}>
                                   <td>
                                     <span className="estimate-pdf-item-title">{item.itemname}</span>
-                                    <div className="estimate-pdf-item-desc" dangerouslySetInnerHTML={{ __html: item.description }} />
+                                    <div className="estimate-pdf-item-desc" dangerouslySetInnerHTML={{ __html: formatDescriptionCompact(item.description) }} />
                                   </td>
                                   <td style={{ textAlign: 'center', fontWeight: 500 }}>{item.itemquantity}</td>
                                   <td style={{ textAlign: 'center', fontWeight: 500 }}>{item.unit}</td>
